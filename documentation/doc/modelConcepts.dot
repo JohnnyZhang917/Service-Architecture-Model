@@ -1,0 +1,11 @@
+digraph model {
+
+
+Architecture -> Category [label="Taxonomy order"];
+Category -> Service [label="contains"];
+Category -> Category [label="access relation"];
+Service -> Interface [label="defined by set of"];
+Architecture -> Service [label="specifies"];
+
+Service -> Implementation [label="*"];
+}

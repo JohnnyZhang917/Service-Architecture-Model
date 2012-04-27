@@ -1,0 +1,9 @@
+*.cookie
+*.toc
+*.make
+*.pdf
+*.d
+*.log
+*.aux
+*.fls
+*.lof

@@ -1,0 +1,24 @@
+GIMP Palette
+Name: TaxoScheme 
+
+#
+213 243  15     primary 1
+158 173  57     primary 2
+127 146   4     primary 3
+223 247  61     primary 4
+228 247  98     primary 5
+ 31 204  13     secondary-a 1
+ 57 146  48     secondary-a 2
+ 15 122   3     secondary-a 3
+ 71 224  55     secondary-a 4
+101 224  88     secondary-a 5
+249 202  16     secondary-b 1
+178 154  59     secondary-b 2
+149 120   4     secondary-b 3
+251 213  62     secondary-b 4
+251 220  99     secondary-b 5
+145  13 163     complement 1
+107  40 117     complement 2
+ 86   3  98     complement 3
+181  52 199     complement 4
+185  81 199     complement 5

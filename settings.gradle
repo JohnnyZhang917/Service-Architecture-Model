@@ -1,0 +1,3 @@
+include 'canonical'
+include 'documentation'
+include 'samproto'

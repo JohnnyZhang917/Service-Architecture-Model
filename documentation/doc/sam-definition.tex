@@ -1,0 +1,396 @@
+\documentclass[a4paper,10pt]{article}
+\pagestyle{headings}
+\usepackage[utf8x]{inputenc}
+\usepackage{polski}
+\usepackage{color}
+\usepackage{transparent}
+\usepackage{graphicx}
+\graphicspath{{includes/}}
+
+\usepackage{listings}
+\usepackage{courier}
+\usepackage{amsmath}
+\usepackage{syntax}
+
+
+\newtheorem{defi}{Definition}[section]
+
+
+\definecolor{javared}{rgb}{0.6,0,0} % for strings
+\definecolor{javagreen}{rgb}{0.25,0.5,0.35} % comments
+\definecolor{javapurple}{rgb}{0.5,0,0.35} % keywords
+\definecolor{javadocblue}{rgb}{0.25,0.35,0.75} % javadoc
+
+ \lstloadlanguages{
+         Java
+ }
+ \lstset{language=Java,
+         basicstyle=\footnotesize\ttfamily, % Standardschrift
+         %numbers=left,               % Ort der Zeilennummern
+         numberstyle=\tiny\color{black},          % Stil der Zeilennummern
+         stepnumber=2,               % Abstand zwischen den Zeilennummern
+         numbersep=5pt,              % Abstand der Nummern zum Text
+         tabsize=1,                  % Groesse von Tabs
+% 	inputencoding=utf8, extendchars=\true
+         extendedchars=true,         %
+         breaklines=true,            % Zeilen werden Umgebrochen
+keywordstyle=\color{javapurple}\bfseries,
+stringstyle=\color{javared},
+commentstyle=\color{javagreen},
+morecomment=[s][\color{javadocblue}]{/**}{*/},
+    		frame=b,         
+ %        keywordstyle=[1]\textbf,    % Stil der Keywords
+ %        keywordstyle=[2]\textbf,    %
+ %        keywordstyle=[3]\textbf,    %
+ %        keywordstyle=[4]\textbf,   \sqrt{\sqrt{}} %
+         stringstyle=\color{white}\ttfamily, % Farbe der String
+         showspaces=false,           % Leerzeichen anzeigen ?
+         showtabs=false,             % Tabs anzeigen ?
+         xleftmargin=17pt,
+         framexleftmargin=17pt,
+         framexrightmargin=5pt,
+         framexbottommargin=4pt,
+         %backgroundcolor=\color{lightgray},
+         showstringspaces=false      % Leerzeichen in Strings anzeigen ?        
+ }
+    %\DeclareCaptionFont{blue}{\color{blue}} 
+
+  %\captionsetup[lstlisting]{singlelinecheck=false, labelfont={blue}, textfont={blue}}
+  \usepackage{caption}
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}{\parbox{\textwidth}{\hspace{15pt}#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
+
+
+
+
+
+
+%opening
+\title{Service Architecture Model}
+\author{Paweł Cesar Sanjuan Szklarz}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Abstract
+dokument opisujace model Service Architecture Model
+\end{abstract}
+
+\section{Introduction}
+
+% Przedstawiamy nieformalnie pojęcia występujące w modelu oraz szkicujemy kluczowe idee zawarte w Service Architecture Model(SAM).
+
+Service Architecture Model jest conceptual framework realizacji service architecture. Wszelkie produkty architektur tworzonych w podejściu SAM są zdefiniowane kodem źródłowym JAVY. SAM definiuje dodatkową semantykę związaną z architekturą i sposobem jej uruchomienia. 
+
+Wybrany do specyfikacji został język JAVA, ale realizacja w innym języku programowania z paradygmatem objektowym bez automatyczna.
+
+W tym rozdziale przedstawione są powierzchnie wszystkie elementy SAM i zaszkicowane główne idea kryjące się za modelem. Dokładne definicje i szczegółowe przedstawienie koncepcji SAM znajdują się w kolejnych rozdizałach.
+
+%  TODO dodac porównanie z EAF
+% W odróżnieniu do Enterprise Architecture Frameworks like TOGAF or NAF.
+%  powiedziec jak sie maja do siebie
+
+
+
+\subsection{Przykład architektury}
+
+% Usługa jest zdefiniowana przez zestaw interface określające API dostępu do usługi. Jako przyklad zdefiniujmy usługę składającą się z interfejsów Listing simpleService oraz complexService:
+% 
+% \lstinputlisting[label=simpleService,caption=Interface API of service]{../src/eu/pmsoft/sam/service/SimpleServiceAPI.java}
+% 
+% 
+% Najprostsza metoda \lstinline|void simpleMethod();| pozwala wywołać usługę bez argumentów i bez odpowiedzi.
+% 
+% Metoda \lstinline|DomainTypeSimple simpleDomainInstance(String basicType);| przekazuje prosty typ danych jako argument od usługi i otrzymuje w odpowiedzi objekt typu DomainTypeSimple.
+% 
+% DomainTypeSimple należy do Domain Interface, zestawu interfejs definiujące język danej dziedziny w postaci zestawu interfejsów. Tylko Typy należące do Domain Interface oraz typy proste mogą wystąpić jako argumenty i wyniki metod w interfejsach definiujących usługi.
+% 
+% 
+% 
+% \lstinputlisting[label=complexService,caption=Interface API of service]{../src/eu/pmsoft/sam/service/ComplexServiceAPI.java}
+% 
+
+
+
+\subsection{Bird eye view}
+
+
+\subsection{Features}
+
+\begin{description}
+ \item[Service live cycle] SAM określa sposób rozwoju architektury, w którym przewidziane jest nie tylko powstawanie nowych usług, ale również proces zastąpienia usług przez nowych oraz ostatecznego wyłączenia danej usługi.
+ \item[Architecture compilation] Wszystkie produkty wchodzące w skład architektury są zdefiniowanie przez kod żródłowy. Sprawdzenie poprawność architektury oraz spełnienie wymagań modelu określonego przez SAM jest możliwe poprzez kompilacja architektury oraz sprawdzenie automatyczne.
+ \end{description}
+% TODO: hacer mas fetures
+
+
+\section{Service Taxonomy Model}
+
+Określamy dokładny model produktów architektury oraz ich sposobu definiowania za pomocą kodu żródłowego JAVY. Ten rozdział należy traktorać jako referencje modelu SAM.
+
+Polecamy zapoznania się najpierw z nieformalną definicję architektury oraz przykładu przedstawioną w XXX.
+
+
+\subsection{Interface - basic construction unit}
+
+Podstawową jednostką definicji w SAM to interfejs. W dalszych opisach będziemy wykorzystywać interfejsy JAVY, ale w tym podrozdziale przedstawiamy abstrakcyjny model interfejsu oraz założenia wykorzystane w procesie tworzenia modelu SAM. Abstrakcyjne model interfejsu jest intuicjinie zgodne z interfejsami Javy, ale musi być określone w celu dokładnego zdefiniowania modelu SAM. 
+
+
+Interfejs określa Typ oraz składa się z Metody. Metoda to Typ wynikowy, nazwa metody , Parametry oraz lista możliwych wyjątków. Parametr to Typ oraz nazwa parametru. Nazwy parametrów w odrzębie metody są unikalne. Nazwy metod w odrzębie interfejsu są unikalne.
+
+% \begin{grammar}
+% [(colon){::$\Rightarrow$}]
+% [(semicolon){ $|$}]
+% [(period){ \rule{1ex}{1ex}\\}]
+% [(quote){‘}{’}]
+% Type:SimpleType,Interface
+% SimpleType:\\
+% "byte","char","short","int","long","float","double","boolean","void",\\
+% "Byte","Character","Short","Integer","Long","Float","Double","Boolean","Void","String"
+% Interface:ResultType MethodName Parametr* Exceptions*
+% ResultType:Type
+% \end{grammar}
+
+\grammarindent8em
+
+\begin{grammar}
+<statement> ::= <ident> ‘=’ <expr> \alt ‘for’ <ident> ‘=’ <expr> ‘to’ <expr> ‘do’ <statement> \alt ‘{’ <stat-list> ‘}’ \alt <empty>
+
+<stat-list> ::= <statement> ‘;’ <stat-list> | <statement>
+\end{grammar}
+
+
+% \begin{syntdiag}
+% <ident> ‘(’
+% \begin{rep} \begin{stack} \\
+% <type> \begin{stack} \\ <ident> \end{stack}
+% \end{stack} \\ ‘,’ \end{rep}
+% \begin{stack} \\ ‘...’ \end{stack} ‘)’
+% \end{syntdiag}
+
+
+
+\subsection{Domain Interface Model}
+
+\begin{defi}[Domain Interface]
+  Zbiór interfejców.
+\end{defi}
+
+Założenia:
+\begin{enumerate}
+ \item Dwa dowolne Domain Interface są rozłączne
+\end{enumerate}
+
+Zbiór wszystkich Domain Interface w architekturze określamy przez $\mathcal{D}$.
+
+Interfejsu wchodzące w skład Domain Interface definiują typy. Rozważając zbior Typów wykorzystanych w signaturze metod w Interfejsach danego Domain Interface rozdzielamy $\mathcal{D}$ na dwa rodzaje:
+
+
+\begin{defi}[Simple Domain Interface]
+  Domain Interface wykorzystające w signaturze metod tylko typy proste oraz typy wynikające z tego samego Domain Interface.
+\end{defi}
+
+\begin{defi}[Model Domain Interface]
+  Domain Interface wykorzystające w signaturze metod typy z innych Domain Interface, typy proste oraz typy wynikające z tego samego Domain Interface.
+\end{defi}
+
+Zbiór wszystkich Simple Domain Interface określamy przez $\mathcal{D}_s$. Zbiór Model Domain Interface określamy przez $\mathcal{D}_m$. Oczywiście $\mathcal{D} = \mathcal{D}_s \cup \mathcal{D}_m$.
+
+W przypadku Model Domain Interface istotne jest zbiór Domain Interface's z nim związane. Taka zależność określa relację Domain Interface dependency
+\begin{eqnarray}
+\delta \subset \mathcal{D}_m \times \mathcal{D} 
+\end{eqnarray}
+$(m,d) \in \delta$ jeżeli w sygnaturze method z interfejsów należących do $m$ wykorzystane są typy z interfejsów należących do $d$. Mówimy wtedy, że ``$m$ zależy od $d$''
+
+Założenia:
+\begin{enumerate}
+ \item Relacja $\delta$ jest acykliczna
+\end{enumerate}
+
+\subsection{Service}
+
+% USLUGA
+Service to Model Domain Interface, która nie może być wykorzystana jako zależność. Dokładnie
+
+\begin{defi}[Service]
+  Model Domain Interface $s$, dla ktorego spełniony jest warunek $\forall d\in D,  (d,s) \notin \delta$.
+\end{defi}
+
+Zbiór usług określamy przez $U$, i oczywiście $U \subset D_m$.
+
+\subsection{Taxonomy and Category}
+
+\begin{defi}[Taxonomy]
+  Relacja równoważności w zbiorze usług.
+\end{defi}
+
+\begin{defi}[Category]
+  Klasa abstrakcji Taxonomy.
+\end{defi}
+
+Taxonomy określamy przez 
+\begin{eqnarray}
+\mathcal{T} \subset \mathcal{U}  \times \mathcal{U} 
+\end{eqnarray}
+
+Rzut kanoniczne Taxonomy oznaczamy przez
+\begin{eqnarray}
+cat: U \rightarrow \mathcal{T}
+\end{eqnarray}
+
+\subsection{Implementation}
+
+% Określenie Implementacji wymaga zdefiniowania modelu Inverse of Control Model (IoCM). Dokładna definicja patrz w XXX 
+% 
+% Usługa składa się ze zbioru Interface's. Implementacja składać się będzie oczywiście ze zbioru klas implementujących tych Interface's. Naturalne przepisanie jednej klasy do jednego interfejsu nie jest adekwatne do zdefiniowania Implementacji. Wynika to z faktu, że wykorzystanie usługi odbywać się będzie przez injektowania referencji klasy w kodzie klienta, ale wybór klasy do injektowania może nie być jednoznaczne i zależyć będzie od mapowania IoC określone w Implementacji.
+% 
+% \begin{defi}\label{Implementation}
+%   Implementacja to Module w modelu IoCM oraz zbiór klas wynikających z tego Module.
+% \end{defi}
+% TODO uproszczony model, ale latwiej pokazac
+% latwiej bedzie okreslic implementacja jako proste mapowanie. Tak nie bedzie prototypu w specyfikacji, a w kodzie to juz zrobie jak trzeba.
+
+Implementacja jest związana z jedną Usługą. Możliwe jest tworzenie wiele implementacji do jednej usługi, proces uruchomienia oraz współpracy jest określone w Service execution enviroment.
+
+\begin{defi}[Implementation]
+  Mapowanie określające klas implementacji dla każdego interfejsu z jednej Usługi.
+\end{defi}
+
+Zbiór wszystkich Implementation w architekturze określamy przez $\mathcal{I}$. 
+
+Funkcję 
+\begin{eqnarray}
+ impl: \mathcal{I}  \rightarrow \mathcal{U}
+\end{eqnarray}
+ przypisuje Implementation do realizowanej Service.
+
+W klasach danej implementacji możliwe jest injektowanie interfejsów z innych usług. Określamy relację:
+\begin{eqnarray}
+\kappa \subset \mathcal{I} \times \mathcal{U}
+\end{eqnarray}
+$(i,u) \in \kappa$ jeżeli w klasach $i$ deklarowane są injektowania do interfejsów z $u$. Mówimy wtedy, że ``Implementacja $i$ stosuje Usługę $u$'' oraz że ``Implementacja $i$ jest klientem Usługi $u$''. Zbiór stosowanych usług w Implementacji $i$ określamy przez $K(i) := \{ u : (i,u)\in \kappa \} \subset \mathcal{U}$.
+
+
+\subsection{Service dependencies}
+
+Określamy relację Category Accessibility:
+\begin{eqnarray}
+\pi \subset \mathcal{T} \times \mathcal{T}
+\end{eqnarray}
+
+Jeżeli mamy $(c_1,c_2) \in \tau$, to mówimy że Category $c_2$ jest dostępna dla Category $c_1$.
+
+Relacja Category accessibility $\pi$ służy do ograniczenia stosowanych Usług w Implementacjach. Mowi o tym następujące założenie.
+
+Założenia
+\begin{enumerate}
+ \item $ \forall u_x \in K(i),  (cat(impl(i)),cat(u_x)) \in \tau$.
+\end{enumerate}
+
+
+To założenie określa, że w przypadku spełnienia warunków:
+\begin{itemize}
+\item Implementacja $i$ implementuje Usługę $u$ [$Impl(i) = u $]
+\item Implementacja $i$ stosuje Usługę $u_x$ [$ u_x \in K(i)$, czyli $(i,u_x)\in\kappa$ ]
+\item Usługa $u$ należy do Kategorii $C$ [$u\in C$]
+\item Usługa $u_x$ należy do Kategorii $C_x$ [$u_x\in C_x$]
+\end{itemize}
+
+wymagane jest aby Category $C_x$ była dostępna dla Category $C_1$ [$(C_1,C_x)\in \tau $].
+
+
+\section{Service Call Canonical Protocol}
+\subsection{Domain Interface Gramma}
+\subsection{Service interaction}
+\subsection{Delayed logic feature}
+
+\section{Service Implementation}
+\subsection{IoC bind mapping}
+\subsection{Service Provider Implementation}
+\subsection{External service binding}
+\subsection{Prototype implementations}
+
+\section{Service execution enviroment}
+\subsection{Service instance}
+\subsection{Execution Context}
+\subsection{Service injection}
+\subsection{Enviroment provider}
+
+\section{Service live cycle}
+\subsection{Versioning}
+\subsection{Service definition rozwinięciu}
+\subsection{Service transition proces}
+
+
+
+% TODO dokldanie opisac abstrakcyjny model IoC, tak aby wytlumaczyc podczepienie implementacji zamiast prototypu
+% \section{Inverse of Control Model}
+% 
+% Przedstawiony model odwzorowuje się na bibliotece Guice, ale nie implikuje w żaden sposób konieczność wykorzystania tej biblioteki w implementacji usług. Patrz (http://code.google.com/p/google-guice/wiki/ExtendingGuice#Core_Abstractions).
+% 
+% \begin{description}
+%  \item[InjectionPoint] A constructor, field or method that can receive injections. Typically this is a member with the @Inject annotation. For non-private, no argument constructors, the member may omit the annotation. Each injection point has a collection of dependencies.
+%  \item[Key] A type, plus an optional binding annotation.
+%  \item[Dependency]  A key, optionally associated to an injection point. These exist for injectable fields, and for the parameters of injectable methods and constructors. Dependencies know whether they accept null values via an @Nullable annotation.
+%  \item[Element] A configuration unit, such as a bind or requestInjection statement. Elements are visitable.
+%  \item[Module] A collection of configuration elements. Extracting the elements of a module enables static analysis and code-rewriting. You can inspect, rewrite, and validate these elements, and use them to build new modules.
+%  \item[Injector] Manages the application's object graph, as specified by modules. SPI access to the injector works like reflection. It can be used to retrieve the application's bindings and dependency graph.
+%  \end{description}
+
+
+
+% 
+% \subsection{pojęcia modelu}
+% 
+% Architektura składa się z produktów, należących do przedstawionych poniżej rodzajów.
+% 
+% % INTERFACE
+% 
+% Intujcjinie Interface to interface javy posiadający metody oraz określające typ objektów.
+% 
+% %DI
+% Domain Interface (DI) to zbiór interfejców. Dwa dowolne DI są rozłączne. Zbiór DI w architekturze określamy przez $D$
+% 
+% DI w którym wykorzystane są w signaturze metod interfejsów tylko typy proste oraz typy należące do tego samego DI, nazywamy Simple Domain Interface (SDI). Zbiór wszystkich SDI określamy przez $D_s$.
+% 
+% DI wykorzystające w signaturze metod typy z innych DI, nazywamy Model Domain Interface (MDI). Zbiór MDI określamy przez $D_m$.
+% Oczywiście, $D = D_s \cup D_m$.
+% 
+% Określamy relację DI-dependency $\delta \subset D_m\times D$: Jeżeli w MDI $m$ wykorzystane są typy z DI $d$, to mówimy że ``$m$ zależy od $d$'' i piszemy $(m,d) \in \delta$. Wymagamy aby relacja DI-dependency $\delta$ była acykliczna.
+% 
+% % USLUGA
+% Usługa $s$ to MDI, która nie może być wykorzystana jako zależność. To jest $\forall d\in D,  (d,s) \notin \delta$. Zbiór usług określamy przez $U$, i oczywiście $U \subset D_m$.
+% 
+% 
+% % IMPLEMENTACJA
+% Nieformalnie Implementacja to realizacja wybranej jednej usługi, mówimy wtedy że Implementacja $i$ implementuje Usługę $u$. Zbiór Implementacji określamy przez $I$. Możliwe jest wystąpienie wiele Implementacji tej samej usługi. Określamy więc funkcję $Impl:I \rightarrow U$. $Impl(i) = u$ jeżeli $i$ implementuje $u$.
+% 
+%  Dokładna definicja Implementacji jest związana z mapowaniem określającym klasy implementujące interfejsców wchodzących w skład usługi, jak zobaczymy w XXX definiowanie tego mapowania jest związane z IoC i wymaga wprowadzenia dodatkowych pojęć. 
+% 
+% Określamy relację Impl-dependency $\kappa \subset I \times U$. Jeżeli $(i,u) \in \kappa$, to w klasach Implementacji $i$ wykorzystane jest injektowanie interfejsów z usługi $u$. Mówimy wtedy, że ``Implementacja $i$ stosuje Usługę $u$'' oraz że ``Implementacja $i$ jest klientem Usługi $u$''. Zbiór stosowanych usług w Implementacji $i$ określamy przez $K(i) \subset U$.
+% 
+% % KATEGORIA
+% Kategoria to zbiór usług. Wszystkie kategorie są rozłączne. Zbiór kategorii określamy przez $C$DUZE. Każda usługa $u$ należy do jednej kategorii, którą znaczamy przez $CC(u)$ i mowimy, że usługa $u$ jest przypisana do $CC(u)$.
+% 
+% $CC : U \rightarrow C$.
+% 
+% Określamy relację C-accesible $\tau \subset C \times C$. Jeżeli mamy $(c_1,c_2) \in \tau$, to mówimy że Kategoria $c_2$ jest dostępna dla Kategorii $c_1$.
+% 
+% Relacja C-accesible $\tau$ służy do ograniczenia stosowanych Usług w Implementacjach.
+% Nieformalnie jeżeli zachodzą następujące warunki
+% \begin{itemize}
+% \item Implementacja $i_1$ implementuje Usługę $u_1$ [$Impl(i_1) = u_1 $]
+% \item Implementacja $i_1$ stosuje Usługę $u_x$ [$(i_1,u_x)\in\kappa$ lub $ u_x \in K(i_1)$]
+% \item Usługa $u_1$ należy do Kategorii $C_1$[$u_1\in C_1$]
+% \item Usługa $u_x$ należy do Kategorii $C_x$[$u_x\in C_x$]
+% \end{itemize}
+% 
+% to wymagamy aby Kategoria $C_x$ była dostępna dla Kategorii $C_1$ [$(C_1,C_x)\in \tau $].
+% 
+% Dokładnie wymagamy, aby $ \forall u_x \in K(i_1),  (CC(Impl(i_1)),CC(u_x)) \in \tau$.
+
+
+\end{document}

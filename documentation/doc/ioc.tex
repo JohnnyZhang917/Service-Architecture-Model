@@ -1,0 +1,112 @@
+\section{Dependency Injection Model}
+\label{sec:ioc}
+
+Dependency Injection Model define a Injection Process to instantiate instances of classes with injected dependencies. This is a self-containing abstract model independent of Service Architecture Model.
+
+Dependency Injection Model idea is based on Guice dependency injection framework abstraction model, but it cover only explicitly defined bindings. All injection frameworks know to the author are compatible with this model, only specific configuration details change. For details Guice Abstract Model see \url{http://code.google.com/p/google-guice/wiki/ExtendingGuice#Core_Abstractions}.
+
+The used subset of the Guice Abstract Model is selected to provide only external injection configurations. In this way, the injection process can be controlled from a external execution environment. This feature is used on the definition of the Service Execution Environment.
+
+Use of Guice library is NOT necessary to implement the Dependency Injection Model nor Service Architecture Model.
+
+This definition is provided in the context of the Java language, but any semantically equivalent implementation in other languages are possible.
+
+\subsection{Binding Provider}
+
+\begin{defi}[Binding Annotation]
+  A Java annotation instance.
+\end{defi}
+
+\begin{defi}[Injection Point]
+  A constructor argument, field or method argument of a Java Class that can receive injections, plus an optional binding annotation.
+\end{defi}
+
+Usually Injection Point are annotated with the \lstinline|javax.inject.Inject| annotation.
+
+\begin{defi}[Key]
+  A pair containing a Type and a Binding Annotation or empty set $\emptyset$.
+\begin{eqnarray}
+(\text{Type}&,&\text{Binding Annotation}) \nonumber \\
+(\text{Type}&,&\emptyset) \nonumber 
+\end{eqnarray}
+\end{defi}
+
+A Key is represented by a object of type \lstinline|com.google.inject.Key<T>|.
+
+\begin{defi}[BindingProvider interface]
+  \lstinline|BindingProvider| interface defined by listing \ref{BindingProvider}.
+\lstinputlisting[label=BindingProvider,caption=BindingProvider Interface]{../srcAPI/eu/pmsoft/inject/BindingProvider.java}
+\end{defi}
+
+\begin{defi}[Binding Provider]
+  on a set of Annotation Types $B$ for a set of Types $T$ is a implementation of \lstinline|BindingProvider| interface that retrieve a instance of type \lstinline|javax.inject.Provider<T>| for each possible generated \lstinline|com.google.inject.Key<T>| using ($T$,$B$). 
+\end{defi}
+
+Type \lstinline|javax.inject.Provider<T>| has method \lstinline|T get();| used to retrieve a instance of Type \lstinline|T| as marked in Key.
+
+\subsection{Injection Process}
+\label{sec:iocIP}
+
+Given a Binding Provider, the process of creation of instances by a Key is given by
+
+\begin{defi}[Injection Process]
+  The algorithm to retrieve an instance of Type $T$ for Key $k$ of type $<T,\beta>$ using a Binding Provider \lstinline|binding| defined as follow:
+  \begin{enumerate}
+   \item retrieve provider for key $k$ and execute internal Provider logic
+
+  \lstinline|javax.inject.Provider<T> p = binding.getProvider(k);|
+
+  \lstinline|T = p.get();|
+
+   \item Provider $p$ can return a already existing instance of Type $T$ and finish.
+   \item If this is a recursive execution of Injection Process that generate a cyclic dependency on Provider $p$, then return a Proxy instance that will delay further steps of Injection Process until first method call to that Proxy. Proxy instance executes ones the Injection Process and fix the retrieved instance to redirect all methods calls to it.
+   
+  \item Provider choose a class constructor to create a new instance on base of Key information $<T,\beta>$.
+  
+Internal Provider logic must produce a instance with the same references on injection points as given by the following steps
+
+   \item Find all \textbf{constructor argument} Injection Point on the constructor that Provider $p$ will use to instantiate the instance
+   \item Find all \textbf{method argument} Injection Points on the class that Provider $p$ will use to instantiate the instance
+   \item Find all \textbf{field} Injection Points on the class that Provider $p$ will use to instantiate the instance
+   \item For each Injection Point from 5), look for matching Keys and run the Injection Process
+   \item Use retrieved instances from 8) as arguments to execute the selected constructor
+   \item For each Injection Point from 6), look for matching Keys and run the Injection Process
+   \item For each Injection Point from 7), look for matching Keys and run the Injection Process
+   \item Use retrieved instances from 10) as arguments to related Injection Point methods
+   \item Use retrieved instances from 11) to set related Injection Point field reference
+  \end{enumerate}
+
+Provider behavior can be externally controlled.
+\end{defi}
+
+
+ \subsection{Binding Replacement}
+ 
+ When deploying a Service Implementation on a Service Execution Environment, it is necessary to change a Prototype implementation of a service with some other implementations. This section define the Binding Replace operation to make that change.
+ 
+ \begin{defi}[Binding Replacement]
+   is a operation that generate a new Binding Provider on base of Binding Provider $\tilde{b}$ and a pair consisting on Binding Provider $b$ and set of Keys $K$.
+ \begin{eqnarray}
+ BReplace(\tilde{b},(b,K))
+ \end{eqnarray}
+ Binding Provider $BReplace(b,(b,K))$ retrieve Providers using logic:
+ \begin{equation}
+ BReplace(\tilde{b},(b,K)).get(key) = \left\{\begin{aligned}
+          \tilde{b}.get(key) & \quad \text{if} \quad key\notin K\\
+          b.get(key) & \quad \text{if} \quad key\in K
+        \end{aligned}\right.
+ \end{equation}
+ 
+ 
+  For a set of pairs $\{(b_i,K_i)\}$ of Binding Provider and set of Keys, such that $K_i$ are mutually disjoin define
+ \begin{equation}
+ BReplace(\tilde{b},\{(b_i,K_i)\}) = \left\{\begin{aligned}
+          \tilde{b}.get(key) & \quad \text{if} \quad key\notin \bigcup K_i\\
+          b_i.get(key) & \quad \text{if} \quad key\in K_i
+        \end{aligned}\right.
+ \end{equation}
+ 
+ \end{defi}
+ 
+
+

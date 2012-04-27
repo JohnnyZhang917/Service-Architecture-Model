@@ -1,0 +1,147 @@
+\documentclass[a4paper]{article}
+\pagestyle{headings}
+\usepackage[utf8x]{inputenc}
+% \usepackage{polski}
+\usepackage{color}
+\usepackage{transparent}
+\usepackage{graphicx}
+\graphicspath{{images/}}
+\usepackage{listings}
+\usepackage{courier}
+\usepackage{amsmath}
+\usepackage{syntax}
+\usepackage{url}
+
+
+
+\usepackage{wrapfig}
+
+\grammarindent8em
+\newtheorem{defi}{Definition}[section]
+
+\definecolor{javared}{rgb}{0.6,0,0} % for strings
+\definecolor{javagreen}{rgb}{0.25,0.5,0.35} % comments
+\definecolor{javapurple}{rgb}{0.5,0,0.35} % keywords
+\definecolor{javadocblue}{rgb}{0.25,0.35,0.75} % javadoc
+
+ \lstloadlanguages{
+         Java
+ }
+ \lstset{language=Java,
+         basicstyle=\footnotesize\ttfamily, % Standardschrift
+         %numbers=left,               % Ort der Zeilennummern
+         numberstyle=\tiny\color{black},          % Stil der Zeilennummern
+         stepnumber=1,               % Abstand zwischen den Zeilennummern
+         numbersep=5pt,              % Abstand der Nummern zum Text
+         tabsize=1,                  % Groesse von Tabs
+% 	inputencoding=utf8, extendchars=\true
+         extendedchars=true,         %
+         breaklines=true,            % Zeilen werden Umgebrochen
+keywordstyle=\color{javapurple}\bfseries,
+stringstyle=\color{javared},
+commentstyle=\color{javagreen},
+morecomment=[s][\color{javadocblue}]{/**}{*/},
+    		frame=b,         
+ %        keywordstyle=[1]\textbf,    % Stil der Keywords
+ %        keywordstyle=[2]\textbf,    %
+ %        keywordstyle=[3]\textbf,    %
+ %        keywordstyle=[4]\textbf,   \sqrt{\sqrt{}} %
+         stringstyle=\color{white}\ttfamily, % Farbe der String
+         showspaces=false,           % Leerzeichen anzeigen ?
+         showtabs=false,             % Tabs anzeigen ?
+         xleftmargin=17pt,
+         framexleftmargin=17pt,
+         framexrightmargin=5pt,
+         framexbottommargin=4pt,
+         %backgroundcolor=\color{lightgray},
+         showstringspaces=false      % Leerzeichen in Strings anzeigen ?        
+ }
+    %\DeclareCaptionFont{blue}{\color{blue}} 
+
+  %\captionsetup[lstlisting]{singlelinecheck=false, labelfont={blue}, textfont={blue}}
+  \usepackage{caption}
+\DeclareCaptionFont{white}{\color{white}}
+\DeclareCaptionFormat{listing}{\colorbox[cmyk]{0.43, 0.35, 0.35,0.01}{\parbox{\textwidth}{\hspace{15pt}#1#2#3}}}
+\captionsetup[lstlisting]{format=listing,labelfont=white,textfont=white, singlelinecheck=false, margin=0pt, font={bf,footnotesize}}
+
+
+
+\newcommand{\jls}{The Java\texttrademark Language Specification}
+\newenvironment{zalozenie}{\textbf{Assumptions}:\begin{enumerate}}{\end{enumerate}}
+
+
+%opening
+\title{Service Architecture Model \\ Draft 0.2}
+\author{Paweł Cesar Sanjuan Szklarz \\ \texttt{paweld2@gmail.com}}
+\date{\today}
+
+
+
+
+
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Service Architecture Model (SAM) is a mathematical model for definition of service oriented architectures. SAM Architecture products are defined using code and precisely defined relations. Validation of architecture is based on a compilation process. It is also possible to automatically verify implementations compliance with service specifications. A development and verification process for service implementation is also defined. A key idea behind SAM is the use of a canonical execution protocol, intuitively related to ``methods execution recording''.
+\end{abstract}
+
+\null\vfill
+\noindent
+\includegraphics[scale=0.5]{by-nc-nd}
+This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+
+\noindent\line(1,0){340}
+
+\noindent
+Copyright \textcopyright 2011 Paweł Cesar Sanjuan Szklarz
+
+\newpage
+% \input{title}
+
+\tableofcontents 
+\null\vfill\noindent\newpage
+\listoffigures
+\null\vfill\noindent\newpage
+\input{introduction}
+\null\vfill\noindent\newpage
+\input{definition}
+\null\vfill\noindent\newpage
+\input{ioc}
+\null\vfill\noindent\newpage
+\input{execution}
+
+\section{Model Concepts}
+
+\begin{figure}
+ \centering
+ \includegraphics[width=1\textwidth]{modelConcepts}
+ \caption{Model Concepts relations}
+ \label{fig:robotq}
+\end{figure}
+
+
+% \null\vfill\noindent\newpage
+% \
+% \section{TODO}
+% \label{sec:todo}
+% 
+% \textbf{Document has draft status}, this section \ref{sec:todo} contain a list of TODO issues for author's use.
+% 
+% List of topic that may require refinement or more detailed explication.
+% \begin{enumerate}
+%  \item Use of Generics on Domain Specifications.
+%  \item Async calls on Canonical execution protocol
+%  \item Extend Basic Types to contain Class Types.
+%  \item Service interaction optimalization based on stateless Service Implementation and Data Services (instance related to a datasource): it may be faster to create locally a shadow Service Instance on the same machine and run interaction on one virtual machine, but result must be the same after optimalization. When and how to optimalize.
+%  \item Use cases of service interaction, specially one showing not interconnected instances exchanging methods calls.
+%  \item Provide a formal definition of Dependency Injection Model and Service Execution Enviroment, may be as a abstract implementations.
+%  \item how to handle exceptions and use checked exception declarations on Architecture Interfaces?
+% \end{enumerate}
+
+
+
+
+
+\end{document}

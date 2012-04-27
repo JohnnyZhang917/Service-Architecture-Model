@@ -1,0 +1,177 @@
+
+
+\section{Service Execution Environment}
+\label{sec:SEE}
+
+Creation of Service Instances and management of Service injection is fully controlled by a Service Execution Environment. This section defines a model for configuration of a Service Execution Environment. Concrete implementations may use internally a different approach, nevertheless Service Execution Environment interaction as defined on this section require exchange of information according to the presented model.
+
+\subsection{Configuration Model}
+
+Service Instance is a execution of a Service Implementation, it is a instantiation of the Binding Provider given by the Service Implementation. It is possible to create many Service Instance using the same Service Implementation, also different Service Implementations may be used to create Service Instance on the same Service Execution Environment. Each Service Instance has a unique Service Instance ID (IID).
+
+Note that instantiation of the Binding Provider do not require instantiation of classes implementing the Service Specification Interfaces. Only after the first method execution, the injection process must executed.
+
+The set of Service Instances ID on a Service Execution Environment is denoted by $\Omega$.
+
+Define function $provider$ such that retrieve the Service Implementation used to create a Service Instance.
+\begin{eqnarray}
+ provider: \Omega  \rightarrow \mathcal{P}
+\end{eqnarray}
+
+Remark that for a Service Implementation, function $spec$ give the Service Specification implemented  and function $injected$ give the Set of Injected Service Specifications.
+
+\begin{eqnarray}
+spec &:& \mathcal{P}  \rightarrow \mathcal{S} \nonumber \\
+injected &:& \mathcal{P} \rightarrow 2^\mathcal{S} \nonumber
+\end{eqnarray}
+
+
+
+
+\begin{defi}[Injection Configuration]
+  is a mapping
+\begin{eqnarray}
+config : \Omega \times \mathcal{S} \rightarrow \Omega
+\end{eqnarray}
+such that
+\begin{eqnarray}
+\forall \alpha \in \Omega \quad \forall i \in injected(provider(\alpha)) \nonumber\\ 
+spec(provider(config(\alpha,i))) = i
+\end{eqnarray}
+\end{defi}
+
+% This means that Injection Configuration provide for each Service Instance ID and fixed Service Specification a Service Instance ID of a Service Instance of the fixed Service Specification, so that it can be injected on the Service Implementation.
+
+Condition on Injection Configuration ensure that given Service Instance ID by mapping $config$ is a good candidate for replacing injected Service Specifications on a Service Implementation.
+
+
+
+\subsection{Service Instance creation}
+
+To create a Service Instance for a given Service Implementation each Injection Point is bind to the Service Instance marked be the Injection Configuration.
+
+\begin{defi}[Service Instance creation algorithm]
+  To create a Service Instance for Service Implementation $p\in\mathcal{P}$:
+  \begin{enumerate}
+   \item create a new IID $\alpha$ and extend Injection Configuration $config$.
+   \item for each injected service
+\begin{eqnarray}
+i \in injected(p) \nonumber
+\end{eqnarray}
+    create the pair $(b_i,K_i)$ (Binding Provider,Key set) given be (Service Implementation with IID = $config(\alpha,i)$ , maximum set of Keys generated with Service Specification $i$).
+   \item create a new Binding Provider
+\begin{equation}
+  \tilde{p} = BReplace(p,\{(b_i,K_i)\}) \nonumber
+\end{equation}
+  \item the new Service Instance is the execution of Binding Provider $\tilde{p}$.
+  \end{enumerate}
+\end{defi}
+
+Dynamic change of Injection Configuration, it is change of injected Service Instance during execution are not defined. It may be possible, but require additional assumptions on internal Service Instance execution.
+
+\subsection{Environment interaction}
+
+Given two Injection Configurations over the same Architecture
+\begin{eqnarray}
+config_1 : \Omega_1 \times \mathcal{S} \rightarrow \Omega_1 \nonumber \\
+config_2 : \Omega_2 \times \mathcal{S} \rightarrow \Omega_2 \nonumber 
+\end{eqnarray}
+it is possible to define a merged one as
+\begin{eqnarray}
+config &:& \Omega_1 \cup \Omega_2 \times \mathcal{S} \rightarrow \Omega_1 \cup \Omega_2 \nonumber \\
+config(\alpha,s) &=& \left\{\begin{aligned}
+         config_1(\alpha,s) & \quad \text{if} \quad \alpha \in \Omega_1\\
+         config_2(\alpha,s) & \quad \text{if} \quad \alpha \in \Omega_2
+       \end{aligned}\right. \nonumber
+\end{eqnarray}
+
+Using the merged Injection Configurations, it is possible to create new Service Instance with injections belonging to the set $\Omega_1\cup\Omega_2$.
+
+Given two separate Service Execution Environments, it is possible to interconnect Service Instances using a merged Injection Configuration as above. This is a key feature to allow extension of the Service Execution Environment to a distributed environment.
+
+\subsection{Canonical Execution Protocol}
+
+% Interaction between Service Instances is defined using a abstract information exchange protocol called Canonical Execution Protocol. Service Instance internal generate sentences of a fixed grammar, this sentences are interpreted by the Service Execution Environment and produce of methods of Service Instance according to Injection Configuration.
+
+Service Instance interaction in a Service Execution Environment is defined by exchange of messages using the following Canonical Execution Grammar.
+
+\begin{defi}[Canonical Execution Grammar]
+\end{defi}
+\begin{grammar}
+<serviceExecution> ::= <execution> 'PAYLOAD' <payload>
+
+<execution> ::= <methodCall>*
+
+<methodCall> ::= <objectid> METHOD_SIGNATURE '(' <objectid>* ')' <objectid>? 
+
+<objectid> ::= 'r_' INTEGER | 'i_' INTEGER
+
+<payload> ::= <objectPayload>*
+
+<objectPayload> ::= <objectid> '=' <objectData>
+
+<objectData> ::= <bindingData> | <serializationData> | <typeData>
+
+<bindingData> ::= 'KEY<' TYPE ',' BINDING_ANNOTATION '>' 
+
+<serializationData> ::= OBJECT_SERIALIZATION
+
+<typeData> ::= 'TYPE<' TYPE '>'
+\end{grammar}
+METHOD_SIGNATURE, INTEGER, TYPE, BINDING_ANNOTATION and OBJECT_SERIALIZATION are literal categories.
+
+
+Calls to methods from Interfaces of Service Specifications can be serialized to a \textbf{Canonical Request} using the Canonical Execution Grammar. The following rules apply:
+\begin{enumerate}
+ \item Create one \synt{serviceExecution} production to record methods calls.
+ \item For each method call create a \synt{methodCall} [see 4)] and add it to the list on \synt{execution} of \synt{serviceExecution}
+ \item If called object reference has no related \synt{objectid}, then 
+
+Create a new \synt{objectid} using 'i_' and increasing integer value for literal INTEGER 
+
+Create a new \synt{objectPayload} for this object. 
+
+Remember Object reference relation to generated \synt{objectid}. 
+
+Add \synt{objectPayload} to \synt{payload} of \synt{serviceExecution}
+
+ \item \synt{methodCall} is created using
+
+ \synt{objectid} related to object reference called
+
+ Unique METHOD_SIGNATURE literal as a hash function of the executed method signature
+
+ '('
+
+\synt{objectid} for each object reference argument 
+
+')' 
+
+ If method has  void/VOID return Type, then no final \synt{objectid} element is added. Otherwise:
+
+Create a new \synt{objectid} using 'r_' and increasing integer value for literal INTEGER 
+
+Create a new \synt{objectPayload} production with alternative \synt{typeData}.
+ 
+\item If object reference on 3) is a injected object reference of a Interface of a Service Specification, then use \synt{bindingData} alternative, otherwise use \synt{serializationData}
+ \item To produce \synt{bindingData} use Type and Binding Annotation of Key associated to the injected object reference.
+ \item To produce \synt{serializationData} use a unique serialization method for objects.
+\end{enumerate}
+
+
+Service Execution Environment is capable to repeat method's calls on base of Canonical Requests: for a Canonical Request produced on Service Instance with IID $i$
+\begin{enumerate}
+ \item for a given \synt{bindingData}, deserialize Key $k$ and find relative Service Specification $s$ for TYPE.
+ \item find Service Instance ID to call using the Injection Configuration
+
+\begin{eqnarray}
+e = config(i,s)
+\end{eqnarray}
+
+ \item On Service Instance with IID $e$ call the BindingProvider with Key $k$ to get object $o$
+ \item Repeat method call on object $o$.
+%  \item If method return type is a interface type, then associate the final \synt{objectid} of \synt{methodCall} to the returned reference and continue with next \synt{methodCall}.
+\end{enumerate}
+
+
+Note that it is possible to pass object references returned from one service as arguments to other service. In this case the Service Execution Environment must pass a object reference to a Proxy and serialize methods call to it as methods call to a injected object. This process can produce service interaction between Service Instances not directly interconnected.

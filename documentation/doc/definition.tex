@@ -1,0 +1,244 @@
+\newpage
+\section{Service Architecture Model}
+\label{sec:samModel}
+This section define precisely all the Service Architecture Model concepts and assumptions.
+
+To remark the use of SAM concepts on the text Start Case is used for concept names.
+
+Defined sets and relations are related to one Architecture defined using Service Architecture Model.
+
+\subsection{Types and Interface}
+
+A object oriented approach is taken to define Types and Interfaces.
+
+\begin{defi}[Basic Type]
+  A predefined set of primitive types.
+\end{defi}
+
+A concrete list of accessible Basic Types is related to a given implementation of SAM. Bindings to specific programming languages may define mappings between provided Basic Types on SAM implementation and language types.
+
+\begin{defi}[Type]
+  Basic Type and Interface Types uniquely defined by a Interface.
+\end{defi}
+
+\begin{defi}[Interface]
+  Interface is a set of methods. Method signature is defined by a
+\begin{itemize}
+ \item method Name
+ \item return Type
+ \item list of arguments (list of Types)
+\end{itemize}
+\end{defi}
+
+An Interface should be uniquely identified by a name.
+
+% \begin{zalozenie}
+%  \item Architecture Interfaces don't have class members.
+% \end{zalozenie}
+
+
+The set of Interfaces is denoted by $\mathcal{I}$. The set of Types is denoted by $\mathcal{T}$. The set of Basic Types is denoted by $\mathcal{B}\subset\mathcal{T}$.
+
+The mapping between Interface and corresponding Interface Type is denoted by function $t$
+\begin{eqnarray}
+t:\mathcal{I}\rightarrow\mathcal{T}
+\end{eqnarray}
+and implies also a function $\tilde{t}$ between Interfaces sets to Types sets defined as:
+\begin{eqnarray}
+\tilde{t}:2^\mathcal{I}\rightarrow 2^\mathcal{T} \quad
+ \tilde{t}(\{i_1,\dots,i_\alpha\}) := \{t(i_1),\dots,t(i_\alpha) \}
+\end{eqnarray}
+
+\begin{defi}[Signature Relation]
+  Interface `$i$' is signature related to Type `$t$' if a method signature of `$i$' contains `$t$'. This relation is denoted by set `$\mathring{s}$':
+\begin{eqnarray}
+\mathring{s}\subset \mathcal{I}\times \mathcal{T}
+\end{eqnarray}
+\end{defi}
+
+\begin{defi}[Signature Maps]
+The Signature Map is the function $s$
+\begin{eqnarray}
+&s:\mathcal{I}\rightarrow 2^\mathcal{T}&
+\end{eqnarray}
+given by the statement:
+\begin{eqnarray}
+&(i,t) \in \mathring{s} \Rightarrow t\in s(i) &\nonumber
+\end{eqnarray}
+
+A set version of the Signature Map is defined by function $\tilde{s}$
+\begin{eqnarray}
+&\tilde{s}:2^\mathcal{I}\rightarrow 2^\mathcal{T}& 
+\end{eqnarray}
+defined as 
+\begin{eqnarray}
+&\tilde{s}(\{i_1,\dots,i_\alpha\}) := s(i_1) \cup \dots \cup s(i_\alpha) &
+\end{eqnarray}
+
+\end{defi}
+
+\begin{zalozenie}
+ \item For a given Architecture, Signature methods of Interfaces use only Basic Types or Types defined by Interfaces belonging to the given Architecture.
+\end{zalozenie}
+
+\subsection{Domain Specification Model}
+
+\begin{defi}[Domain Specification]
+  A named set of Interfaces.
+\end{defi}
+
+\begin{zalozenie}
+ \item Domain Specifications on Architecture are mutually disjoint.
+\end{zalozenie}
+
+% The set of Interfaces is denoted by $\mathcal{I}$. The set of Types related to $\mathcal{I}$ is denoted by $\mathcal{T}$. The set of Basic Types is denoted by $\mathcal{B}\subset\mathcal{T}$.
+
+The set of Domain Specifications is denoted by $\mathcal{D}$. Because for $d \in \mathcal{D}$ we have $d \subset 2^\mathcal{I}$, function $\tilde{t}$ and $\tilde{s}$ are well defined on $\mathcal{D}$.
+
+\begin{defi}[Domain Dependency Relation]
+  Domain Specification $d_1$ \textbf{depends on} Domain Specification $d_2$ $[(d_1,d_2)\in \delta]$, if a Type related to a Interface belonging to $d_2$ is used on a method signature of a Interface belonging to $d_1$
+\begin{eqnarray}
+ &\delta \subset \mathcal{D} \times \mathcal{D} &\\
+&\tilde{t}(d_2) \cap \tilde{s}(d_1) \neq \emptyset  \Rightarrow (d_1,d_2) \in \delta  &\nonumber
+\end{eqnarray}
+\end{defi}
+
+\begin{zalozenie}
+ \item Domain Dependency Relation $\delta$ is acyclic.
+\end{zalozenie}
+
+Simple Domain Specification is a Domain Interfaces that use in methods signature only Basic Types and own Types, precisely:
+\begin{defi}[Simple Domain Specification]
+  Domain Specification $d$ such that
+\begin{eqnarray}
+\tilde{s}(d) \subset \mathcal{B} \cup \tilde{t}(d)
+\end{eqnarray}
+\end{defi}
+
+Definition implies that Simple Domain Specification don't depend on any Domain Specification.
+
+\begin{defi}[Model Domain Specification]
+  Domain Specification that depends on other Domain Specification.
+\end{defi}
+
+\subsection{Service Specification}
+
+\begin{defi}[Service Specification]
+  A Model Domain Specification.
+\end{defi}
+
+\begin{zalozenie}
+ \item Services are not used as Domain Dependencies: if $s$ is a Service Specification, then
+\begin{eqnarray}
+ \forall d \in \mathcal{D} \quad  (d,s) \notin \delta
+\end{eqnarray}
+\end{zalozenie}
+
+The set of Service Specification is denoted by $\mathcal{S}$, we have $\mathcal{S} \subset \mathcal{D}$.
+
+\subsection{Taxonomy and Category}
+
+\begin{defi}[Taxonomy]
+  Equivalence relation of Services Specifications
+\begin{eqnarray}
+ \tau \subset \mathcal{S}  \times \mathcal{S} 
+\end{eqnarray}
+\end{defi}
+
+\begin{defi}[Category]
+  Equivalence class of Taxonomy.
+\end{defi}
+
+The set of Categories is denoted by $\Gamma$. Taxonomy projection is denoted by
+\begin{eqnarray}
+cat: \mathcal{S} \rightarrow \Gamma
+\end{eqnarray}
+
+\subsection{Service Implementation}
+
+Service Implementation definition is based on Dependency Injection Model presented on section \ref{sec:ioc}.
+
+\begin{defi}[Architecture Annotations]
+  A set of Binding Annotations.
+\end{defi}
+
+\begin{defi}[Service Implementation]
+  A Binding Provider on Architecture Annotations for all the Types related to a Service Specification.
+\end{defi}
+
+The set of Service Implementations is denoted by $\mathcal{P}$. Function $spec$
+\begin{eqnarray}
+ spec: \mathcal{P}  \rightarrow \mathcal{S}
+\end{eqnarray}
+assigns Service Implementation to realized Services Specifications.
+
+
+\begin{defi}[Injection Relation]
+  Service Implementation $p$ \textbf{injects} Service Specification $s$ $[(p,s)\in\kappa]$ if the following chain can be build:
+\begin{eqnarray}
+\mathcal{P} \ni p \xrightarrow[\text{contain Class}]{} c 
+\xrightarrow[\text{with Injection Point}]{} ip
+\xrightarrow[\text{matching Key}]{} k  
+\xrightarrow[\text{of Type}]{} a \nonumber \\ 
+a \xrightarrow[\text{related to Interface}]{t(i) = a} i
+\xrightarrow[\text{belonging to Service Specification}]{i\in s} s \in \mathcal{S} \nonumber
+\end{eqnarray}
+\begin{eqnarray}
+ \kappa \subset \mathcal{P} \times \mathcal{S}
+\end{eqnarray}
+\end{defi}
+
+Initial four relations on definition of Injection Relation are defined in Dependency Injection Model section \ref{sec:ioc}. The last two relations are defined by logical condition over the arrows.
+
+\begin{defi}[Set of Injected Service Specifications]
+  of Service Implementation $p$ is 
+\begin{eqnarray}
+&injected : \mathcal{P} \rightarrow 2^\mathcal{S}& \\
+&injected(p) := \{ s : (p,s)\in \kappa \} \subset \mathcal{S} &\nonumber
+\end{eqnarray}
+\end{defi}
+
+\subsection{Category Accessibility Relation}
+
+\begin{defi}[Category Accessibility Relation]
+  A predefined relation
+\begin{eqnarray}
+\pi \subset \Gamma \times \Gamma
+\end{eqnarray}
+\end{defi}
+
+Category $c_2$ \textbf{is accessible} to Category $c_1$ if $(c_1,c_2) \in \pi$.
+
+As determined by the next assumption, Category Accessibility Relation $\pi$ restrict injection of Services on Implementations. 
+
+\begin{zalozenie}
+ \item $ \forall s_x \in injected(p) \quad  (cat(spec(p)),cat(s_x)) \in \pi$.
+\end{zalozenie}
+
+This mean that if the following conditions are satisfied
+\begin{itemize}
+\item Implementation $p$ implements Service $s$ [$spec(p) = s $]
+\item Implementation $p$ injects Service $s_x$ [$ s_x \in injected(p) \equiv (p,s_x)\in\kappa$ ]
+\item Service $s$ belongs to Category $C$ [$s\in C$]
+\item Service $s_x$ belongs to Category  $C_x$ [$s_x\in C_x$]
+\end{itemize}
+ then it is required that Category $C_x$ is accessible to Category $C$ [$(C,C_x)\in \pi $].
+
+\subsection{Prototype and Test Specifications}
+
+For development of Service Implementations it is necessary to have access to external services for local execution and testing.
+
+\begin{defi}[Prototype Implementation]
+  is a Service Implementation that don't inject any Service Specification.
+\end{defi}
+
+Prototypes can be executed without any other resource, as they don't inject any service.
+
+\begin{defi}[Test Specification]
+  is a Binding Provider that injects only one Service Specification.
+\end{defi}
+
+Test Specifications can inject a Service Implementation and execute test using the Service Specification Interfaces. Test Specifications may implement a Service Specification to control the execution of tests and provide results in a specific format, but this is a per Architecture choice.
+
+Test Specifications may be treated as formal specifications for a Service Specification.
+

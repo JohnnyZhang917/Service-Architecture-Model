@@ -1,0 +1,32 @@
+
+
+dokument opisujace model Service Architecture Model
+
+
+Abstract
+
+Introduction
+- pojecia
+- feature
+- birdeye view
+
+Service Taxonomy Model
+- Model 
+- Service 
+- Categories and Service dependencies
+
+Service Implementation
+- IoC binding map
+- Service Provider Implementation
+- External service binding
+
+Service execution enviroment
+- Service instantation
+- Context extention
+- 
+
+Service live cycle
+- Versioning
+- Service transition
+- Service shutdown
+
