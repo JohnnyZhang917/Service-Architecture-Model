@@ -26,7 +26,8 @@ public class CallToExternalService {
 ```
 is serialized with the canonical protocol to a request containing information about executed methods and created instance. Such request information may be written as:
 
-``i_0.resetProcess()
+<pre>
+i_0.resetProcess()
 i_0.putData(i_1)
 ...
 i_0.putData(i_n)
@@ -37,7 +38,7 @@ i_1="IntegerSerialization"
 ...
 i_n="IntegerSerialization"
 r_0=Type<boolean>
-``
+</pre>
 
 As You may note, this is the neccesary information to create a instance on a injector provider and execute all method calls.
 
