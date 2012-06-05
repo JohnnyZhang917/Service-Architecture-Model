@@ -41,10 +41,10 @@ public class FreeVariableBindingBuilder {
 				return new Provider<T>() {
 					@Inject
 					private Injector injector;
-					private long instanceNr = 0;
+					private volatile long instanceNr = 0;
 
 					public T get() {
-						ExternalBindingSwitch<T> intermedium = new ExternalBindingSwitch<T>(key, instanceNr,slotNr);
+						ExternalBindingSwitch<T> intermedium = new ExternalBindingSwitch<T>(key, instanceNr++,slotNr);
 						injector.injectMembers(intermedium);
 						return intermedium.getReferenceObject();
 					}

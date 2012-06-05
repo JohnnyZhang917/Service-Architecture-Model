@@ -2,7 +2,6 @@ package pmsoft.sam.module.definition.test;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.Random;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -12,22 +11,23 @@ import pmsoft.sam.module.definition.test.data.impl.b.Service2ImplPackBalpha;
 import pmsoft.sam.module.definition.test.data.impl.b.Service2ImplPackBbeta;
 import pmsoft.sam.module.definition.test.data.impl.b.ServiceImplementationPackageB;
 import pmsoft.sam.module.definition.test.data.service.Service1Definition;
-import pmsoft.sam.module.definition.test.data.service.Service1a;
 import pmsoft.sam.module.definition.test.data.service.Service2Definition;
 import pmsoft.sam.module.model.SIID;
 import pmsoft.sam.module.model.ServiceImplementationKey;
+import pmsoft.sam.module.model.ServiceInstance;
 import pmsoft.sam.module.see.ServiceExecutionEnviroment;
 import pmsoft.sam.module.see.transaction.InjectionConfiguration;
 import pmsoft.sam.module.see.transaction.SamTransaction;
 import pmsoft.sam.module.see.transaction.TransactionConfigurator;
 import pmsoft.sam.module.serviceRegistry.SamServiceRegistry;
 import pmsoft.sam.test.environment.SamProtoTestModule;
+import pmsoft.sam.test.util.Grapher;
 
 import com.google.guiceberry.junit4.GuiceBerryRule;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 
-public class ServiceInteractionTest {
+public class ServiceGraphTest {
 	@Rule
 	public GuiceBerryRule guiceBerry = new GuiceBerryRule(SamProtoTestModule.class);
 
@@ -38,7 +38,7 @@ public class ServiceInteractionTest {
 	private ServiceExecutionEnviroment see;
 	
 	@Test
-	public void testServiceCreation() {
+	public void testServiceGraphCreation() {
 		// Register implementations
 		serviceRegistry.registerServiceImplementation(new ServiceImplementationPackageB());
 		ServiceImplementationKey service1 = new ServiceImplementationKey(Service1Definition.class, Service1ImplPackB.class);
@@ -60,10 +60,9 @@ public class ServiceInteractionTest {
 
 		SamTransaction realTransactionAlpha = transactionAlpha.createTransactionContext();
 
-		Injector serviceInjector = realTransactionAlpha.getInjector();
-		Service1a serviceInterface = serviceInjector.getInstance(Service1a.class);
-		assertTrue(serviceInterface.testServiceInteraction());
+		Injector serviceInjectorAlpha = realTransactionAlpha.getInjector();
 
+		
 		// Create beta transaction and run randomly
 		System.out.println("Start multiple random transaction run (alpha and beta)");
 		TransactionConfigurator transactionBeta = see.createTransactionConfiguration(running1);
@@ -71,20 +70,13 @@ public class ServiceInteractionTest {
 		configuration.bindInstance(running2beta);
 		SamTransaction realTransactionBeta = transactionBeta.createTransactionContext();
 
-		Random random = new Random();
-		Service1a callReference;
-		Injector transactionInjector;
-		for (int i = 0; i < 10; i++) {
-			int select = random.nextInt(2);
-			if (select == 0) {
-				transactionInjector = realTransactionAlpha.getInjector();
-			} else {
-				transactionInjector = realTransactionBeta.getInjector();
-			}
-			callReference= transactionInjector.getInstance(Service1a.class);
-			assertTrue(callReference.testServiceInteraction());
-		}
+		Injector serviceInjectorBeta = realTransactionBeta.getInjector();
 
+		ServiceInstance runningInstance = see.getServiceInstance(running1);
+		
+		Grapher.graphGood("/tmp/running.dot", runningInstance.getInjector());
+		Grapher.graphGood("/tmp/alpha.dot", serviceInjectorAlpha);
+		Grapher.graphGood("/tmp/beta.dot", serviceInjectorBeta);
 	}
 
 }

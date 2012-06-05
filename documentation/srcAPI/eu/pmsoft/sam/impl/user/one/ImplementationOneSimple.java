@@ -9,7 +9,7 @@ import eu.pmsoft.sam.service.user.UserDataSimpleAPI;
 public class ImplementationOneSimple implements UserDataSimpleAPI {
 
 	private Integer internalCounter = 0;
-	
+
 	@Inject
 	private CoreServiceExample coreService;
 

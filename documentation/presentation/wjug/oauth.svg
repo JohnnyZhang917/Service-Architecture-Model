@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg6729"
+   version="1.1"
+   inkscape:version="0.48.3.1 r9886"
+   sodipodi:docname="oauth.svg">
+  <defs
+     id="defs6731" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="2.0300099"
+     inkscape:cx="-0.91287918"
+     inkscape:cy="666.93448"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer2"
+     showgrid="true"
+     inkscape:window-width="1653"
+     inkscape:window-height="1021"
+     inkscape:window-x="27"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid3069" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata6734">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="layout">
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 125,417.36218 -60,35"
+       id="path3911-9"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/wjug/aouthScenario.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="454.8718"
+       y="513.90063"
+       id="text3491"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan3493" /></text>
+    <g
+       id="g3931"
+       transform="translate(-35,0)"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/wjug/aouthScenario.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300">
+      <rect
+         ry="21.626389"
+         rx="21.626389"
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+         y="342.36218"
+         x="105"
+         height="75"
+         width="165"
+         id="rect2987-0-2"
+         style="fill:#fbdc63;fill-opacity:0.54605264;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
+      <text
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+         sodipodi:linespacing="125%"
+         id="text2996-4-2-5-7"
+         y="375.32361"
+         x="187.20801"
+         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+         xml:space="preserve"><tspan
+           id="tspan3398-6"
+           style="font-size:13px;text-align:center;text-anchor:middle"
+           y="375.32361"
+           x="187.20801"
+           sodipodi:role="line">Printing Service</tspan><tspan
+           style="font-size:13px;text-align:center;text-anchor:middle"
+           y="391.57361"
+           x="187.20801"
+           sodipodi:role="line"
+           id="tspan3835">Beppa</tspan></text>
+    </g>
+    <rect
+       style="fill:#fbdc63;fill-opacity:0.54509807;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       id="rect2987-0-9-6-6"
+       width="165.00002"
+       height="75"
+       x="-220"
+       y="342.36218"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/wjug/aouthScenario.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"
+       rx="21.626389"
+       ry="21.626389" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+       x="-137.79199"
+       y="375.32361"
+       id="text2996-4-2-5-9-2-6"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/wjug/aouthScenario.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         x="-137.79199"
+         y="375.32361"
+         style="font-size:13px;text-align:center;text-anchor:middle"
+         id="tspan3655-0">Photo Share Service</tspan><tspan
+         sodipodi:role="line"
+         x="-137.79199"
+         y="391.57361"
+         style="font-size:13px;text-align:center;text-anchor:middle"
+         id="tspan3860">Faji</tspan></text>
+    <rect
+       style="fill:#fbdc63;fill-opacity:0.54605264;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
+       id="rect2987-0-2-3"
+       width="165"
+       height="75"
+       x="-80"
+       y="452.36218"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/wjug/aouthScenario.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"
+       rx="21.626389"
+       ry="21.626389" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+       x="2.480957"
+       y="485.37439"
+       id="text2996-4-2-5-7-6"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/wjug/aouthScenario.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         id="tspan3835-0"
+         sodipodi:role="line"
+         x="2.480957"
+         y="485.37439"
+         style="font-size:13px;text-align:center;text-anchor:middle">GUI Service</tspan><tspan
+         sodipodi:role="line"
+         x="2.480957"
+         y="501.62439"
+         style="font-size:13px;text-align:center;text-anchor:middle"
+         id="tspan3909">Jane</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m -100,417.36218 50,35"
+       id="path3911"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/wjug/aouthScenario.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer3"
+     inkscape:label="services"
+     style="display:inline" />
+</svg>

@@ -3,12 +3,14 @@
 \usepackage{polski}
 % \usepackage{color}
 \usepackage{transparent}
-\usepackage{graphicx}
 \usepackage{amsrefs}
 \usepackage{amsfonts}
 \usepackage{listings}
 \usepackage{syntax}
 \usepackage{wrapfig}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{subcaption}
 
 \graphicspath{{includes/}}
 
@@ -27,7 +29,7 @@
          numberstyle=\tiny\color{black},          % Stil der Zeilennummern
          stepnumber=1,               % Abstand zwischen den Zeilennummern
          numbersep=5pt,              % Abstand der Nummern zum Text
-         tabsize=1,                  % Groesse von Tabs
+         tabsize=3,                  % Groesse von Tabs
 % 	inputencoding=utf8, extendchars=\true
          extendedchars=true,         %
          breaklines=true,            % Zeilen werden Umgebrochen
@@ -62,7 +64,7 @@ morecomment=[s][\color{javadocblue}]{/**}{*/},
 \usetheme{Warsaw}
 \title[Implementacja architektury usługowej]{Implementacja architektury usługowej - od specifikacji do kodu}
 \author{Paweł Cesar Sanjuan Szklarz}
-\institute{}
+\institute{Warszawa Java User Group}
 \date{5 czerwca 2012}
 \begin{document}
 
@@ -165,13 +167,16 @@ Do tworzenia ``Injector'' potrzebujemy zestaw modułów tak, aby graf zależnoś
 
 \section{Definicja architektury}
 \subsection{Specifikacja usługi - Kategorie - Architektura}
-\begin{frame}{Specifikacja-Kontrakt}
-Definiujemy usługę jako podstawowy element. 
+\begin{frame}{Budowanie definicji architektury}
 
-Architektura jest porządkiem w zbiorze usług.
+Usługa to kontrakt zdefiniowany przez zbiór interfejsów.
+
+\pause
+
+Architektura jest to struktura uporządkowująca zbiór usług.
 
 \begin{description}
- \item[Specikacja usługi] Zbiór intejfejsów
+ \item[Specykacja usługi] Zbiór intejfejsów
  \item[Kategoria] Rozłączne zbiory usług 
  \item[Architektura] Zbiór wszystkich kategorii.
 \end{description}
@@ -180,14 +185,14 @@ Architektura jest porządkiem w zbiorze usług.
 Definiujemy ograniczenia dla implementacji usług
 
 \begin{description}
- \item[Implementacja] Bindowanie interfejsów usługi
+ \item[Implementacja] Bindowanie interfejsów usługi  (moduł Guice)
  \item[Relacja dostępności kategorii] Odpowiada na pytanie: \hfill \\
  Jakie \lstinline|Key<T>| mogę injektować w implementacji usługi?
 \end{description}
 \end{frame}
 
 \subsection{Implementacje usług}
-\begin{frame}{Specifikacja-Kontrakt}
+\begin{frame}{Specyfikacja-Kontrakt}
 \begin{figure}
  \centering
  \includegraphics[width=1\textwidth]{servicePicture}
@@ -198,24 +203,67 @@ Implementacje usług oraz injektowanie instancji usług
 
 
 \section{Architektura usługowa - Protokoł kanoniczny}
-\subsection{Problem}
+\subsection{Problemy}
 \begin{frame}
- Standardowy moduł to nie usługa:
-
+Standardowe narzędzia DI nie odpowiadają architekturze usługowej. Problemy:
+\pause
+ \begin{enumerate}
+  \item<2-> Moduł/Komponent to \emph{NIE} instancji usługi:
+  \begin{enumerate}
+   \item Sztywne połączenie
+   \item Instancie to singletony
+  \end{enumerate}
+  \item<3-> Kontekst uruchomienia
+  \begin{enumerate}
+   \item Ograniczenie do jednej JVM
+   \item ograniczenia dostępu
+   \item ``własność'' usługi
+  \end{enumerate}
+ \end{enumerate}
 \end{frame}
 
-\subsection{Rozwiązanie 1 - dynamiczne łączenie modułów}
+\subsection{Rozwiązanie - dynamiczne łączenie modułów}
+% % % 
+\begin{frame}{ExternalBindingSwitch}
+Instancja usługi to moduł uruchomiony z ``przełącznikiem`` na potrzebne usługi:
+\begin{figure}
+        \begin{subfigure}[b]{0.3\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{directBinding}
+                \caption{Direct}
+        \end{subfigure}%
+        \begin{subfigure}[b]{0.3\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{switchBinding}
+                \caption{Switch}
+        \end{subfigure}%
+\end{figure}
+\end{frame}
 
-\subsection{Rzowiązanie 2 - zdalne łączenie modułów}
 
+\subsection{Rozwiązanie - zdalne łączenie modułów}
+
+\begin{frame}{Protokoł kanoniczny}
+\begin{figure}
+ \centering
+ \includegraphics[width=1\textwidth]{canonicalSplit}
+ \label{fig:serviceImplementation}
+\end{figure}
+\end{frame}
 
 \section{Demo}
-\subsection{OAuth scenario}
+\begin{frame}{DEMO}
+\begin{figure}
+ \centering
+ \includegraphics[width=1\textwidth]{aouthScenario}
+ \label{fig:serviceImplementation}
+\end{figure}
+\end{frame}
 
-\section{Argumentacja innowacyjności SAM}
-\subsection{Nowe rozwiązanie?}
-\subsection{Why Functional Programming Matters}
-\subsection{Modularize and Glue in SAM}
+% \section{Argumentacja innowacyjności SAM}
+% \subsection{Nowe rozwiązanie?}
+% \subsection{Why Functional Programming Matters}
+% \subsection{Modularize and Glue in SAM}
 
 
 \end{document}
