@@ -1,0 +1,7 @@
+include 'taxonomy:infrastructureCategory:logStreaming'
+include 'taxonomy:infrastructureCategory:transactionBroadCast'
+include 'taxonomy:userCategory:publication'
+include 'taxonomy:userCategory:commandAndControl'
+include 'taxonomy:operationalCategory:architectureModel'
+include 'taxonomy:operationalCategory:deploymentService'
+include 'taxonomy:operationalCategory:serviceManagement'
