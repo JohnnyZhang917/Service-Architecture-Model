@@ -1,0 +1,1189 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.3.1 r9886"
+   sodipodi:docname="logicGarbage.svg"
+   inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/duzo_warstwFig.png"
+   inkscape:export-xdpi="300"
+   inkscape:export-ydpi="300">
+  <defs
+     id="defs4">
+    <marker
+       inkscape:stockid="Arrow1Mstart"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Mstart"
+       style="overflow:visible">
+      <path
+         id="path4251"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt"
+         transform="scale(0.4) translate(10,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0.0"
+       refX="0.0"
+       id="Arrow1Mend"
+       style="overflow:visible;">
+      <path
+         id="path4254"
+         d="M 0.0,0.0 L 5.0,-5.0 L -12.5,0.0 L 5.0,5.0 L 0.0,0.0 z "
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1.0pt;"
+         transform="scale(0.4) rotate(180) translate(10,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend-6"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4254-3"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend-2"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4254-7"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend-9"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4254-4"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4732"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4734"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4736"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4738"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="Arrow1Mend-66"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4254-5"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4778"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4780"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4782"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4784"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4786"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4788"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4790"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4792"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4794"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4796"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4794-0"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4796-9"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4794-1"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4796-4"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4794-4"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4796-5"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4794-3"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4796-7"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4794-45"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4796-6"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4794-34"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4796-63"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4794-8"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4796-59"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4794-5"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4796-73"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4794-19"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4796-60"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4794-9"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4796-79"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4794-2"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4796-1"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4794-42"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4796-3"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+    <marker
+       inkscape:stockid="Arrow1Mend"
+       orient="auto"
+       refY="0"
+       refX="0"
+       id="marker4794-30"
+       style="overflow:visible">
+      <path
+         inkscape:connector-curvature="0"
+         id="path4796-8"
+         d="M 0,0 5,-5 -12.5,0 5,5 0,0 z"
+         style="fill-rule:evenodd;stroke:#000000;stroke-width:1pt"
+         transform="matrix(-0.4,0,0,-0.4,-4,0)" />
+    </marker>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.7227692"
+     inkscape:cx="532.24764"
+     inkscape:cy="-258.48749"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="true"
+     inkscape:window-width="1653"
+     inkscape:window-height="1021"
+     inkscape:window-x="27"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2985" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="580"
+       y="1412.3622"
+       id="text2989-8-2-2-5-9-4-3-5"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-1-22-6-6"
+         x="580"
+         y="1412.3622"
+         style="font-size:40px">2 odbicia!!!</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="80"
+       y="627.36218"
+       id="text2989-8-2-2-5"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6"
+         x="80"
+         y="627.36218"
+         style="font-size:40px">A</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="195"
+       y="567.36218"
+       id="text2989-8-2-2-5-9"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-1"
+         x="195"
+         y="567.36218"
+         style="font-size:40px">B</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="190"
+       y="687.36218"
+       id="text2989-8-2-2-5-9-5"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-1-9"
+         x="190"
+         y="687.36218"
+         style="font-size:40px">C</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 110,597.36218 75,-40"
+       id="path5612"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 110,632.36218 75,35"
+       id="path5612-5"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#marker4794)"
+       d="m 195,577.36218 c 0,0 -60,5 -65,35 -5,30 65,40 65,40"
+       id="path4922-6-8"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="czc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="365"
+       y="622.36218"
+       id="text2989-8-2-2-5-1"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-5"
+         x="365"
+         y="622.36218"
+         style="font-size:40px">A</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="480"
+       y="562.36218"
+       id="text2989-8-2-2-5-9-8"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-1-2"
+         x="480"
+         y="562.36218"
+         style="font-size:40px">B</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="475"
+       y="682.36218"
+       id="text2989-8-2-2-5-9-5-7"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-1-9-6"
+         x="475"
+         y="682.36218"
+         style="font-size:40px">C</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 395,592.36218 75,-40"
+       id="path5612-7"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 395,627.36218 75,34.99999"
+       id="path5612-5-7"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#marker4794)"
+       d="m 655,582.36218 c 0,0 -240,-20 -240,30 0,50 240,30 240,30"
+       id="path4922-6-8-4"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="czc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 515,547.36218 35,0"
+       id="path5612-7-8"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="560"
+       y="562.36218"
+       id="text2989-8-2-2-5-9-8-7"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-1-2-6"
+         x="560"
+         y="562.36218"
+         style="font-size:40px">B</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 595,547.36218 35,0"
+       id="path5612-7-8-2"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="640"
+       y="562.36218"
+       id="text2989-8-2-2-5-9-8-4"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-1-2-5"
+         x="640"
+         y="562.36218"
+         style="font-size:40px">B</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 510,667.36218 35,0"
+       id="path5612-7-8-7"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="555"
+       y="682.36218"
+       id="text2989-8-2-2-5-9-8-7-6"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-1-2-6-2"
+         x="555"
+         y="682.36218"
+         style="font-size:40px">C</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 590,667.36218 35,0"
+       id="path5612-7-8-2-3"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="635"
+       y="682.36218"
+       id="text2989-8-2-2-5-9-8-4-5"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-1-2-5-8"
+         x="635"
+         y="682.36218"
+         style="font-size:40px">C</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="505"
+       y="572.36218"
+       id="text2989-8-2-2-5-9-5-1"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-1-9-1"
+         x="505"
+         y="572.36218"
+         style="font-size:20px">1</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="585"
+       y="572.36218"
+       id="text2989-8-2-2-5-9-5-1-5"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-1-9-1-0"
+         x="585"
+         y="572.36218"
+         style="font-size:20px">2</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="665"
+       y="572.36218"
+       id="text2989-8-2-2-5-9-5-1-3"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-1-9-1-03"
+         x="665"
+         y="572.36218"
+         style="font-size:20px">n</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="505"
+       y="692.36218"
+       id="text2989-8-2-2-5-9-5-1-1"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-1-9-1-7"
+         x="505"
+         y="692.36218"
+         style="font-size:20px">1</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="585"
+       y="692.36218"
+       id="text2989-8-2-2-5-9-5-1-5-5"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-1-9-1-0-5"
+         x="585"
+         y="692.36218"
+         style="font-size:20px">2</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="665"
+       y="692.36218"
+       id="text2989-8-2-2-5-9-5-1-3-9"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageComplexFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-1-9-1-03-5"
+         x="665"
+         y="692.36218"
+         style="font-size:20px">n</tspan></text>
+    <g
+       id="g6083">
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/pozornyKierunekFig.png"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path5612-1"
+         d="m 205,857.36218 0,-125"
+         style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <text
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/pozornyKierunekFig.png"
+         sodipodi:linespacing="125%"
+         id="text2989-8-2-2-5-2"
+         y="802.36218"
+         x="70"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         xml:space="preserve"><tspan
+           style="font-size:40px"
+           y="802.36218"
+           x="70"
+           id="tspan2991-1-5-6-6-8"
+           sodipodi:role="line">HTML</tspan></text>
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/pozornyKierunekFig.png"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path5612-1-1"
+         d="m 240,857.36218 0,-125"
+         style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/pozornyKierunekFig.png"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path5612-1-5"
+         d="m 275,857.36218 0,-125"
+         style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/pozornyKierunekFig.png"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path5612-1-1-6"
+         d="m 310,857.36218 0,-125"
+         style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/pozornyKierunekFig.png"
+         sodipodi:nodetypes="czc"
+         inkscape:connector-curvature="0"
+         id="path4922-6-8-9"
+         d="m 185,752.36218 c 0,0 175,-10 175,45 0,55 -175,40 -175,40"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#marker4794)" />
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/pozornyKierunekFig.png"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path5612-1-5-1"
+         d="m 345,857.36218 0,-125"
+         style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/pozornyKierunekFig.png"
+         transform="translate(-10,5)"
+         d="m 440,749.86218 a 25,12.5 0 1 1 -50,0 25,12.5 0 1 1 50,0 z"
+         sodipodi:ry="12.5"
+         sodipodi:rx="25"
+         sodipodi:cy="749.86218"
+         sodipodi:cx="415"
+         id="path6027"
+         style="fill:none;stroke:#000000;stroke-width:3;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         sodipodi:type="arc" />
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/pozornyKierunekFig.png"
+         transform="translate(-10,75)"
+         d="m 440,749.86218 a 25,12.5 0 1 1 -50,0 25,12.5 0 1 1 50,0 z"
+         sodipodi:ry="12.5"
+         sodipodi:rx="25"
+         sodipodi:cy="749.86218"
+         sodipodi:cx="415"
+         id="path6027-9"
+         style="fill:none;stroke:#000000;stroke-width:3;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         sodipodi:type="arc" />
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/pozornyKierunekFig.png"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path5612-1-7"
+         d="m 430,822.36218 0,-70"
+         style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/pozornyKierunekFig.png"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path5612-1-7-0"
+         d="m 380,822.36218 0,-70"
+         style="fill:none;stroke:#000000;stroke-width:3;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+    </g>
+    <g
+       id="g6958"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/rotation2dFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300">
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path5612-5-74"
+         d="m 290,952.36218 0,60.00002"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path5612-5-74-4"
+         d="m 320,982.36218 -60,0"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path4922-6-8-0"
+         d="m 290,982.36218 30,-50"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#marker4794)" />
+      <path
+         transform="translate(-14.621949,3.6424318)"
+         sodipodi:open="true"
+         sodipodi:end="10.176327"
+         sodipodi:start="5.7214675"
+         d="m 334.62195,958.71975 a 35,35 0 1 1 -55.19407,-5.25456"
+         sodipodi:ry="35"
+         sodipodi:rx="35"
+         sodipodi:cy="977.36218"
+         sodipodi:cx="305"
+         id="path6157"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         sodipodi:type="arc" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6383"
+         d="m 320,962.36218 -5,15"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6383-5"
+         d="m 335,967.36218 -15,-5"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path4922-6-8-0-1"
+         d="m 380,967.36218 45,0"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:none" />
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path4922-6-8-0-1-6"
+         d="m 380,982.36218 45,0"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:none" />
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path4922-6-8-0-1-3"
+         d="m 380,997.36218 45,0"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:none" />
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path5612-5-74-8"
+         d="m 550,952.36216 0,59.99994"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path5612-5-74-4-8"
+         d="m 580,982.36218 -60,0"
+         style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <path
+         transform="translate(195.37804,-31.357604)"
+         sodipodi:open="true"
+         sodipodi:end="10.629481"
+         sodipodi:start="5.7214675"
+         d="M 334.62195,958.71975 A 35,35 0 1 1 292.47104,944.68153"
+         sodipodi:ry="35"
+         sodipodi:rx="35"
+         sodipodi:cy="977.36218"
+         sodipodi:cx="305"
+         id="path6157-8"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         sodipodi:type="arc" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6383-1"
+         d="m 530,927.36214 -5,15.00002"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6383-5-3"
+         d="m 545,932.36216 -15,-5.00002"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 295,1377.3622 0,60"
+       id="path5612-5-74-2"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       d="m 325,1407.3622 -60,0"
+       id="path5612-5-74-4-6"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#marker4794)"
+       d="m 295,1407.3622 30,-50"
+       id="path4922-6-8-0-16"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       sodipodi:type="arc"
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="path6157-0"
+       sodipodi:cx="305"
+       sodipodi:cy="977.36218"
+       sodipodi:rx="35"
+       sodipodi:ry="35"
+       d="m 334.62195,958.71975 a 35,35 0 1 1 -55.19407,-5.25456"
+       sodipodi:start="5.7214675"
+       sodipodi:end="10.176327"
+       sodipodi:open="true"
+       transform="translate(-9.621945,428.64239)" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 325,1387.3622 -5,15"
+       id="path6383-7"
+       inkscape:connector-curvature="0" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 340,1392.3622 -15,-5"
+       id="path6383-5-0"
+       inkscape:connector-curvature="0" />
+    <g
+       id="g7156"
+       transform="translate(-130,199.99998)">
+      <path
+         transform="translate(125.37804,103.6424)"
+         sodipodi:open="true"
+         sodipodi:end="10.629481"
+         sodipodi:start="5.7214675"
+         d="m 334.62195,958.71975 c 10.29593,16.35975 5.38023,37.96845 -10.97952,48.26435 -16.35975,10.296 -37.96845,5.3803 -48.26438,-10.97949 -10.29593,-16.35975 -5.38023,-37.96845 10.97952,-48.26438 1.93314,-1.2166 3.98072,-2.24106 6.11347,-3.0587"
+         sodipodi:ry="35"
+         sodipodi:rx="35"
+         sodipodi:cy="977.36218"
+         sodipodi:cx="305"
+         id="path6157-8-4"
+         style="fill:none;stroke:#000000;stroke-width:2;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+         sodipodi:type="arc" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6383-1-1"
+         d="m 460,1062.3621 -5,15.0001"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:connector-curvature="0"
+         id="path6383-5-3-2"
+         d="m 475,1067.3622 -15,-5.0001"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+    </g>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:url(#marker4794)"
+       d="m 305,1212.3622 0,-60"
+       id="path4922-6-8-0-16-0"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:none"
+       d="m 435,1212.3622 80,0"
+       id="path4922-6-8-0-1-3-3-2"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:none"
+       d="m 435,1182.3622 80,0"
+       id="path4922-6-8-0-1-3-3-2-4"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="595"
+       y="1202.3622"
+       id="text2989-8-2-2-5-9-4"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-1-22"
+         x="595"
+         y="1202.3622"
+         style="font-size:40px">2 odbicia</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="595"
+       y="1292.3622"
+       id="text2989-8-2-2-5-9-4-3"
+       sodipodi:linespacing="125%"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300"><tspan
+         sodipodi:role="line"
+         id="tspan2991-1-5-6-6-1-22-6"
+         x="595"
+         y="1292.3622"
+         style="font-size:40px">2 odbicia</tspan></text>
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:none"
+       d="m 445,1262.3622 80,30"
+       id="path4922-6-8-0-1-3-3-2-41"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:none"
+       d="m 445,1292.3622 80,-30"
+       id="path4922-6-8-0-1-3-3-2-4-1"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:none"
+       d="m 400,1417.3622 150,0"
+       id="path4922-6-8-0-1-3-3-2-2"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:none"
+       d="m 415,1442.3622 115,-70"
+       id="path4922-6-8-0-1-3-3-2-4-1-0"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+    <path
+       style="fill:none;stroke:#000000;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-end:none"
+       d="m 400,1392.3622 150,0"
+       id="path4922-6-8-0-1-3-3-2-2-5"
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="cc"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/logicGarbageSimpleFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300" />
+  </g>
+</svg>
