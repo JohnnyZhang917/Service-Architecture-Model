@@ -166,7 +166,7 @@
        inkscape:export-ydpi="300" />
     <g
        id="g3541"
-       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/wjug/canonicalSplit.png"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/canonicalSplit.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300">
       <rect
@@ -261,7 +261,7 @@
     <g
        id="g3528"
        transform="translate(-115,0)"
-       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/wjug/canonicalSplit.png"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/canonicalSplit.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300">
       <rect
@@ -359,7 +359,7 @@
        y="332.36218"
        rx="21.626389"
        ry="21.626389"
-       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/wjug/canonicalSplit.png"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/canonicalSplit.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300" />
     <text
@@ -369,7 +369,7 @@
        y="365.07458"
        id="text3557"
        sodipodi:linespacing="125%"
-       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/wjug/canonicalSplit.png"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/canonicalSplit.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300"><tspan
          sodipodi:role="line"
@@ -406,7 +406,7 @@
          x="-25.406235"
          y="470.07458"
          style="font-size:14px"
-         id="tspan3592">#30&gt;DATA</tspan></text>
+         id="tspan3592">#3&gt;DATA</tspan></text>
   </g>
   <g
      inkscape:groupmode="layer"

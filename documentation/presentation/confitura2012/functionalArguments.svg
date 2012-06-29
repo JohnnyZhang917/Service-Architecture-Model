@@ -14,7 +14,7 @@
    id="svg6729"
    version="1.1"
    inkscape:version="0.48.3.1 r9886"
-   sodipodi:docname="serviceImplementation.svg">
+   sodipodi:docname="functionalArguments.svg">
   <defs
      id="defs6731" />
   <sodipodi:namedview
@@ -25,10 +25,10 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="2.0300099"
-     inkscape:cx="115.83532"
-     inkscape:cy="666.93448"
+     inkscape:cx="313.36753"
+     inkscape:cy="510.48502"
      inkscape:document-units="px"
-     inkscape:current-layer="layer2"
+     inkscape:current-layer="layer3"
      showgrid="true"
      inkscape:window-width="1653"
      inkscape:window-height="1021"
@@ -57,55 +57,23 @@
      inkscape:label="layout">
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 345,377.36218 c -25,5 -25,45 -60,45"
+       d="m 545.07935,257.36218 c -25,5 -25,45 -60,45"
        id="path4587"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 345,347.36218 c -55,0 -25,40 -60,40"
+       d="m 545.07935,227.36218 c -55,0 -25,40 -60,40"
        id="path4587-9"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
-    <rect
-       style="fill:#fbdc63;fill-opacity:0.54605264;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
-       id="rect2987-0"
-       width="180"
-       height="315"
-       x="95"
-       y="202.36218"
-       inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
-       inkscape:export-xdpi="300"
-       inkscape:export-ydpi="300"
-       rx="21.626389"
-       ry="21.626389" />
-    <text
-       xml:space="preserve"
-       style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
-       x="185"
-       y="222.36218"
-       id="text2996-4-2-5"
-       sodipodi:linespacing="125%"
-       inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
-       inkscape:export-xdpi="300"
-       inkscape:export-ydpi="300"><tspan
-         sodipodi:role="line"
-         x="185"
-         y="222.36218"
-         style="font-size:13px;text-align:center;text-anchor:middle"
-         id="tspan4579">Service Implementation</tspan><tspan
-         sodipodi:role="line"
-         x="185"
-         y="238.61218"
-         style="font-size:13px;text-align:center;text-anchor:middle"
-         id="tspan3543">ProvidedServiceType</tspan></text>
     <rect
        style="fill:#65e058;fill-opacity:0.54605264;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline"
        id="rect2987-0-9"
        width="190"
        height="140"
-       x="355"
-       y="292.36218"
+       x="555.07935"
+       y="172.36218"
        inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300"
@@ -114,25 +82,25 @@
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
-       x="449.92065"
-       y="312.36218"
+       x="650"
+       y="192.36218"
        id="text2996-4-2-5-9"
        sodipodi:linespacing="125%"
        inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300"><tspan
          sodipodi:role="line"
-         x="449.92065"
-         y="312.36218"
+         x="650"
+         y="192.36218"
          style="font-size:13px;text-align:center;text-anchor:middle"
          id="tspan4585">Prototype Implementation</tspan><tspan
          sodipodi:role="line"
-         x="449.92065"
-         y="328.61218"
+         x="650"
+         y="208.61218"
          style="font-size:13px;text-align:center;text-anchor:middle"
          id="tspan3279">ExternalService_Type1</tspan></text>
     <g
-       transform="matrix(-1,0,0,1,650,50.000003)"
+       transform="matrix(-1,0,0,1,850.07935,-69.999997)"
        id="g4274-5">
       <g
          id="g4271-1">
@@ -158,7 +126,7 @@
          sodipodi:type="arc" />
     </g>
     <g
-       transform="matrix(-1,0,0,1,650,80.000003)"
+       transform="matrix(-1,0,0,1,850.07935,-39.999997)"
        id="g4274-5-6">
       <g
          id="g4271-1-7">
@@ -184,7 +152,7 @@
          sodipodi:type="arc" />
     </g>
     <g
-       transform="matrix(-1,0,0,1,675,120)"
+       transform="matrix(-1,0,0,1,875.07935,0)"
        id="g4274-5-6-6">
       <g
          id="g4271-1-7-5"
@@ -213,7 +181,7 @@
     <g
        style="display:inline"
        id="g4233-93-3-3"
-       transform="translate(215,0)">
+       transform="translate(415.07935,-120)">
       <text
          inkscape:export-ydpi="300"
          inkscape:export-xdpi="300"
@@ -249,8 +217,8 @@
        id="rect2987-0-9-4"
        width="190"
        height="140"
-       x="355.07935"
-       y="452.36218"
+       x="555.15869"
+       y="332.36218"
        inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300"
@@ -259,25 +227,25 @@
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
-       x="450"
-       y="472.36218"
+       x="650.07935"
+       y="352.36218"
        id="text2996-4-2-5-9-0"
        sodipodi:linespacing="125%"
        inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300"><tspan
          sodipodi:role="line"
-         x="450"
-         y="472.36218"
+         x="650.07935"
+         y="352.36218"
          style="font-size:13px;text-align:center;text-anchor:middle"
          id="tspan4585-1">Prototype Implementation</tspan><tspan
          sodipodi:role="line"
-         x="450"
-         y="488.61218"
+         x="650.07935"
+         y="368.61218"
          style="font-size:13px;text-align:center;text-anchor:middle"
          id="tspan3279-3">ExternalService_Type2</tspan></text>
     <g
-       transform="matrix(-1,0,0,1,650,225)"
+       transform="matrix(-1,0,0,1,850.07935,105)"
        id="g4274-5-7">
       <g
          id="g4271-1-4">
@@ -303,7 +271,7 @@
          sodipodi:type="arc" />
     </g>
     <g
-       transform="matrix(-1,0,0,1,674.92065,270)"
+       transform="matrix(-1,0,0,1,875,150)"
        id="g4274-5-6-6-1">
       <g
          id="g4271-1-7-5-7"
@@ -332,7 +300,7 @@
     <g
        style="display:inline"
        id="g4233-93-3-3-5"
-       transform="translate(214.92065,150)">
+       transform="translate(415,30)">
       <text
          inkscape:export-ydpi="300"
          inkscape:export-xdpi="300"
@@ -366,7 +334,7 @@
     <g
        style="display:inline"
        id="g4227-1-3-7"
-       transform="translate(215,155)">
+       transform="translate(415.07935,35)">
       <text
          inkscape:export-ydpi="300"
          inkscape:export-xdpi="300"
@@ -408,13 +376,13 @@
          id="tspan3493" /></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 345,522.36218 c -25,5 -25,-65 -60,-65"
+       d="m 545.07935,402.36218 c -25,5 -25,-65 -60,-65"
        id="path4587-5"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 345,557.36218 c -25,5 -25,-65 -60,-65"
+       d="m 545.07935,437.36218 c -25,5 -25,-65 -60,-65"
        id="path4587-5-7"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
@@ -423,8 +391,8 @@
        id="rect2987-0-9-6"
        width="190"
        height="205"
-       x="-160"
-       y="202.36218"
+       x="-324.70801"
+       y="372.36218"
        inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300"
@@ -433,27 +401,27 @@
     <text
        xml:space="preserve"
        style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
-       x="-65.291992"
-       y="222.36218"
+       x="-230"
+       y="392.36218"
        id="text2996-4-2-5-9-2"
        sodipodi:linespacing="125%"
        inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
        inkscape:export-xdpi="300"
        inkscape:export-ydpi="300"><tspan
          sodipodi:role="line"
-         x="-65.291992"
-         y="222.36218"
+         x="-230"
+         y="392.36218"
          style="font-size:13px;text-align:center;text-anchor:middle"
          id="tspan3279-2">Test Specification</tspan><tspan
          sodipodi:role="line"
-         x="-65.291992"
-         y="238.61218"
+         x="-230"
+         y="408.61218"
          style="font-size:13px;text-align:center;text-anchor:middle"
          id="tspan3655">ProvidedServiceType</tspan></text>
     <g
        style="display:inline"
        id="g4024-6"
-       transform="matrix(0,-1,1,0,-317.36218,467.36218)">
+       transform="matrix(0,-1,1,0,-482.07019,637.36218)">
       <path
          sodipodi:open="true"
          sodipodi:end="6.2831853"
@@ -482,7 +450,7 @@
     <g
        style="display:inline"
        id="g4024-9-8"
-       transform="matrix(0,-1,1,0,-317.36218,502.36218)">
+       transform="matrix(0,-1,1,0,-482.07019,672.36218)">
       <path
          sodipodi:open="true"
          sodipodi:end="6.2831853"
@@ -511,7 +479,7 @@
     <g
        style="display:inline"
        id="g4024-6-7"
-       transform="matrix(0,-1,1,0,-317.36218,537.36218)">
+       transform="matrix(0,-1,1,0,-482.07019,707.36218)">
       <path
          sodipodi:open="true"
          sodipodi:end="6.2831853"
@@ -540,7 +508,7 @@
     <g
        style="display:inline"
        id="g4024-9-8-9"
-       transform="matrix(0,-1,1,0,-317.36218,572.36218)">
+       transform="matrix(0,-1,1,0,-482.07019,742.36218)">
       <path
          sodipodi:open="true"
          sodipodi:end="6.2831853"
@@ -569,7 +537,7 @@
     <g
        style="display:inline"
        id="g3118-8-4"
-       transform="translate(-132.51172,127.98242)">
+       transform="translate(-297.21973,297.98242)">
       <text
          inkscape:export-ydpi="300"
          inkscape:export-xdpi="300"
@@ -603,7 +571,7 @@
     <g
        style="display:inline"
        id="g3118-0-6-2-5"
-       transform="translate(-132.51172,92.98242)">
+       transform="translate(-297.21973,262.98242)">
       <text
          inkscape:export-ydpi="300"
          inkscape:export-xdpi="300"
@@ -636,25 +604,25 @@
     </g>
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 85,267.36218 c -20,0 -25,-5 -45,-5"
+       d="m -79.708008,437.36218 c -20,0 -25.000002,-5 -45.000002,-5"
        id="path4587-9-5"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 85,302.36218 c -20,0 -25,-5 -45,-5"
+       d="m -79.708008,472.36218 c -20,0 -25.000002,-5 -45.000002,-5"
        id="path4587-9-5-1"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 85,337.36218 c -20,0 -25,-5 -45,-5"
+       d="m -79.708008,507.36218 c -20,0 -25.000002,-5 -45.000002,-5"
        id="path4587-9-5-1-1"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
     <path
        style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 85,337.36218 c -20,0 -25,30 -45,30"
+       d="m -79.708008,507.36218 c -20,0 -25.000002,30 -45.000002,30"
        id="path4587-9-5-1-1-3"
        inkscape:connector-curvature="0"
        sodipodi:nodetypes="cc" />
@@ -665,438 +633,349 @@
      inkscape:label="services"
      style="display:inline">
     <g
-       id="g4274"
-       transform="matrix(-1,0,0,1,390,-29.999997)">
-      <g
-         id="g4271">
-        <path
-           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-           d="m 305,297.36218 -25,0"
-           id="path3169"
-           inkscape:connector-curvature="0"
-           sodipodi:nodetypes="cc" />
-      </g>
-      <path
+       id="g10584">
+      <rect
+         ry="21.626389"
+         rx="21.626389"
          inkscape:export-ydpi="300"
          inkscape:export-xdpi="300"
-         inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
-         transform="matrix(0,1,-1,0,347.36218,257.36218)"
-         d="m 45,42.362183 c 0,2.761423 -2.238576,5 -5,5 -2.761424,0 -5,-2.238577 -5,-5 0,-2.761424 2.238576,-5 5,-5 2.761424,0 5,2.238576 5,5 z"
-         sodipodi:ry="5"
-         sodipodi:rx="5"
-         sodipodi:cy="42.362183"
-         sodipodi:cx="40"
-         id="path3142-9-9-4-4"
-         style="fill:#ed6c40;fill-opacity:1;stroke:none;display:inline"
-         sodipodi:type="arc" />
-    </g>
-    <g
-       id="g4024"
-       transform="matrix(0,-1,1,0,-72.36218,662.36218)">
-      <path
-         sodipodi:open="true"
-         sodipodi:end="6.2831853"
-         sodipodi:start="3.1415927"
-         inkscape:export-ydpi="300"
-         inkscape:export-xdpi="300"
-         inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
-         transform="translate(165,315)"
-         d="m 35,42.362182 c 0,-2.761423 2.238576,-5 5,-4.999999 2.761424,0 5,2.238576 5,5"
-         sodipodi:ry="5"
-         sodipodi:rx="5"
-         sodipodi:cy="42.362183"
-         sodipodi:cx="40"
-         id="path3142-9-9-4-4-9"
-         style="fill:none;stroke:#ed6c40;stroke-opacity:1;display:inline"
-         sodipodi:type="arc" />
-      <g
-         id="g4021">
-        <path
-           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-           d="m 205,332.36218 0,20"
-           id="path3169-4"
-           inkscape:connector-curvature="0" />
-      </g>
-    </g>
-    <g
-       id="g4024-9"
-       transform="matrix(0,-1,1,0,-72.36218,697.36218)">
-      <path
-         sodipodi:open="true"
-         sodipodi:end="6.2831853"
-         sodipodi:start="3.1415927"
-         inkscape:export-ydpi="300"
-         inkscape:export-xdpi="300"
-         inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
-         transform="translate(165,315)"
-         d="m 35,42.362182 c 0,-2.761423 2.238576,-5 5,-4.999999 2.761424,0 5,2.238576 5,5"
-         sodipodi:ry="5"
-         sodipodi:rx="5"
-         sodipodi:cy="42.362183"
-         sodipodi:cx="40"
-         id="path3142-9-9-4-4-9-3"
-         style="fill:none;stroke:#ed6c40;stroke-opacity:1;display:inline"
-         sodipodi:type="arc" />
-      <g
-         id="g4021-0">
-        <path
-           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-           d="m 205,332.36218 0,20"
-           id="path3169-4-2"
-           inkscape:connector-curvature="0" />
-      </g>
-    </g>
-    <g
-       id="g4233"
-       transform="translate(-20,85.000006)">
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/serviceAsFunctionFig.png"
+         y="202.36218"
+         x="95"
+         height="210"
+         width="180"
+         id="rect2987-0"
+         style="fill:#fbdc63;fill-opacity:0.54605263999999998;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
       <text
          inkscape:export-ydpi="300"
          inkscape:export-xdpi="300"
-         inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/serviceAsFunctionFig.png"
          sodipodi:linespacing="125%"
-         id="text2996-4-2-9-4-3"
-         y="404.56921"
-         x="217.71289"
+         id="text2996-4-2-5"
+         y="222.36218"
+         x="185"
          style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
          xml:space="preserve"><tspan
-           id="tspan3067-4-8-4"
-           style="font-size:8px;text-align:center;text-anchor:middle"
+           id="tspan3543"
+           style="font-size:13px;text-align:center;text-anchor:middle"
+           y="222.36218"
+           x="185"
+           sodipodi:role="line">Service Implementation</tspan></text>
+      <text
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/serviceAsFunctionFig.png"
+         sodipodi:linespacing="125%"
+         id="text2996-4-2-5-5"
+         y="282.36218"
+         x="35"
+         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+         xml:space="preserve"><tspan
+           id="tspan3543-5"
+           style="font-size:13px;text-align:center;text-anchor:middle"
+           y="282.36218"
+           x="35"
+           sodipodi:role="line">INPUT</tspan><tspan
+           id="tspan10490"
+           style="font-size:13px;text-align:center;text-anchor:middle"
+           y="298.61218"
+           x="35"
+           sodipodi:role="line">GRAMMAR</tspan></text>
+      <text
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/serviceAsFunctionFig.png"
+         sodipodi:linespacing="125%"
+         id="text2996-4-2-5-5-0"
+         y="352.36218"
+         x="330"
+         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+         xml:space="preserve"><tspan
+           id="tspan10490-4"
+           style="font-size:13px;text-align:center;text-anchor:middle"
+           y="352.36218"
+           x="330"
+           sodipodi:role="line">OUTPUT</tspan><tspan
+           id="tspan10518"
+           style="font-size:13px;text-align:center;text-anchor:middle"
+           y="368.61218"
+           x="330"
+           sodipodi:role="line">GRAMMAR</tspan></text>
+      <g
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/serviceAsFunctionFig.png"
+         transform="matrix(-1,0,0,1,390,-29.999997)"
+         id="g4274">
+        <g
+           id="g4271">
+          <path
+             sodipodi:nodetypes="cc"
+             inkscape:connector-curvature="0"
+             id="path3169"
+             d="m 305,297.36218 -25,0"
+             style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+        <path
+           sodipodi:type="arc"
+           style="fill:#ed6c40;fill-opacity:1;stroke:none;display:inline"
+           id="path3142-9-9-4-4"
+           sodipodi:cx="40"
+           sodipodi:cy="42.362183"
+           sodipodi:rx="5"
+           sodipodi:ry="5"
+           d="m 45,42.362183 c 0,2.761423 -2.238576,5 -5,5 -2.761424,0 -5,-2.238577 -5,-5 0,-2.761424 2.238576,-5 5,-5 2.761424,0 5,2.238576 5,5 z"
+           transform="matrix(0,1,-1,0,347.36218,257.36218)"
+           inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+           inkscape:export-xdpi="300"
+           inkscape:export-ydpi="300" />
+      </g>
+      <g
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/serviceAsFunctionFig.png"
+         transform="translate(87.488281,27.982422)"
+         id="g3118">
+        <text
+           xml:space="preserve"
+           style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+           x="85"
+           y="237.36218"
+           id="text2996-4-2-9-4-1"
+           sodipodi:linespacing="125%"
+           inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+           inkscape:export-xdpi="300"
+           inkscape:export-ydpi="300"><tspan
+             sodipodi:role="line"
+             x="85"
+             y="237.36218"
+             style="font-size:8px;text-align:center;text-anchor:middle"
+             id="tspan3067-4-8-6">ProvidedServiceType_API1</tspan><tspan
+             sodipodi:role="line"
+             x="85"
+             y="247.36218"
+             style="font-size:8px;text-align:center;text-anchor:middle"
+             id="tspan4113-3-9"> 0</tspan></text>
+        <rect
+           ry="0"
+           rx="0"
+           y="229.37976"
+           x="17.511719"
+           height="20"
+           width="135"
+           id="rect4225-7"
+           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      </g>
+      <g
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/serviceAsFunctionFig.png"
+         transform="matrix(0,-1,1,0,-72.36218,547.36217)"
+         id="g4024-92"
+         style="display:inline">
+        <path
+           sodipodi:type="arc"
+           style="fill:none;stroke:#ed6c40;stroke-opacity:1;display:inline"
+           id="path3142-9-9-4-4-9-5"
+           sodipodi:cx="40"
+           sodipodi:cy="42.362183"
+           sodipodi:rx="5"
+           sodipodi:ry="5"
+           d="m 35,42.362182 c 0,-2.761423 2.238576,-5 5,-4.999999 2.761424,0 5,2.238576 5,5"
+           transform="translate(165,315)"
+           inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+           inkscape:export-xdpi="300"
+           inkscape:export-ydpi="300"
+           sodipodi:start="3.1415927"
+           sodipodi:end="6.2831853"
+           sodipodi:open="true" />
+        <g
+           id="g4021-7">
+          <path
+             inkscape:connector-curvature="0"
+             id="path3169-4-4"
+             d="m 205,332.36218 0,20"
+             style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+      </g>
+      <g
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/serviceAsFunctionFig.png"
+         transform="matrix(0,-1,1,0,-72.36218,582.36217)"
+         id="g4024-9-9"
+         style="display:inline">
+        <path
+           sodipodi:type="arc"
+           style="fill:none;stroke:#ed6c40;stroke-opacity:1;display:inline"
+           id="path3142-9-9-4-4-9-3-9"
+           sodipodi:cx="40"
+           sodipodi:cy="42.362183"
+           sodipodi:rx="5"
+           sodipodi:ry="5"
+           d="m 35,42.362182 c 0,-2.761423 2.238576,-5 5,-4.999999 2.761424,0 5,2.238576 5,5"
+           transform="translate(165,315)"
+           inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+           inkscape:export-xdpi="300"
+           inkscape:export-ydpi="300"
+           sodipodi:start="3.1415927"
+           sodipodi:end="6.2831853"
+           sodipodi:open="true" />
+        <g
+           id="g4021-0-4">
+          <path
+             inkscape:connector-curvature="0"
+             id="path3169-4-2-5"
+             d="m 205,332.36218 0,20"
+             style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+      </g>
+      <g
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/serviceAsFunctionFig.png"
+         transform="translate(-20,-30)"
+         id="g4233-93"
+         style="display:inline">
+        <text
+           xml:space="preserve"
+           style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+           x="217.71289"
            y="404.56921"
-           x="217.71289"
-           sodipodi:role="line">ExternalService_Type2_API2</tspan><tspan
-           id="tspan4113-3-6"
-           style="font-size:8px;text-align:center;text-anchor:middle"
-           y="414.56921"
-           x="217.71289"
-           sodipodi:role="line"> @BA_02</tspan></text>
-      <rect
-         ry="0"
-         rx="0"
-         y="397.36218"
-         x="150"
-         height="20"
-         width="135"
-         id="rect4187-5"
-         style="fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-    </g>
-    <g
-       id="g4227"
-       transform="translate(-20,90.000005)">
-      <text
+           id="text2996-4-2-9-4-3-5"
+           sodipodi:linespacing="125%"
+           inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+           inkscape:export-xdpi="300"
+           inkscape:export-ydpi="300"><tspan
+             sodipodi:role="line"
+             x="217.71289"
+             y="404.56921"
+             style="font-size:8px;text-align:center;text-anchor:middle"
+             id="tspan3067-4-8-4-7">ExternalService_Type1_API2</tspan><tspan
+             sodipodi:role="line"
+             x="217.71289"
+             y="414.56921"
+             style="font-size:8px;text-align:center;text-anchor:middle"
+             id="tspan4113-3-6-0"> @BA_12</tspan></text>
+        <rect
+           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+           id="rect4187-5-8"
+           width="135"
+           height="20"
+           x="150"
+           y="397.36218"
+           rx="0"
+           ry="0" />
+      </g>
+      <g
          inkscape:export-ydpi="300"
          inkscape:export-xdpi="300"
-         inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
-         sodipodi:linespacing="125%"
-         id="text2996-4-2-9-4"
-         y="365.3446"
-         x="217.48828"
-         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
-         xml:space="preserve"><tspan
-           id="tspan3067-4-8"
-           style="font-size:8px;text-align:center;text-anchor:middle"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/serviceAsFunctionFig.png"
+         transform="translate(-20,-25)"
+         id="g4227-1"
+         style="display:inline">
+        <text
+           xml:space="preserve"
+           style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+           x="217.48828"
            y="365.3446"
-           x="217.48828"
-           sodipodi:role="line">ExternalService_Type2_API1</tspan><tspan
-           id="tspan4113-3"
-           style="font-size:8px;text-align:center;text-anchor:middle"
-           y="375.3446"
-           x="217.48828"
-           sodipodi:role="line"> @BA_01</tspan></text>
-      <rect
-         style="fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-         id="rect4225"
-         width="135"
-         height="20"
-         x="150"
-         y="357.36218"
-         rx="0"
-         ry="0" />
-    </g>
-    <g
-       id="g3118"
-       transform="translate(87.488281,27.982422)">
-      <text
+           id="text2996-4-2-9-4-9"
+           sodipodi:linespacing="125%"
+           inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+           inkscape:export-xdpi="300"
+           inkscape:export-ydpi="300"><tspan
+             sodipodi:role="line"
+             x="217.48828"
+             y="365.3446"
+             style="font-size:8px;text-align:center;text-anchor:middle"
+             id="tspan3067-4-8-9">ExternalService_Type1_API1</tspan><tspan
+             sodipodi:role="line"
+             x="217.48828"
+             y="375.3446"
+             style="font-size:8px;text-align:center;text-anchor:middle"
+             id="tspan4113-3-7"> @BA_11</tspan></text>
+        <rect
+           ry="0"
+           rx="0"
+           y="357.36218"
+           x="150"
+           height="20"
+           width="135"
+           id="rect4225-8"
+           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      </g>
+      <g
          inkscape:export-ydpi="300"
          inkscape:export-xdpi="300"
-         inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
-         sodipodi:linespacing="125%"
-         id="text2996-4-2-9-4-1"
-         y="237.36218"
-         x="85"
-         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
-         xml:space="preserve"><tspan
-           id="tspan3067-4-8-6"
-           style="font-size:8px;text-align:center;text-anchor:middle"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/serviceAsFunctionFig.png"
+         transform="matrix(-1,0,0,1,390,5.0000014)"
+         id="g4274-56"
+         style="display:inline">
+        <g
+           id="g4271-7">
+          <path
+             sodipodi:nodetypes="cc"
+             inkscape:connector-curvature="0"
+             id="path3169-7"
+             d="m 305,297.36218 -25,0"
+             style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+        <path
+           sodipodi:type="arc"
+           style="fill:#ed6c40;fill-opacity:1;stroke:none;display:inline"
+           id="path3142-9-9-4-4-4"
+           sodipodi:cx="40"
+           sodipodi:cy="42.362183"
+           sodipodi:rx="5"
+           sodipodi:ry="5"
+           d="m 45,42.362183 c 0,2.761423 -2.238576,5 -5,5 -2.761424,0 -5,-2.238577 -5,-5 0,-2.761424 2.238576,-5 5,-5 2.761424,0 5,2.238576 5,5 z"
+           transform="matrix(0,1,-1,0,347.36218,257.36218)"
+           inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+           inkscape:export-xdpi="300"
+           inkscape:export-ydpi="300" />
+      </g>
+      <g
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/serviceAsFunctionFig.png"
+         transform="translate(87.48828,62.982422)"
+         id="g3118-0"
+         style="display:inline">
+        <text
+           xml:space="preserve"
+           style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
+           x="85"
            y="237.36218"
-           x="85"
-           sodipodi:role="line">ProvidedServiceType_API1</tspan><tspan
-           id="tspan4113-3-9"
-           style="font-size:8px;text-align:center;text-anchor:middle"
-           y="247.36218"
-           x="85"
-           sodipodi:role="line"> 0</tspan></text>
-      <rect
-         style="fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-         id="rect4225-7"
-         width="135"
-         height="20"
-         x="17.511719"
-         y="229.37976"
-         rx="0"
-         ry="0" />
-    </g>
-    <g
-       style="display:inline"
-       id="g4024-92"
-       transform="matrix(0,-1,1,0,-72.36218,592.36217)">
-      <path
-         sodipodi:open="true"
-         sodipodi:end="6.2831853"
-         sodipodi:start="3.1415927"
-         inkscape:export-ydpi="300"
-         inkscape:export-xdpi="300"
-         inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
-         transform="translate(165,315)"
-         d="m 35,42.362182 c 0,-2.761423 2.238576,-5 5,-4.999999 2.761424,0 5,2.238576 5,5"
-         sodipodi:ry="5"
-         sodipodi:rx="5"
-         sodipodi:cy="42.362183"
-         sodipodi:cx="40"
-         id="path3142-9-9-4-4-9-5"
-         style="fill:none;stroke:#ed6c40;stroke-opacity:1;display:inline"
-         sodipodi:type="arc" />
-      <g
-         id="g4021-7">
-        <path
-           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-           d="m 205,332.36218 0,20"
-           id="path3169-4-4"
-           inkscape:connector-curvature="0" />
+           id="text2996-4-2-9-4-1-6"
+           sodipodi:linespacing="125%"
+           inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+           inkscape:export-xdpi="300"
+           inkscape:export-ydpi="300"><tspan
+             sodipodi:role="line"
+             x="85"
+             y="237.36218"
+             style="font-size:8px;text-align:center;text-anchor:middle"
+             id="tspan3067-4-8-6-4">ProvidedServiceType_API1</tspan><tspan
+             sodipodi:role="line"
+             x="85"
+             y="247.36218"
+             style="font-size:8px;text-align:center;text-anchor:middle"
+             id="tspan4113-3-9-7"> @BA_11</tspan></text>
+        <rect
+           ry="0"
+           rx="0"
+           y="229.37976"
+           x="17.511719"
+           height="20"
+           width="135"
+           id="rect4225-7-4"
+           style="fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
       </g>
-    </g>
-    <g
-       style="display:inline"
-       id="g4024-9-9"
-       transform="matrix(0,-1,1,0,-72.36218,627.36217)">
-      <path
-         sodipodi:open="true"
-         sodipodi:end="6.2831853"
-         sodipodi:start="3.1415927"
-         inkscape:export-ydpi="300"
-         inkscape:export-xdpi="300"
-         inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
-         transform="translate(165,315)"
-         d="m 35,42.362182 c 0,-2.761423 2.238576,-5 5,-4.999999 2.761424,0 5,2.238576 5,5"
-         sodipodi:ry="5"
-         sodipodi:rx="5"
-         sodipodi:cy="42.362183"
-         sodipodi:cx="40"
-         id="path3142-9-9-4-4-9-3-9"
-         style="fill:none;stroke:#ed6c40;stroke-opacity:1;display:inline"
-         sodipodi:type="arc" />
-      <g
-         id="g4021-0-4">
-        <path
-           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-           d="m 205,332.36218 0,20"
-           id="path3169-4-2-5"
-           inkscape:connector-curvature="0" />
-      </g>
-    </g>
-    <g
-       style="display:inline"
-       id="g4233-93"
-       transform="translate(-20,15)">
-      <text
-         inkscape:export-ydpi="300"
-         inkscape:export-xdpi="300"
-         inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
-         sodipodi:linespacing="125%"
-         id="text2996-4-2-9-4-3-5"
-         y="404.56921"
-         x="217.71289"
-         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
-         xml:space="preserve"><tspan
-           id="tspan3067-4-8-4-7"
-           style="font-size:8px;text-align:center;text-anchor:middle"
-           y="404.56921"
-           x="217.71289"
-           sodipodi:role="line">ExternalService_Type1_API2</tspan><tspan
-           id="tspan4113-3-6-0"
-           style="font-size:8px;text-align:center;text-anchor:middle"
-           y="414.56921"
-           x="217.71289"
-           sodipodi:role="line"> @BA_12</tspan></text>
-      <rect
-         ry="0"
-         rx="0"
-         y="397.36218"
-         x="150"
-         height="20"
-         width="135"
-         id="rect4187-5-8"
-         style="fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-    </g>
-    <g
-       style="display:inline"
-       id="g4227-1"
-       transform="translate(-20,20)">
-      <text
-         inkscape:export-ydpi="300"
-         inkscape:export-xdpi="300"
-         inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
-         sodipodi:linespacing="125%"
-         id="text2996-4-2-9-4-9"
-         y="365.3446"
-         x="217.48828"
-         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
-         xml:space="preserve"><tspan
-           id="tspan3067-4-8-9"
-           style="font-size:8px;text-align:center;text-anchor:middle"
-           y="365.3446"
-           x="217.48828"
-           sodipodi:role="line">ExternalService_Type1_API1</tspan><tspan
-           id="tspan4113-3-7"
-           style="font-size:8px;text-align:center;text-anchor:middle"
-           y="375.3446"
-           x="217.48828"
-           sodipodi:role="line"> @BA_11</tspan></text>
-      <rect
-         style="fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-         id="rect4225-8"
-         width="135"
-         height="20"
-         x="150"
-         y="357.36218"
-         rx="0"
-         ry="0" />
-    </g>
-    <g
-       style="display:inline"
-       id="g4274-56"
-       transform="matrix(-1,0,0,1,390,5.0000014)">
-      <g
-         id="g4271-7">
-        <path
-           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-           d="m 305,297.36218 -25,0"
-           id="path3169-7"
-           inkscape:connector-curvature="0"
-           sodipodi:nodetypes="cc" />
-      </g>
-      <path
-         inkscape:export-ydpi="300"
-         inkscape:export-xdpi="300"
-         inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
-         transform="matrix(0,1,-1,0,347.36218,257.36218)"
-         d="m 45,42.362183 c 0,2.761423 -2.238576,5 -5,5 -2.761424,0 -5,-2.238577 -5,-5 0,-2.761424 2.238576,-5 5,-5 2.761424,0 5,2.238576 5,5 z"
-         sodipodi:ry="5"
-         sodipodi:rx="5"
-         sodipodi:cy="42.362183"
-         sodipodi:cx="40"
-         id="path3142-9-9-4-4-4"
-         style="fill:#ed6c40;fill-opacity:1;stroke:none;display:inline"
-         sodipodi:type="arc" />
-    </g>
-    <g
-       style="display:inline"
-       id="g3118-0"
-       transform="translate(87.48828,62.982422)">
-      <text
-         inkscape:export-ydpi="300"
-         inkscape:export-xdpi="300"
-         inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
-         sodipodi:linespacing="125%"
-         id="text2996-4-2-9-4-1-6"
-         y="237.36218"
-         x="85"
-         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
-         xml:space="preserve"><tspan
-           id="tspan3067-4-8-6-4"
-           style="font-size:8px;text-align:center;text-anchor:middle"
-           y="237.36218"
-           x="85"
-           sodipodi:role="line">ProvidedServiceType_API1</tspan><tspan
-           id="tspan4113-3-9-7"
-           style="font-size:8px;text-align:center;text-anchor:middle"
-           y="247.36218"
-           x="85"
-           sodipodi:role="line"> @BA_11</tspan></text>
-      <rect
-         style="fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-         id="rect4225-7-4"
-         width="135"
-         height="20"
-         x="17.511719"
-         y="229.37976"
-         rx="0"
-         ry="0" />
-    </g>
-    <g
-       style="display:inline"
-       id="g4274-56-0"
-       transform="matrix(-1,0,0,1,390,40.000002)">
-      <g
-         id="g4271-7-6">
-        <path
-           style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-           d="m 305,297.36218 -25,0"
-           id="path3169-7-6"
-           inkscape:connector-curvature="0"
-           sodipodi:nodetypes="cc" />
-      </g>
-      <path
-         inkscape:export-ydpi="300"
-         inkscape:export-xdpi="300"
-         inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
-         transform="matrix(0,1,-1,0,347.36218,257.36218)"
-         d="m 45,42.362183 c 0,2.761423 -2.238576,5 -5,5 -2.761424,0 -5,-2.238577 -5,-5 0,-2.761424 2.238576,-5 5,-5 2.761424,0 5,2.238576 5,5 z"
-         sodipodi:ry="5"
-         sodipodi:rx="5"
-         sodipodi:cy="42.362183"
-         sodipodi:cx="40"
-         id="path3142-9-9-4-4-4-4"
-         style="fill:#ed6c40;fill-opacity:1;stroke:none;display:inline"
-         sodipodi:type="arc" />
-    </g>
-    <g
-       style="display:inline"
-       id="g3118-0-6"
-       transform="translate(87.48828,97.982422)">
-      <text
-         inkscape:export-ydpi="300"
-         inkscape:export-xdpi="300"
-         inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
-         sodipodi:linespacing="125%"
-         id="text2996-4-2-9-4-1-6-2"
-         y="237.36218"
-         x="85"
-         style="font-size:40px;font-style:normal;font-weight:normal;text-align:center;line-height:125%;letter-spacing:0px;word-spacing:0px;text-anchor:middle;fill:#000000;fill-opacity:1;stroke:none;display:inline;font-family:Sans"
-         xml:space="preserve"><tspan
-           id="tspan3067-4-8-6-4-8"
-           style="font-size:8px;text-align:center;text-anchor:middle"
-           y="237.36218"
-           x="85"
-           sodipodi:role="line">ProvidedServiceType_API2</tspan><tspan
-           id="tspan4113-3-9-7-9"
-           style="font-size:8px;text-align:center;text-anchor:middle"
-           y="247.36218"
-           x="85"
-           sodipodi:role="line"> 0</tspan></text>
-      <rect
-         style="fill:none;stroke:#000000;stroke-width:0.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-         id="rect4225-7-4-6"
-         width="135"
-         height="20"
-         x="17.511719"
-         y="229.37976"
-         rx="0"
-         ry="0" />
     </g>
     <g
        style="display:inline"
        id="g4227-1-3"
-       transform="translate(215,-20)">
+       transform="translate(415.07935,-140)">
       <text
          inkscape:export-ydpi="300"
          inkscape:export-xdpi="300"
@@ -1130,7 +1009,7 @@
     <g
        style="display:inline"
        id="g4233-93-3"
-       transform="translate(215,-30)">
+       transform="translate(415.07935,-150)">
       <text
          inkscape:export-ydpi="300"
          inkscape:export-xdpi="300"
@@ -1164,7 +1043,7 @@
     <g
        style="display:inline"
        id="g3118-8"
-       transform="translate(-132.51172,22.98242)">
+       transform="translate(-297.21973,192.98242)">
       <text
          inkscape:export-ydpi="300"
          inkscape:export-xdpi="300"
@@ -1198,7 +1077,7 @@
     <g
        style="display:inline"
        id="g3118-0-6-2"
-       transform="translate(-132.51172,57.98242)">
+       transform="translate(-297.21973,227.98242)">
       <text
          inkscape:export-ydpi="300"
          inkscape:export-xdpi="300"
@@ -1228,6 +1107,357 @@
          y="229.37976"
          rx="0"
          ry="0" />
+    </g>
+    <g
+       id="g10879"
+       inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/lazyExecutionFig.png"
+       inkscape:export-xdpi="300"
+       inkscape:export-ydpi="300">
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/lazyExecutionFig.png"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path4587-9-5-1-1-1"
+         d="m 145,562.36218 c 0,20 -65,25 -65,40"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/lazyExecutionFig.png"
+         sodipodi:nodetypes="cc"
+         inkscape:connector-curvature="0"
+         id="path4587-9-5-1-1-1-6"
+         d="m 255,562.36218 c 0,20 65,25 65,40"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <path
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/lazyExecutionFig.png"
+         sodipodi:nodetypes="czzzzzc"
+         inkscape:connector-curvature="0"
+         id="path10874"
+         d="m 180,432.36218 c 0,0 15,40 -5,75 -20,35 -145,105 -145,150 0,45 48.501689,13.51775 75,10 26.49831,-3.51774 35,-30 45,-65 10,-35 15,-75 65,-75 50,1e-5 45,135.00001 110,135.00001"
+         style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+      <rect
+         ry="21.626389"
+         rx="21.626389"
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/lazyExecutionFig.png"
+         y="627.36218"
+         x="-5"
+         height="60"
+         width="175"
+         id="rect2987-0-98-9"
+         style="fill:#b951c6;fill-opacity:0.54509807;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
+      <rect
+         ry="21.626389"
+         rx="21.626389"
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/lazyExecutionFig.png"
+         y="487.36218"
+         x="110"
+         height="60"
+         width="175"
+         id="rect2987-0-98"
+         style="fill:#fbdc63;fill-opacity:0.54605264;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
+      <g
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/lazyExecutionFig.png"
+         transform="translate(-60,205)"
+         id="g4024-9-9-7"
+         style="display:inline">
+        <path
+           sodipodi:type="arc"
+           style="fill:none;stroke:#ed6c40;stroke-opacity:1;display:inline"
+           id="path3142-9-9-4-4-9-3-9-1"
+           sodipodi:cx="40"
+           sodipodi:cy="42.362183"
+           sodipodi:rx="5"
+           sodipodi:ry="5"
+           d="m 35,42.362182 c 0,-2.761423 2.238576,-5 5,-4.999999 2.761424,0 5,2.238576 5,5"
+           transform="translate(165,315)"
+           inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+           inkscape:export-xdpi="300"
+           inkscape:export-ydpi="300"
+           sodipodi:start="3.1415927"
+           sodipodi:end="6.2831853"
+           sodipodi:open="true" />
+        <g
+           id="g4021-0-4-7">
+          <path
+             inkscape:connector-curvature="0"
+             id="path3169-4-2-5-0"
+             d="m 205,332.36218 0,20"
+             style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+      </g>
+      <g
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/lazyExecutionFig.png"
+         transform="matrix(0,-1,-1,0,492.36218,772.36218)"
+         id="g4274-56-4"
+         style="display:inline">
+        <g
+           id="g4271-7-3">
+          <path
+             sodipodi:nodetypes="cc"
+             inkscape:connector-curvature="0"
+             id="path3169-7-8"
+             d="m 305,297.36218 -25,0"
+             style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+        <path
+           sodipodi:type="arc"
+           style="fill:#ed6c40;fill-opacity:1;stroke:none;display:inline"
+           id="path3142-9-9-4-4-4-6"
+           sodipodi:cx="40"
+           sodipodi:cy="42.362183"
+           sodipodi:rx="5"
+           sodipodi:ry="5"
+           d="m 45,42.362183 c 0,2.761423 -2.238576,5 -5,5 -2.761424,0 -5,-2.238577 -5,-5 0,-2.761424 2.238576,-5 5,-5 2.761424,0 5,2.238576 5,5 z"
+           transform="matrix(0,1,-1,0,347.36218,257.36218)"
+           inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+           inkscape:export-xdpi="300"
+           inkscape:export-ydpi="300" />
+      </g>
+      <g
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/lazyExecutionFig.png"
+         transform="translate(50,205)"
+         id="g4024-9-9-7-2"
+         style="display:inline">
+        <path
+           sodipodi:type="arc"
+           style="fill:none;stroke:#ed6c40;stroke-opacity:1;display:inline"
+           id="path3142-9-9-4-4-9-3-9-1-6"
+           sodipodi:cx="40"
+           sodipodi:cy="42.362183"
+           sodipodi:rx="5"
+           sodipodi:ry="5"
+           d="m 35,42.362182 c 0,-2.761423 2.238576,-5 5,-4.999999 2.761424,0 5,2.238576 5,5"
+           transform="translate(165,315)"
+           inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+           inkscape:export-xdpi="300"
+           inkscape:export-ydpi="300"
+           sodipodi:start="3.1415927"
+           sodipodi:end="6.2831853"
+           sodipodi:open="true" />
+        <g
+           id="g4021-0-4-7-0">
+          <path
+             inkscape:connector-curvature="0"
+             id="path3169-4-2-5-0-2"
+             d="m 205,332.36218 0,20"
+             style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+      </g>
+      <g
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/lazyExecutionFig.png"
+         transform="translate(-175,345)"
+         id="g4024-9-9-7-23"
+         style="display:inline">
+        <path
+           sodipodi:type="arc"
+           style="fill:none;stroke:#ed6c40;stroke-opacity:1;display:inline"
+           id="path3142-9-9-4-4-9-3-9-1-8"
+           sodipodi:cx="40"
+           sodipodi:cy="42.362183"
+           sodipodi:rx="5"
+           sodipodi:ry="5"
+           d="m 35,42.362182 c 0,-2.761423 2.238576,-5 5,-4.999999 2.761424,0 5,2.238576 5,5"
+           transform="translate(165,315)"
+           inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+           inkscape:export-xdpi="300"
+           inkscape:export-ydpi="300"
+           sodipodi:start="3.1415927"
+           sodipodi:end="6.2831853"
+           sodipodi:open="true" />
+        <g
+           id="g4021-0-4-7-6">
+          <path
+             inkscape:connector-curvature="0"
+             id="path3169-4-2-5-0-9"
+             d="m 205,332.36218 0,20"
+             style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+      </g>
+      <g
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/lazyExecutionFig.png"
+         transform="matrix(0,-1,-1,0,377.36218,912.36218)"
+         id="g4274-56-4-8"
+         style="display:inline">
+        <g
+           id="g4271-7-3-9">
+          <path
+             sodipodi:nodetypes="cc"
+             inkscape:connector-curvature="0"
+             id="path3169-7-8-2"
+             d="m 305,297.36218 -25,0"
+             style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+        <path
+           sodipodi:type="arc"
+           style="fill:#ed6c40;fill-opacity:1;stroke:none;display:inline"
+           id="path3142-9-9-4-4-4-6-9"
+           sodipodi:cx="40"
+           sodipodi:cy="42.362183"
+           sodipodi:rx="5"
+           sodipodi:ry="5"
+           d="m 45,42.362183 c 0,2.761423 -2.238576,5 -5,5 -2.761424,0 -5,-2.238577 -5,-5 0,-2.761424 2.238576,-5 5,-5 2.761424,0 5,2.238576 5,5 z"
+           transform="matrix(0,1,-1,0,347.36218,257.36218)"
+           inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+           inkscape:export-xdpi="300"
+           inkscape:export-ydpi="300" />
+      </g>
+      <g
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/lazyExecutionFig.png"
+         transform="translate(-65,345)"
+         id="g4024-9-9-7-2-8"
+         style="display:inline">
+        <path
+           sodipodi:type="arc"
+           style="fill:none;stroke:#ed6c40;stroke-opacity:1;display:inline"
+           id="path3142-9-9-4-4-9-3-9-1-6-3"
+           sodipodi:cx="40"
+           sodipodi:cy="42.362183"
+           sodipodi:rx="5"
+           sodipodi:ry="5"
+           d="m 35,42.362182 c 0,-2.761423 2.238576,-5 5,-4.999999 2.761424,0 5,2.238576 5,5"
+           transform="translate(165,315)"
+           inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+           inkscape:export-xdpi="300"
+           inkscape:export-ydpi="300"
+           sodipodi:start="3.1415927"
+           sodipodi:end="6.2831853"
+           sodipodi:open="true" />
+        <g
+           id="g4021-0-4-7-0-5">
+          <path
+             inkscape:connector-curvature="0"
+             id="path3169-4-2-5-0-2-9"
+             d="m 205,332.36218 0,20"
+             style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+      </g>
+      <rect
+         ry="21.626389"
+         rx="21.626389"
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/lazyExecutionFig.png"
+         y="627.36218"
+         x="235"
+         height="60"
+         width="175"
+         id="rect2987-0-98-6"
+         style="fill:#65e058;fill-opacity:0.54509807;stroke:#000000;stroke-width:1;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline" />
+      <g
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/lazyExecutionFig.png"
+         transform="translate(65,345)"
+         id="g4024-9-9-7-7"
+         style="display:inline">
+        <path
+           sodipodi:type="arc"
+           style="fill:none;stroke:#ed6c40;stroke-opacity:1;display:inline"
+           id="path3142-9-9-4-4-9-3-9-1-5"
+           sodipodi:cx="40"
+           sodipodi:cy="42.362183"
+           sodipodi:rx="5"
+           sodipodi:ry="5"
+           d="m 35,42.362182 c 0,-2.761423 2.238576,-5 5,-4.999999 2.761424,0 5,2.238576 5,5"
+           transform="translate(165,315)"
+           inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+           inkscape:export-xdpi="300"
+           inkscape:export-ydpi="300"
+           sodipodi:start="3.1415927"
+           sodipodi:end="6.2831853"
+           sodipodi:open="true" />
+        <g
+           id="g4021-0-4-7-3">
+          <path
+             inkscape:connector-curvature="0"
+             id="path3169-4-2-5-0-3"
+             d="m 205,332.36218 0,20"
+             style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+      </g>
+      <g
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/lazyExecutionFig.png"
+         transform="matrix(0,-1,-1,0,617.36218,912.36218)"
+         id="g4274-56-4-7"
+         style="display:inline">
+        <g
+           id="g4271-7-3-5">
+          <path
+             sodipodi:nodetypes="cc"
+             inkscape:connector-curvature="0"
+             id="path3169-7-8-9"
+             d="m 305,297.36218 -25,0"
+             style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+        <path
+           sodipodi:type="arc"
+           style="fill:#ed6c40;fill-opacity:1;stroke:none;display:inline"
+           id="path3142-9-9-4-4-4-6-3"
+           sodipodi:cx="40"
+           sodipodi:cy="42.362183"
+           sodipodi:rx="5"
+           sodipodi:ry="5"
+           d="m 45,42.362183 c 0,2.761423 -2.238576,5 -5,5 -2.761424,0 -5,-2.238577 -5,-5 0,-2.761424 2.238576,-5 5,-5 2.761424,0 5,2.238576 5,5 z"
+           transform="matrix(0,1,-1,0,347.36218,257.36218)"
+           inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+           inkscape:export-xdpi="300"
+           inkscape:export-ydpi="300" />
+      </g>
+      <g
+         inkscape:export-ydpi="300"
+         inkscape:export-xdpi="300"
+         inkscape:export-filename="/home/pawel/src/Service-Architecture-Model/documentation/presentation/confitura2012/lazyExecutionFig.png"
+         transform="translate(175,345)"
+         id="g4024-9-9-7-2-9"
+         style="display:inline">
+        <path
+           sodipodi:type="arc"
+           style="fill:none;stroke:#ed6c40;stroke-opacity:1;display:inline"
+           id="path3142-9-9-4-4-9-3-9-1-6-6"
+           sodipodi:cx="40"
+           sodipodi:cy="42.362183"
+           sodipodi:rx="5"
+           sodipodi:ry="5"
+           d="m 35,42.362182 c 0,-2.761423 2.238576,-5 5,-4.999999 2.761424,0 5,2.238576 5,5"
+           transform="translate(165,315)"
+           inkscape:export-filename="/home/pawel/repo/sam/doc/images/taxonomy-ser.png"
+           inkscape:export-xdpi="300"
+           inkscape:export-ydpi="300"
+           sodipodi:start="3.1415927"
+           sodipodi:end="6.2831853"
+           sodipodi:open="true" />
+        <g
+           id="g4021-0-4-7-0-8">
+          <path
+             inkscape:connector-curvature="0"
+             id="path3169-4-2-5-0-2-8"
+             d="m 205,332.36218 0,20"
+             style="fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+      </g>
     </g>
   </g>
 </svg>
