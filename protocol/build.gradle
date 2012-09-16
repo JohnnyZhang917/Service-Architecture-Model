@@ -1,0 +1,39 @@
+
+configure(subprojects.findAll {it.name != 'definition' && it.name != 'infrastructure'}) {
+	apply plugin: 'java'
+	apply plugin: 'eclipse'
+
+	sourceCompatibility = 1.6
+	version = '0.3.1.alpha'
+	group = 'eu.pmsoft'
+
+repositories {
+        mavenCentral()
+    }
+
+    eclipse {
+        classpath {
+        downloadSources = true
+        downloadJavadoc = true
+        }
+    }
+}
+
+project(':definition:samModel') {
+    dependencies {
+        compile project(':definition:samCoreApi')
+    }
+}
+project(':infrastructure:samExecution') {
+	dependencies {
+		compile project(':infrastructure:canonicalProtocol')
+        	compile project(':definition:samModel')
+        	compile project(':definition:samCoreApi')
+	}
+}
+project(':integrationTest') {
+    dependencies {
+        compile project(':definition:samModel')
+        compile project(':infrastructure:samExecution')
+    }
+}

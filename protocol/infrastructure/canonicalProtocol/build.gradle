@@ -1,0 +1,8 @@
+dependencies {
+    compile (
+        [group: 'com.google.inject', name: 'guice', version: '3.0'],
+        [group: 'com.google.guava', name: 'guava', version: '13.0.1'],
+    )
+    testCompile group: 'org.testng', name: 'testng', version: '6.1.1'
+}
+

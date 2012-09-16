@@ -1,0 +1,12 @@
+dependencies {
+    compile (
+        [group: 'com.google.inject', name: 'guice', version: '3.0'],
+        [group: 'com.google.inject.extensions', name: 'guice-servlet', version: '3.0'],
+        [group: 'com.google.inject.extensions', name: 'guice-grapher', version: '3.0'],
+        [group: 'com.google.inject.extensions', name: 'guice-assistedinject', version: '3.0'],
+        [group: 'com.google.guava', name: 'guava', version: '13.0.1'],
+    )
+    testCompile group: 'com.google.guiceberry', name: 'guiceberry', version: '3.1.0'
+    testCompile group: 'org.testng', name: 'testng', version: '6.1.1'
+}
+

@@ -1,0 +1,5 @@
+include 'definition:samCoreApi'
+include 'definition:samModel'
+include 'infrastructure:canonicalProtocol'
+include 'infrastructure:samExecution'
+include 'integrationTest'
