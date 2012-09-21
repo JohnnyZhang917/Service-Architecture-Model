@@ -8,7 +8,7 @@ import java.net.URL;
 import org.junit.Rule;
 import org.junit.Test;
 
-import pmsoft.sam.model.architecture.ServiceKey;
+import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.model.instance.SIID;
 import pmsoft.sam.model.instance.ServiceImplementationKey;
 import pmsoft.sam.module.definition.test.data.impl.c.Service3ImplPackC;

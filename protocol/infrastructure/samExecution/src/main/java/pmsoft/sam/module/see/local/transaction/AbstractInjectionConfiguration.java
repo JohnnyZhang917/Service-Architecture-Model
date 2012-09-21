@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import pmsoft.sam.architecture.model.SamArchitecture;
+import pmsoft.sam.architecture.model.SamService;
+import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.canonical.service.CanonicalProtocolExecutionService;
 import pmsoft.sam.inject.wrapper.ServiceBindingDefinition;
 import pmsoft.sam.inject.wrapper.WrappingInjectorBuilder;
 import pmsoft.sam.inject.wrapper.WrappingInjectorLoader;
 import pmsoft.sam.inject.wrapper.WrappingInjectorMainLoader;
-import pmsoft.sam.model.architecture.SamArchitecture;
-import pmsoft.sam.model.architecture.SamService;
-import pmsoft.sam.model.architecture.ServiceKey;
 import pmsoft.sam.module.see.ServiceExecutionEnviroment;
 import pmsoft.sam.module.see.local.ServiceExecutionEnviromentInternalAPI;
 

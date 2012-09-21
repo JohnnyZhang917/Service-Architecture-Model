@@ -3,7 +3,7 @@ package pmsoft.sam.model.instance;
 import java.util.List;
 import java.util.UUID;
 
-import pmsoft.sam.model.architecture.ServiceKey;
+import pmsoft.sam.architecture.model.ServiceKey;
 
 public class SIID {
 

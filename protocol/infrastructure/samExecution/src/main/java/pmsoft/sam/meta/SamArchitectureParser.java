@@ -1,7 +1,7 @@
 package pmsoft.sam.meta;
 
-import pmsoft.sam.definition.architecture.SamArchitectureDefinition;
-import pmsoft.sam.model.architecture.SamArchitecture;
+import pmsoft.sam.architecture.definition.SamArchitectureDefinition;
+import pmsoft.sam.architecture.model.SamArchitecture;
 
 public interface SamArchitectureParser {
 

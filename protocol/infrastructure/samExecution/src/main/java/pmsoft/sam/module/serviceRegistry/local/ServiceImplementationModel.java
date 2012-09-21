@@ -2,7 +2,7 @@ package pmsoft.sam.module.serviceRegistry.local;
 
 import java.util.List;
 
-import pmsoft.sam.model.architecture.ServiceKey;
+import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.model.instance.ServiceImplementation;
 import pmsoft.sam.model.instance.ServiceImplementationKey;
 

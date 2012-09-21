@@ -1,4 +1,4 @@
-package pmsoft.sam.definition.architecture;
+package pmsoft.sam.architecture.definition;
 
 
 public interface SamArchitectureDefinition {

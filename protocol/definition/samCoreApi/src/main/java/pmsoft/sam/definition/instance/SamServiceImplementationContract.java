@@ -9,7 +9,5 @@ package pmsoft.sam.definition.instance;
  * 
  */
 public interface SamServiceImplementationContract {
-	
-	void readContract(SamServiceImplementationContractLoader reader);
-
+	void loadContractPackage(SamServiceImplementationContractLoader reader);
 }

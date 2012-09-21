@@ -2,7 +2,6 @@ package pmsoft.sam.test.environment;
 
 import pmsoft.sam.module.canonical.CanonicalProtocolInfrastructure;
 import pmsoft.sam.module.definition.test.oauth.OAuthArchitectureModule;
-import pmsoft.sam.module.model.std.SamArchitectureLoaderStdModule;
 import pmsoft.sam.module.see.local.SEELocalModule;
 import pmsoft.sam.module.serviceRegistry.local.LocalVMServiceRegistryModule;
 
@@ -15,7 +14,6 @@ public class OAuthTestEnvironmentModule extends GuiceBerryModule {
 		super.configure();
 		bind(GuiceBerryEnvMain.class).to(ProtoEnviromentStarter.class);
 		// Service Architecture Instance
-		install(new SamArchitectureLoaderStdModule());
 		install(new OAuthArchitectureModule());
 
 		// ServiceRegistry instance

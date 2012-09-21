@@ -1,5 +1,10 @@
 package pmsoft.sam.definition.service;
 
+/**
+ * Definition of ONE service contract ( a set of interfaces )
+ * @author pawel
+ *
+ */
 public abstract class AbstractSamServiceDefinition implements
 		SamServiceDefinition {
 
@@ -9,7 +14,6 @@ public abstract class AbstractSamServiceDefinition implements
 		try {
 			loader.setupLoadContext(this.getClass());
 			this.loaderRef = loader;
-			
 			loadServiceDefinition();
 		} finally {
 			this.loaderRef = null;

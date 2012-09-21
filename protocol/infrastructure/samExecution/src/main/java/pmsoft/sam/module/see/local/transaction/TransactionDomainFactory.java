@@ -2,7 +2,7 @@ package pmsoft.sam.module.see.local.transaction;
 
 import java.net.URL;
 
-import pmsoft.sam.model.architecture.ServiceKey;
+import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.model.instance.SIID;
 import pmsoft.sam.module.see.transaction.TransactionConfigurator;
 

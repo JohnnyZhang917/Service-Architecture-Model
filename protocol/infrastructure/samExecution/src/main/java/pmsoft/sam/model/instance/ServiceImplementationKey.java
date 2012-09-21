@@ -1,7 +1,7 @@
 package pmsoft.sam.model.instance;
 
+import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.definition.service.SamServiceDefinition;
-import pmsoft.sam.model.architecture.ServiceKey;
 
 import com.google.inject.Module;
 

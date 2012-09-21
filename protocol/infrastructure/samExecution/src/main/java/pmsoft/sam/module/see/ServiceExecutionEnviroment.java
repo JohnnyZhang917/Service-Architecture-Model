@@ -3,7 +3,7 @@ package pmsoft.sam.module.see;
 import java.net.URL;
 import java.util.List;
 
-import pmsoft.sam.model.architecture.SamService;
+import pmsoft.sam.architecture.model.SamService;
 import pmsoft.sam.model.instance.SIID;
 import pmsoft.sam.model.instance.ServiceImplementationKey;
 import pmsoft.sam.module.see.transaction.SamTransaction;

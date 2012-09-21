@@ -1,9 +1,13 @@
-package pmsoft.sam.model.architecture;
+package pmsoft.sam.architecture.model;
 
 import java.util.Set;
 
 public interface SamCategory {
 
+	/**
+	 * Unique category ID
+	 * @return
+	 */
 	public String getCategoryId();
 
 	/**

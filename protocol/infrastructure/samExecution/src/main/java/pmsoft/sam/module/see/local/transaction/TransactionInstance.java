@@ -4,13 +4,13 @@ import java.net.URL;
 import java.util.Map;
 import java.util.UUID;
 
+import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.canonical.api.CanonicalProtocolRequestHandler;
 import pmsoft.sam.canonical.api.execution.ExecutionContextImpl;
 import pmsoft.sam.canonical.model.CanonicalProtocolRequestData;
 import pmsoft.sam.canonical.model.ServiceExecutionRequest;
 import pmsoft.sam.canonical.service.CanonicalProtocolExecutionService;
 import pmsoft.sam.inject.wrapper.WrappingInjectorController;
-import pmsoft.sam.model.architecture.SamArchitecture;
 import pmsoft.sam.module.see.ExternalServiceReference;
 import pmsoft.sam.module.see.local.ServiceExecutionEnviromentInternalAPI;
 import pmsoft.sam.module.see.transaction.SamTransaction;

@@ -2,7 +2,7 @@ package pmsoft.sam.model.instance;
 
 import java.util.List;
 
-import pmsoft.sam.model.architecture.ServiceKey;
+import pmsoft.sam.architecture.model.ServiceKey;
 
 import com.google.inject.Module;
 

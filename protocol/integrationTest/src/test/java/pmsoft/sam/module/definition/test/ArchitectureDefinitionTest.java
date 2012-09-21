@@ -8,9 +8,9 @@ import java.util.List;
 import org.junit.Rule;
 import org.junit.Test;
 
-import pmsoft.sam.model.architecture.SamArchitecture;
-import pmsoft.sam.model.architecture.SamCategory;
-import pmsoft.sam.model.architecture.ServiceKey;
+import pmsoft.sam.architecture.model.SamArchitecture;
+import pmsoft.sam.architecture.model.SamCategory;
+import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.model.instance.ServiceImplementationKey;
 import pmsoft.sam.module.definition.test.data.impl.a.ServiceImplementationPackageA;
 import pmsoft.sam.module.definition.test.data.service.Service1Definition;

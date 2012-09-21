@@ -5,9 +5,9 @@ import static com.google.common.base.Preconditions.checkState;
 import java.net.URL;
 import java.util.Collection;
 
+import pmsoft.sam.architecture.model.SamArchitecture;
+import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.inject.wrapper.ServiceBindingDefinition;
-import pmsoft.sam.model.architecture.SamArchitecture;
-import pmsoft.sam.model.architecture.ServiceKey;
 import pmsoft.sam.model.instance.SIID;
 import pmsoft.sam.module.see.ServiceExecutionEnviroment;
 import pmsoft.sam.module.see.transaction.InjectionConfiguration;

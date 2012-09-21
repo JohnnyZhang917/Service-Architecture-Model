@@ -3,9 +3,9 @@ package pmsoft.sam.module.see.local.transaction;
 import java.net.URL;
 import java.util.List;
 
+import pmsoft.sam.architecture.model.SamArchitecture;
+import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.inject.wrapper.ServiceBindingDefinition;
-import pmsoft.sam.model.architecture.SamArchitecture;
-import pmsoft.sam.model.architecture.ServiceKey;
 import pmsoft.sam.model.instance.SIID;
 import pmsoft.sam.module.see.ServiceExecutionEnviroment;
 import pmsoft.sam.module.see.ServiceInstance;

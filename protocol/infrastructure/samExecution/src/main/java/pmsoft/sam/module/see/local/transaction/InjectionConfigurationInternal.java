@@ -2,11 +2,11 @@ package pmsoft.sam.module.see.local.transaction;
 
 import java.net.URL;
 
+import pmsoft.sam.architecture.model.SamArchitecture;
+import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.canonical.service.CanonicalProtocolExecutionService;
 import pmsoft.sam.inject.wrapper.ServiceBindingDefinition;
 import pmsoft.sam.inject.wrapper.WrappingInjectorLoader;
-import pmsoft.sam.model.architecture.SamArchitecture;
-import pmsoft.sam.model.architecture.ServiceKey;
 import pmsoft.sam.module.see.ServiceExecutionEnviroment;
 import pmsoft.sam.module.see.local.ServiceExecutionEnviromentInternalAPI;
 import pmsoft.sam.module.see.transaction.InjectionConfiguration;

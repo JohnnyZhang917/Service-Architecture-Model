@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import pmsoft.sam.architecture.model.SamArchitecture;
+import pmsoft.sam.architecture.model.SamService;
+import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.inject.free.FreeVariableBindingBuilder;
-import pmsoft.sam.model.architecture.SamArchitecture;
-import pmsoft.sam.model.architecture.SamService;
-import pmsoft.sam.model.architecture.ServiceKey;
 import pmsoft.sam.model.instance.SIID;
 import pmsoft.sam.model.instance.ServiceImplementation;
 import pmsoft.sam.model.instance.ServiceImplementationKey;

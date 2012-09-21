@@ -1,11 +1,11 @@
-package pmsoft.sam.model.architecture;
+package pmsoft.sam.architecture.model;
 
 public class ServiceKey {
 
 	private final String serviceDefinitionSignature;
 
 	public ServiceKey(String serviceDefinitionSignature) {
-		super();
+		assert serviceDefinitionSignature != null;
 		this.serviceDefinitionSignature = serviceDefinitionSignature;
 	}
 
@@ -15,12 +15,6 @@ public class ServiceKey {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime
-				* result
-				+ ((serviceDefinitionSignature == null) ? 0
-						: serviceDefinitionSignature.hashCode());
 		return serviceDefinitionSignature.hashCode();
 	}
 

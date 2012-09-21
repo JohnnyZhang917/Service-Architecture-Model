@@ -1,6 +1,6 @@
 package pmsoft.sam.module.definition.test.oauth;
 
-import pmsoft.sam.definition.architecture.SamArchitectureDefinition;
+import pmsoft.sam.architecture.definition.SamArchitectureDefinition;
 
 import com.google.inject.AbstractModule;
 

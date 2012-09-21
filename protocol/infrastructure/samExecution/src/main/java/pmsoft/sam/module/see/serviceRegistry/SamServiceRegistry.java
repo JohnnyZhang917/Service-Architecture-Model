@@ -2,8 +2,8 @@ package pmsoft.sam.module.see.serviceRegistry;
 
 import java.util.List;
 
+import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.definition.instance.SamServiceImplementationContract;
-import pmsoft.sam.model.architecture.ServiceKey;
 import pmsoft.sam.model.instance.ServiceImplementation;
 import pmsoft.sam.model.instance.ServiceImplementationKey;
 
