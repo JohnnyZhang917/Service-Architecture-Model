@@ -3,8 +3,6 @@ package pmsoft.sam.see.execution.localjvm;
 import java.util.Map;
 import java.util.Set;
 
-import org.testng.collections.Maps;
-
 import pmsoft.sam.architecture.api.SamArchitectureRegistry;
 import pmsoft.sam.architecture.model.SamService;
 import pmsoft.sam.architecture.model.ServiceKey;
@@ -18,6 +16,7 @@ import pmsoft.sam.see.api.model.SamServiceImplementationKey;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 import com.google.inject.Module;
