@@ -18,14 +18,14 @@ import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.architecture.model.SamCategory;
 import pmsoft.sam.architecture.model.SamService;
 import pmsoft.sam.architecture.model.ServiceKey;
-import pmsoft.sam.model.instance.SIID;
-import pmsoft.sam.model.instance.ServiceImplementationKey;
 import pmsoft.sam.module.definition.test.data.impl.a.ServiceImplementationPackageA;
 import pmsoft.sam.module.definition.test.data.service.Service1Definition;
 import pmsoft.sam.module.definition.test.data.service.Service1a;
 import pmsoft.sam.module.see.ServiceExecutionEnviroment;
-import pmsoft.sam.module.see.ServiceInstance;
-import pmsoft.sam.module.see.serviceRegistry.SamServiceRegistry;
+import pmsoft.sam.module.see.serviceRegistry.SamServiceRegistryDeprecated;
+import pmsoft.sam.see.api.model.SIID;
+import pmsoft.sam.see.api.model.ServiceImplementationKey;
+import pmsoft.sam.see.api.model.ServiceInstance;
 import pmsoft.sam.test.environment.SamProtoTestModule;
 import ch.lambdaj.function.closure.Closure1;
 
@@ -42,7 +42,7 @@ public class ServiceInstanceCreationTest {
 	private SamArchitecture architectureService;
 
 	@Inject
-	private SamServiceRegistry serviceRegistry;
+	private SamServiceRegistryDeprecated serviceRegistry;
 
 	@Inject
 	private ServiceExecutionEnviroment see;

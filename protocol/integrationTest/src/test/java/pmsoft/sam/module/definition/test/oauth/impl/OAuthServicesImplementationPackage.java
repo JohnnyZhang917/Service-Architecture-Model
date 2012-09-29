@@ -1,6 +1,6 @@
 package pmsoft.sam.module.definition.test.oauth.impl;
 
-import pmsoft.sam.definition.instance.AbstractSamImplementationPackage;
+import pmsoft.sam.definition.implementation.AbstractSamImplementationPackage;
 
 public class OAuthServicesImplementationPackage extends AbstractSamImplementationPackage {
 

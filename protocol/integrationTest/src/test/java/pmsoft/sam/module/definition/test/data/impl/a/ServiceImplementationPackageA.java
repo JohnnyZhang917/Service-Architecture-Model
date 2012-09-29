@@ -1,6 +1,6 @@
 package pmsoft.sam.module.definition.test.data.impl.a;
 
-import pmsoft.sam.definition.instance.AbstractSamImplementationPackage;
+import pmsoft.sam.definition.implementation.AbstractSamImplementationPackage;
 
 public class ServiceImplementationPackageA extends AbstractSamImplementationPackage {
 

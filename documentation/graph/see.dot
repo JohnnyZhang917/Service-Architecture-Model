@@ -1,0 +1,61 @@
+digraph see {
+subgraph clusterSEE {
+	label = "Service Execution Environment";
+	subgraph clusterSEENode {
+		label = "Execution node";
+		SI [label="Service Instance"];
+		PH [label="Protocol Handler"];
+		IT [label="Injection Transaction"];
+		SIrec [label="Service Registry"];
+	}
+	subgraph clusterInfrastructure {
+		label = "Infrastructure";
+		AR [label="Architecture Registry"];
+		SDR [label="Service Discovery Registry"];
+		TP [label="Transport Provider"];
+	}
+}
+
+
+subgraph clusterServiceDefinition {
+	label = "Service\nDefinition";
+	SC [label="Service Contract"];
+	I [label="Interface"];
+	DM [label="Domain Model"];
+}
+subgraph clusterArchitectureDefinition {
+	label = "Architecture\nDefinition";
+	A [label="Architecure"];
+	C [label="Category"];
+}
+subgraph clusterServiceInstance {
+	SImpl [label="Service Implementation"];
+}
+
+
+SImpl -> SC;
+A -> C;
+C -> C;
+C -> SC;
+AR -> A;
+SC -> I;
+I -> DM;
+SI -> SImpl;
+
+
+
+IT -> SIrec;
+IT -> SI;
+IT -> PH;
+#PH -> IT [arrowhead="onormal"];
+#IT -> PH [arrowhead="onormal"];
+#PH -> IT;
+
+PH -> TP;
+
+SIrec -> SDR;
+SDR -> SIrec [arrowhead="onormal"];
+TP -> PH [arrowhead="onormal"];
+SDR -> AR;
+
+}

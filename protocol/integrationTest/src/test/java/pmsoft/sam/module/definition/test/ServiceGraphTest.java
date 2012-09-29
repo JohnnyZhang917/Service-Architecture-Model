@@ -3,8 +3,6 @@ package pmsoft.sam.module.definition.test;
 import org.junit.Rule;
 import org.junit.Test;
 
-import pmsoft.sam.model.instance.SIID;
-import pmsoft.sam.model.instance.ServiceImplementationKey;
 import pmsoft.sam.module.definition.test.data.impl.b.Service1ImplPackB;
 import pmsoft.sam.module.definition.test.data.impl.b.Service2ImplPackBalpha;
 import pmsoft.sam.module.definition.test.data.impl.b.Service2ImplPackBbeta;
@@ -12,11 +10,13 @@ import pmsoft.sam.module.definition.test.data.impl.b.ServiceImplementationPackag
 import pmsoft.sam.module.definition.test.data.service.Service1Definition;
 import pmsoft.sam.module.definition.test.data.service.Service2Definition;
 import pmsoft.sam.module.see.ServiceExecutionEnviroment;
-import pmsoft.sam.module.see.ServiceInstance;
-import pmsoft.sam.module.see.serviceRegistry.SamServiceRegistry;
+import pmsoft.sam.module.see.serviceRegistry.SamServiceRegistryDeprecated;
 import pmsoft.sam.module.see.transaction.InjectionConfiguration;
 import pmsoft.sam.module.see.transaction.SamTransaction;
 import pmsoft.sam.module.see.transaction.TransactionConfigurator;
+import pmsoft.sam.see.api.model.SIID;
+import pmsoft.sam.see.api.model.ServiceImplementationKey;
+import pmsoft.sam.see.api.model.ServiceInstance;
 import pmsoft.sam.test.environment.SamProtoTestModule;
 import pmsoft.sam.test.util.Grapher;
 
@@ -29,7 +29,7 @@ public class ServiceGraphTest {
 	public GuiceBerryRule guiceBerry = new GuiceBerryRule(SamProtoTestModule.class);
 
 	@Inject
-	private SamServiceRegistry serviceRegistry;
+	private SamServiceRegistryDeprecated serviceRegistry;
 
 	@Inject
 	private ServiceExecutionEnviroment see;

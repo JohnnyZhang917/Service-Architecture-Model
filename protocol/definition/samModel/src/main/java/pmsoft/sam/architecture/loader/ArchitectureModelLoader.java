@@ -128,7 +128,7 @@ public class ArchitectureModelLoader implements SamArchitectureLoader {
 			public SamServiceObject buildService(){
 				Preconditions.checkState(definitionClass != null);
 				Preconditions.checkState(serviceInterfaces.size() > 0);
-				ServiceKey key = new ServiceKey(definitionClass.getName());
+				ServiceKey key = new ServiceKey(definitionClass);
 				return new SamServiceObject(key, ImmutableSet.copyOf(serviceInterfaces));
 			}
 

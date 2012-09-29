@@ -8,7 +8,9 @@ import org.mockito.stubbing.Answer;
 import org.mockito.stubbing.Stubber;
 import org.testng.annotations.Test;
 
-import pmsoft.sam.definition.instance.SamServiceImplementationContractLoader.SamServiceInstanceGrammarContract;
+import pmsoft.sam.definition.implementation.AbstractSamImplementationPackage;
+import pmsoft.sam.definition.implementation.SamServiceImplementationContractLoader;
+import pmsoft.sam.definition.implementation.SamServiceImplementationContractLoader.SamServiceImplementationGrammarContract;
 import pmsoft.sam.definition.service.AbstractSamServiceDefinition;
 
 import com.google.inject.AbstractModule;
@@ -60,10 +62,10 @@ public class SamImplementationTest {
 	public void simpleServiceImplementationDefinition() {
 		// Nested mocks for a 2 level regular grammar, no better solution right now.
 		SamServiceImplementationContractLoader reader = Mockito.mock(SamServiceImplementationContractLoader.class);
-		final SamServiceInstanceGrammarContract contract = Mockito.mock(SamServiceInstanceGrammarContract.class);
-		Stubber chaining = Mockito.doAnswer(new Answer<SamServiceInstanceGrammarContract>() {
+		final SamServiceImplementationGrammarContract contract = Mockito.mock(SamServiceImplementationGrammarContract.class);
+		Stubber chaining = Mockito.doAnswer(new Answer<SamServiceImplementationGrammarContract>() {
 			@Override
-			public SamServiceInstanceGrammarContract answer(
+			public SamServiceImplementationGrammarContract answer(
 					InvocationOnMock invocation) throws Throwable {
 				return contract;
 			}

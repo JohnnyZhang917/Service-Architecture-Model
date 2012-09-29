@@ -1,12 +1,14 @@
 package pmsoft.sam.architecture.model;
 
+import pmsoft.sam.definition.service.SamServiceDefinition;
+
 public class ServiceKey {
 
 	private final String serviceDefinitionSignature;
 
-	public ServiceKey(String serviceDefinitionSignature) {
-		assert serviceDefinitionSignature != null;
-		this.serviceDefinitionSignature = serviceDefinitionSignature;
+	public ServiceKey(Class<? extends SamServiceDefinition> definitionClass) {
+		assert definitionClass != null;
+		this.serviceDefinitionSignature = definitionClass.getCanonicalName();
 	}
 
 	public String getServiceDefinitionSignature() {

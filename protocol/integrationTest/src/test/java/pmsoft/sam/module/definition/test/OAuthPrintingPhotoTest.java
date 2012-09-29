@@ -7,8 +7,6 @@ import java.net.URL;
 import org.junit.Rule;
 import org.junit.Test;
 
-import pmsoft.sam.model.instance.SIID;
-import pmsoft.sam.model.instance.ServiceImplementationKey;
 import pmsoft.sam.module.definition.test.oauth.impl.OAuthServicesImplementationPackage;
 import pmsoft.sam.module.definition.test.oauth.impl.beppa.BeppaPrintingPhotoService;
 import pmsoft.sam.module.definition.test.oauth.impl.faji.FajiPhotoSharingService;
@@ -18,10 +16,12 @@ import pmsoft.sam.module.definition.test.oauth.service.JaneGuiServiceDefinition;
 import pmsoft.sam.module.definition.test.oauth.service.PhotoSharingServiceDefinition;
 import pmsoft.sam.module.definition.test.oauth.service.PrintingPhotoServiceDefinition;
 import pmsoft.sam.module.see.ServiceExecutionEnviroment;
-import pmsoft.sam.module.see.serviceRegistry.SamServiceRegistry;
+import pmsoft.sam.module.see.serviceRegistry.SamServiceRegistryDeprecated;
 import pmsoft.sam.module.see.transaction.InjectionConfiguration;
 import pmsoft.sam.module.see.transaction.SamTransaction;
 import pmsoft.sam.module.see.transaction.TransactionConfigurator;
+import pmsoft.sam.see.api.model.SIID;
+import pmsoft.sam.see.api.model.ServiceImplementationKey;
 import pmsoft.sam.test.environment.OAuthTestEnvironmentModule;
 
 import com.google.guiceberry.junit4.GuiceBerryRule;
@@ -32,7 +32,7 @@ public class OAuthPrintingPhotoTest {
 	public GuiceBerryRule guiceBerry = new GuiceBerryRule(OAuthTestEnvironmentModule.class);
 
 	@Inject
-	private SamServiceRegistry serviceRegistry;
+	private SamServiceRegistryDeprecated serviceRegistry;
 
 	@Inject
 	private ServiceExecutionEnviroment see;
