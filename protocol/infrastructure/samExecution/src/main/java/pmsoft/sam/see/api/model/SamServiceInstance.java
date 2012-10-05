@@ -8,7 +8,7 @@ public interface SamServiceInstance {
 
 	public SIID getKey();
 	
-	public ServiceInstanceMetadata getMetadata();
+	public ServiceMetadata getMetadata();
 
 	// TODO maybe not necessary
 	// public ServiceImplementation getImplementation();

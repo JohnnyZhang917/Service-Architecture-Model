@@ -22,7 +22,7 @@ public class TestServiceTwoModule extends AbstractModule {
 		
 		@Override
 		public boolean runTest() {
-			return false;
+			return serviceOne.runTest();
 		}
 		
 	}
@@ -37,7 +37,7 @@ public class TestServiceTwoModule extends AbstractModule {
 
 		@Override
 		public boolean runTest() {
-			return false;
+			return serviceOne.runTest();
 		}
 		
 	}

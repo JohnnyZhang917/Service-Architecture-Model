@@ -7,76 +7,71 @@ import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.definition.service.SamServiceDefinition;
 import pmsoft.sam.see.api.model.SIID;
 import pmsoft.sam.see.api.model.SIURL;
-import pmsoft.sam.see.api.model.SamInjectionTransaction;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-public class SamTransactionGrammar {
-	// A grammar based on ServiceImplementation definition.
-	// InjectionConfiguration: ExposedContract BindingConfiguration*
-	// ExposedServiceInstance
-	// BindingConfiguration: ExtrenalContract -> SIID | ExtrenalContract ->
-	// SIURL | InjectionConfiguration
-	//
+public class SamTransactionConfigurationUtil {
 
-	public static SamInjectionTransactionGrammarContract createTransactionOn(Class<? extends SamServiceDefinition> serviceContract) {
+	public static SamInjectionTransactionDefinitionGrammar createTransactionOn(Class<? extends SamServiceDefinition> serviceContract) {
+		return createTransactionOn(new ServiceKey(serviceContract));
+	}
+
+	public static SamInjectionTransactionDefinitionGrammar createTransactionOn(ServiceKey serviceContract) {
 		return new SamInjectionTransactionGrammarContractBuilder(serviceContract);
 	}
 
-	static public interface SamInjectionTransactionGrammarContract {
-		public SamInjectionTransactionGrammarContract idBinding(Class<? extends SamServiceDefinition> bindedService,
-				SIID instanceId);
-
-		public SamInjectionTransactionGrammarContract urlBinding(Class<? extends SamServiceDefinition> bindedService,
-				SIURL instanceUrl);
-
-		public SamInjectionTransactionGrammarContract transactionBinding(SamInjectionTransaction transaction);
-
-		public SamInjectionTransaction providedByServiceInstance(SIID serviceInstance);
-	}
-
-	static public class SamInjectionTransactionGrammarContractBuilder implements SamInjectionTransactionGrammarContract {
+	static public class SamInjectionTransactionGrammarContractBuilder implements SamInjectionTransactionDefinitionGrammar {
 
 		private final ServiceKey exposedService;
 		private final Set<ServiceKey> registeredKeys = Sets.newHashSet();
 		private final Map<ServiceKey, SIID> siidMapping = Maps.newHashMap();
 		private final Map<ServiceKey, SIURL> siurlMapping = Maps.newHashMap();
-		private final Map<ServiceKey, SamInjectionTransaction> transactionMapping = Maps.newHashMap();
+		private final Map<ServiceKey, SamInjectionTransactionConfiguration> transactionMapping = Maps.newHashMap();
 		private boolean definitionOpen = true;
 
-		public SamInjectionTransactionGrammarContractBuilder(Class<? extends SamServiceDefinition> exposedContract) {
-			this.exposedService = new ServiceKey(exposedContract);
+		public SamInjectionTransactionGrammarContractBuilder(ServiceKey exposedContract) {
+			this.exposedService = exposedContract;
 		}
 
 		@Override
-		public SamInjectionTransactionGrammarContract idBinding(Class<? extends SamServiceDefinition> bindedService,
+		public SamInjectionTransactionDefinitionGrammar idBinding(Class<? extends SamServiceDefinition> bindedService,
 				SIID instanceId) {
+			ServiceKey serviceKey = new ServiceKey(bindedService);
+			return idBinding(serviceKey, instanceId);
+		}
+
+		@Override
+		public SamInjectionTransactionDefinitionGrammar idBinding(ServiceKey key, SIID instanceId) {
 			Preconditions.checkState(definitionOpen, "Definition already build. Dont reuse builder reference");
-			ServiceKey key = loadKey(bindedService);
+			checkKey(key);
 			siidMapping.put(key, instanceId);
 			return this;
 		}
 
-		private ServiceKey loadKey(Class<? extends SamServiceDefinition> bindedService) {
-			ServiceKey serviceKey = new ServiceKey(bindedService);
+		private void checkKey(ServiceKey serviceKey) {
 			Preconditions.checkState(registeredKeys.add(serviceKey));
-			return serviceKey;
 		}
 
 		@Override
-		public SamInjectionTransactionGrammarContract urlBinding(Class<? extends SamServiceDefinition> bindedService,
+		public SamInjectionTransactionDefinitionGrammar urlBinding(Class<? extends SamServiceDefinition> bindedService,
 				SIURL instanceUrl) {
+			ServiceKey serviceKey = new ServiceKey(bindedService);
+			return urlBinding(serviceKey, instanceUrl);
+		}
+
+		@Override
+		public SamInjectionTransactionDefinitionGrammar urlBinding(ServiceKey key, SIURL instanceUrl) {
 			Preconditions.checkState(definitionOpen, "Definition already build. Dont reuse builder reference");
-			ServiceKey key = loadKey(bindedService);
+			checkKey(key);
 			siurlMapping.put(key, instanceUrl);
 			return this;
 		}
 
 		@Override
-		public SamInjectionTransactionGrammarContract transactionBinding(SamInjectionTransaction transaction) {
+		public SamInjectionTransactionDefinitionGrammar transactionBinding(SamInjectionTransactionConfiguration transaction) {
 			Preconditions.checkState(definitionOpen, "Definition already build. Dont reuse builder reference");
 			ServiceKey key = transaction.getProvidedService();
 			Preconditions.checkState(registeredKeys.add(key));
@@ -85,7 +80,7 @@ public class SamTransactionGrammar {
 		}
 
 		@Override
-		public SamInjectionTransaction providedByServiceInstance(SIID serviceInstance) {
+		public SamInjectionTransactionConfiguration providedByServiceInstance(SIID serviceInstance) {
 			Preconditions.checkState(definitionOpen, "Definition already build. Dont reuse builder reference");
 			definitionOpen = false;
 			SamInjectionTransactionObject transaction = new SamInjectionTransactionObject(exposedService, serviceInstance,
@@ -94,22 +89,28 @@ public class SamTransactionGrammar {
 		}
 	}
 
-	static public class SamInjectionTransactionObject implements SamInjectionTransaction {
+	static public class SamInjectionTransactionObject implements SamInjectionTransactionConfiguration {
 
 		private final ServiceKey exposedService;
 		private final SIID exposedInstance;
 		private ImmutableMap<ServiceKey, SIID> internalMap;
 		private ImmutableMap<ServiceKey, SIURL> externalMap;
-		private ImmutableMap<ServiceKey, SamInjectionTransaction> nestedMap;
+		private ImmutableMap<ServiceKey, SamInjectionTransactionConfiguration> nestedMap;
 
 		public SamInjectionTransactionObject(ServiceKey exposedContract, SIID exposedInstance,
 				ImmutableMap<ServiceKey, SIID> internalMap, ImmutableMap<ServiceKey, SIURL> externalMap,
-				ImmutableMap<ServiceKey, SamInjectionTransaction> nestedMap) {
+				ImmutableMap<ServiceKey, SamInjectionTransactionConfiguration> nestedMap) {
 			this.exposedService = exposedContract;
 			this.exposedInstance = exposedInstance;
 			this.internalMap = internalMap;
 			this.externalMap = externalMap;
 			this.nestedMap = nestedMap;
+		}
+
+		@Override
+		public String toString() {
+			return "SamInjectionTransactionObject [exposedService=" + exposedService + ", exposedInstance=" + exposedInstance
+					+ ", internalMap=" + internalMap + ", externalMap=" + externalMap + ", nestedMap=" + nestedMap + "]";
 		}
 
 		@Override
@@ -133,7 +134,7 @@ public class SamTransactionGrammar {
 		}
 
 		@Override
-		public Map<ServiceKey, SamInjectionTransaction> getNestedConfiguration() {
+		public Map<ServiceKey, SamInjectionTransactionConfiguration> getNestedConfiguration() {
 			return nestedMap;
 		}
 

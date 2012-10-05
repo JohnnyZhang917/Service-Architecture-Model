@@ -7,15 +7,21 @@ configure(subprojects.findAll {it.name != 'definition' && it.name != 'infrastruc
 	version = '0.3.1.alpha'
 	group = 'eu.pmsoft'
 
-repositories {
-        mavenCentral()
-    }
+	repositories {
+        	mavenCentral()
+    	}
 
-    eclipse {
-        classpath {
-        downloadSources = true
-        downloadJavadoc = true
+    	eclipse {
+        	classpath {
+        	downloadSources = true
+        	downloadJavadoc = true
         }
+
+	test {
+		useTestNG()
+		options {
+		}
+	}
     }
 }
 

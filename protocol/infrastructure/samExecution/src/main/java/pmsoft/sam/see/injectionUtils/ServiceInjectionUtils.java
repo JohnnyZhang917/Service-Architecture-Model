@@ -9,6 +9,7 @@ import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.inject.free.FreeVariableBindingBuilder;
 import pmsoft.sam.see.api.model.SamServiceImplementation;
 
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -23,13 +24,8 @@ public class ServiceInjectionUtils {
 		Module implModuleInstance;
 		try {
 			implModuleInstance = implModule.newInstance();
-			//TODO handle error
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-			return null;
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-			return null;
+		} catch (Exception e) {
+			throw Throwables.propagate(e);
 		}
 		
 		Set<ServiceKey> injectServices = serviceImplementation.getBindedServices();

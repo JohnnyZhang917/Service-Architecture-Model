@@ -2,7 +2,9 @@ package pmsoft.sam.see.api;
 
 import static org.testng.AssertJUnit.assertEquals;
 import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertTrue;
 
+import java.net.MalformedURLException;
 import java.util.Set;
 
 import org.testng.annotations.DataProvider;
@@ -15,6 +17,8 @@ import pmsoft.sam.architecture.loader.IncorrectArchitectureDefinition;
 import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.see.api.data.architecture.SeeTestArchitecture;
+import pmsoft.sam.see.api.data.architecture.TestInterfaceOne;
+import pmsoft.sam.see.api.data.architecture.TestInterfaceTwo0;
 import pmsoft.sam.see.api.data.architecture.TestServiceOne;
 import pmsoft.sam.see.api.data.architecture.TestServiceTwo;
 import pmsoft.sam.see.api.data.impl.TestImplementationDeclaration;
@@ -22,14 +26,19 @@ import pmsoft.sam.see.api.data.impl.TestServiceOneModule;
 import pmsoft.sam.see.api.data.impl.TestServiceTwoModule;
 import pmsoft.sam.see.api.data.transactions.TestTransactionDefinition;
 import pmsoft.sam.see.api.model.SIID;
-import pmsoft.sam.see.api.model.SamInjectionTransaction;
+import pmsoft.sam.see.api.model.SIURL;
 import pmsoft.sam.see.api.model.SamServiceImplementation;
 import pmsoft.sam.see.api.model.SamServiceImplementationKey;
 import pmsoft.sam.see.api.model.SamServiceInstance;
+import pmsoft.sam.see.api.transaction.SamInjectionTransaction;
+import pmsoft.sam.see.api.transaction.SamInjectionTransactionConfiguration;
 import pmsoft.sam.see.execution.localjvm.LocalSeeExecutionModule;
 import pmsoft.sam.see.infrastructure.localjvm.LocalSeeInfrastructureModule;
 
 import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.Module;
 
 @Guice(modules = {LocalSeeExecutionModule.class,LocalSeeInfrastructureModule.class})
 public class TestServiceExecutionEnvironment {
@@ -79,40 +88,84 @@ public class TestServiceExecutionEnvironment {
 
 	@Test(dataProvider = "registeredImplementations", groups = "architectureLoadCheck", dependsOnGroups="architectureDefinition")
 	public void testServiceInstanceCreation(SamServiceImplementationKey key) {
-		TestImplementationDeclaration declaration = new TestImplementationDeclaration();
-		samServiceRegistry.registerServiceImplementationPackage(declaration);
 		SamServiceInstance serviceInstance = executionNode.createServiceInstance(key,null);
 		assertNotNull(serviceInstance);
 		assertNotNull(serviceInstance.getInjector());
 		assertNotNull(serviceInstance.getKey());
 	}
 	
-	@Test( groups = "transactions", dependsOnGroups="architectureLoadCheck")
-	public void testInjectionTransactionCreation() {
-		SamServiceImplementationKey serviceKeyOne = new SamServiceImplementationKey(TestServiceOneModule.class);
-		SamServiceImplementationKey serviceKeyTwo = new SamServiceImplementationKey(TestServiceTwoModule.class);
-		Set<SamServiceInstance> setInstanceOne = executionNode.searchInstance(serviceKeyOne, null);
-		Set<SamServiceInstance> setInstanceTwo = executionNode.searchInstance(serviceKeyTwo, null);
-		assertEquals("1 instance of Service One expected",1, setInstanceOne.size());
-		assertEquals("1 instance of Service Two expected",1, setInstanceTwo.size());
-		SamServiceInstance instanceOne = setInstanceOne.iterator().next();
-		SamServiceInstance instanceTwo = setInstanceTwo.iterator().next();
-		SIID siidOne = instanceOne.getKey();
-		SIID siidTwo = instanceTwo.getKey();
-		
+	private SIID getUniqueServiceInstance(Class<? extends Module> implementationModule ) {
+		SamServiceImplementationKey serviceKey = new SamServiceImplementationKey(implementationModule);
+
+		Set<SamServiceInstance> setInstance = executionNode.searchInstance(serviceKey, null);
+
+		assertEquals("1 instance of Service expected",1, setInstance.size());
+		SamServiceInstance instance = setInstance.iterator().next();
+		return instance.getKey();
+	}
+
+	@Test( groups = "transactionsCreation", dependsOnGroups="architectureLoadCheck")
+	public void testInjectionTransactionCreation() throws MalformedURLException {
+		SIID siidOne = getUniqueServiceInstance(TestServiceOneModule.class);
+		SIID siidTwo = getUniqueServiceInstance(TestServiceTwoModule.class);
 
 		ServiceKey serviceOneTypeKey = new ServiceKey(TestServiceOne.class);
 		ServiceKey serviceTwoTypeKey = new ServiceKey(TestServiceTwo.class);
 		
-		SamInjectionTransaction transactionOne = TestTransactionDefinition.createServiceOneTransaction(siidOne);
+		SamInjectionTransactionConfiguration transactionOne = TestTransactionDefinition.createServiceOneTransaction(siidOne);
 		assertNotNull(transactionOne);
 		assertEquals(siidOne, transactionOne.getExposedServiceInstance());
 		assertEquals(serviceOneTypeKey, transactionOne.getProvidedService());
 		
-		SamInjectionTransaction transactionTwo = TestTransactionDefinition.createServiceTwoTransaction(siidTwo, siidOne);
+		SamInjectionTransactionConfiguration transactionTwo = TestTransactionDefinition.createServiceTwoTransaction(siidTwo, siidOne);
 		assertNotNull(transactionTwo);
 		assertEquals(siidTwo, transactionTwo.getExposedServiceInstance());
 		assertEquals(siidOne, transactionTwo.getInternalInjectionConfiguration().get(serviceOneTypeKey));
 		assertEquals(serviceTwoTypeKey, transactionTwo.getProvidedService());
+		
+		checkTransactionRegistration(new SIURL("http://localhost/one"),transactionOne);
+		checkTransactionRegistration(new SIURL("http://localhost/two"),transactionTwo);
 	}
+
+	private void checkTransactionRegistration(SIURL url, SamInjectionTransactionConfiguration transaction) {
+		executionNode.setupInjectionTransaction(transaction, null, url);
+		SamInjectionTransaction transactionRegistered = executionNode.getTransaction(url);
+		assertNotNull(transactionRegistered);
+		SamInjectionTransaction transanctionOnRegistry = samServiceRegistry.getTransaction(url);
+		assertNotNull(transanctionOnRegistry);
+		assertEquals(transactionRegistered, transanctionOnRegistry);		
+	}
+
+	@Test( groups = "transactionsExecution", dependsOnGroups="transactionsCreation")
+	public void testInjectionTransactionExecutionForServiceOne() throws MalformedURLException {
+		SIURL oneUrl = new SIURL("http://localhost/one"); 
+		SamInjectionTransaction transaction = executionNode.getTransaction(oneUrl);
+		assertNotNull(transaction);
+
+		Key<TestInterfaceOne> interfaceOneKey = Key.get(TestInterfaceOne.class);
+		Injector injector = transaction.getTransactionInjector();
+		assertNotNull(injector);
+		assertNotNull(injector.getExistingBinding(interfaceOneKey));
+		
+		TestInterfaceOne instanceOne = injector.getInstance(interfaceOneKey);
+		assertTrue(instanceOne.runTest());
+		
+	}
+
+	@Test( groups = "transactionsExecution", dependsOnGroups="transactionsCreation")
+	public void testInjectionTransactionExecutionForServiceTwo() throws MalformedURLException {
+		SIURL url = new SIURL("http://localhost/two"); 
+		SamInjectionTransaction transaction = executionNode.getTransaction(url);
+		assertNotNull(transaction);
+
+		Key<TestInterfaceTwo0> interfaceTwoKey = Key.get(TestInterfaceTwo0.class);
+		Injector injector = transaction.getTransactionInjector();
+		assertNotNull(injector);
+		assertNotNull(injector.getExistingBinding(interfaceTwoKey));
+		
+		TestInterfaceTwo0 instanceOne = injector.getInstance(interfaceTwoKey);
+		assertTrue(instanceOne.runTest());
+		
+	}
+
 }

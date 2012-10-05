@@ -11,7 +11,7 @@ subgraph clusterSEE {
 	subgraph clusterInfrastructure {
 		label = "Infrastructure";
 		AR [label="Architecture Registry"];
-		SDR [label="Service Discovery Registry"];
+		SD [label="Service Discovery"];
 		TP [label="Transport Provider"];
 	}
 }
@@ -53,9 +53,9 @@ IT -> PH;
 
 PH -> TP;
 
-SIrec -> SDR;
-SDR -> SIrec [arrowhead="onormal"];
+SIrec -> SD;
+SD -> SIrec [arrowhead="onormal"];
 TP -> PH [arrowhead="onormal"];
-SDR -> AR;
+SD -> AR;
 
 }

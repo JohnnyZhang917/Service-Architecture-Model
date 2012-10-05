@@ -9,6 +9,7 @@ import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.definition.implementation.SamServiceImplementationContractLoader;
 import pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
 import pmsoft.sam.definition.service.SamServiceDefinition;
+import pmsoft.sam.see.api.SamServiceDiscovery;
 import pmsoft.sam.see.api.SamServiceRegistry;
 import pmsoft.sam.see.api.model.SamServiceImplementation;
 import pmsoft.sam.see.api.model.SamServiceImplementationKey;
@@ -18,18 +19,21 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import com.google.inject.Inject;
+import com.google.common.collect.Sets.SetView;
 import com.google.inject.Module;
 
-public class SamServiceRegistryLocal implements SamServiceRegistry {
+public abstract class SamServiceRegistryLocal implements SamServiceRegistry {
 
 	private final Map<SamServiceImplementationKey, ServiceImplementationObject> register = Maps.newHashMap();
 
-	private final SamArchitectureRegistry architectureRegistry;
+	protected final SamArchitectureRegistry architectureRegistry;
+	
+	protected final SamServiceDiscovery serviceDiscoveryRegistry;
 
-	@Inject
-	public SamServiceRegistryLocal(SamArchitectureRegistry architectureRegistry) {
+	public SamServiceRegistryLocal(SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry) {
+		super();
 		this.architectureRegistry = architectureRegistry;
+		this.serviceDiscoveryRegistry = serviceDiscoveryRegistry;
 	}
 
 	@Override
@@ -37,16 +41,22 @@ public class SamServiceRegistryLocal implements SamServiceRegistry {
 		SamServiceImplementationContractLoaderImpl reader = new SamServiceImplementationContractLoaderImpl();
 		definition.loadContractPackage(reader);
 		Set<ServiceImplementationObject> implementations = reader.buildImplementations();
+		Map<SamServiceImplementationKey, ServiceImplementationObject> registerNew = Maps.newHashMapWithExpectedSize(implementations.size());
 		for (ServiceImplementationObject serviceImplementation : implementations) {
-			register.put(serviceImplementation.getKey(), serviceImplementation);
+			registerNew.put(serviceImplementation.getKey(), serviceImplementation);
 		}
+		SetView<SamServiceImplementationKey> alreadyExistingKeys = Sets.intersection(registerNew.keySet(), register.keySet());
+		Preconditions.checkState(alreadyExistingKeys.size()==0, "Duplicate registration of services with kets [%s]", alreadyExistingKeys);
+		register.putAll(registerNew);
 	}
 
 	@Override
 	public SamServiceImplementation getImplementation(SamServiceImplementationKey key) {
 		return register.get(key);
 	}
+	
 
+	
 	private class SamServiceImplementationContractLoaderImpl implements SamServiceImplementationContractLoader {
 
 		private Set<SamServiceImplementationGrammarContractImpl> implementations = Sets.newHashSet();
