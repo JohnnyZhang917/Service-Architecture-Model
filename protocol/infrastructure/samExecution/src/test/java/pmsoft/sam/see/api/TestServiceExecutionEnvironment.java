@@ -1,8 +1,6 @@
 package pmsoft.sam.see.api;
 
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertNotNull;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.AssertJUnit.*;
 
 import java.net.MalformedURLException;
 import java.util.Set;
@@ -16,6 +14,7 @@ import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
 import pmsoft.sam.architecture.loader.IncorrectArchitectureDefinition;
 import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.architecture.model.ServiceKey;
+import pmsoft.sam.protocol.injection.TransactionController;
 import pmsoft.sam.see.api.data.architecture.SeeTestArchitecture;
 import pmsoft.sam.see.api.data.architecture.TestInterfaceOne;
 import pmsoft.sam.see.api.data.architecture.TestInterfaceTwo0;
@@ -32,6 +31,7 @@ import pmsoft.sam.see.api.model.SamServiceImplementationKey;
 import pmsoft.sam.see.api.model.SamServiceInstance;
 import pmsoft.sam.see.api.transaction.SamInjectionTransaction;
 import pmsoft.sam.see.api.transaction.SamInjectionTransactionConfiguration;
+import pmsoft.sam.see.api.transaction.TransactionExecutionContext;
 import pmsoft.sam.see.execution.localjvm.LocalSeeExecutionModule;
 import pmsoft.sam.see.infrastructure.localjvm.LocalSeeInfrastructureModule;
 
@@ -120,7 +120,7 @@ public class TestServiceExecutionEnvironment {
 		SamInjectionTransactionConfiguration transactionTwo = TestTransactionDefinition.createServiceTwoTransaction(siidTwo, siidOne);
 		assertNotNull(transactionTwo);
 		assertEquals(siidTwo, transactionTwo.getExposedServiceInstance());
-		assertEquals(siidOne, transactionTwo.getInternalInjectionConfiguration().get(serviceOneTypeKey));
+		assertEquals(siidOne, transactionTwo.getInjectionConfiguration().get(serviceOneTypeKey));
 		assertEquals(serviceTwoTypeKey, transactionTwo.getProvidedService());
 		
 		checkTransactionRegistration(new SIURL("http://localhost/one"),transactionOne);
@@ -128,7 +128,7 @@ public class TestServiceExecutionEnvironment {
 	}
 
 	private void checkTransactionRegistration(SIURL url, SamInjectionTransactionConfiguration transaction) {
-		executionNode.setupInjectionTransaction(transaction, null, url);
+		executionNode.setupInjectionTransaction(transaction, url);
 		SamInjectionTransaction transactionRegistered = executionNode.getTransaction(url);
 		assertNotNull(transactionRegistered);
 		SamInjectionTransaction transanctionOnRegistry = samServiceRegistry.getTransaction(url);
@@ -143,7 +143,7 @@ public class TestServiceExecutionEnvironment {
 		assertNotNull(transaction);
 
 		Key<TestInterfaceOne> interfaceOneKey = Key.get(TestInterfaceOne.class);
-		Injector injector = transaction.getTransactionInjector();
+		Injector injector = transaction.createExecutionContext().getInjector();
 		assertNotNull(injector);
 		assertNotNull(injector.getExistingBinding(interfaceOneKey));
 		
@@ -158,14 +158,21 @@ public class TestServiceExecutionEnvironment {
 		SamInjectionTransaction transaction = executionNode.getTransaction(url);
 		assertNotNull(transaction);
 
+		Key<TestInterfaceOne> interfaceOneKey = Key.get(TestInterfaceOne.class);
 		Key<TestInterfaceTwo0> interfaceTwoKey = Key.get(TestInterfaceTwo0.class);
-		Injector injector = transaction.getTransactionInjector();
+		TransactionExecutionContext executionContext = transaction.createExecutionContext();
+		
+		Injector injector = executionContext.getInjector();
 		assertNotNull(injector);
 		assertNotNull(injector.getExistingBinding(interfaceTwoKey));
+		assertNull(injector.getExistingBinding(interfaceOneKey));
+		
+		TransactionController transactionController = executionContext.getTransactionController();
+		transactionController.enterTransactionContext();
 		
 		TestInterfaceTwo0 instanceOne = injector.getInstance(interfaceTwoKey);
 		assertTrue(instanceOne.runTest());
-		
+		transactionController.exitTransactionContext();
 	}
 
 }

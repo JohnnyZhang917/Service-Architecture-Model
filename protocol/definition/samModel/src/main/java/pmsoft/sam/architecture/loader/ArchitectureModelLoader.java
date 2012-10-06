@@ -7,7 +7,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-
 import pmsoft.sam.architecture.definition.SamArchitectureDefinition;
 import pmsoft.sam.architecture.definition.SamArchitectureLoader;
 import pmsoft.sam.architecture.model.SamArchitecture;
@@ -21,10 +20,12 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.google.inject.Key;
 
 public class ArchitectureModelLoader implements SamArchitectureLoader {
 
-	public static SamArchitecture loadArchitectureModel(SamArchitectureDefinition definition) throws IncorrectArchitectureDefinition{
+	public static SamArchitecture loadArchitectureModel(SamArchitectureDefinition definition)
+			throws IncorrectArchitectureDefinition {
 		ArchitectureModelLoader loader = new ArchitectureModelLoader();
 		definition.loadArchitectureDefinition(loader);
 		return loader.createModel();
@@ -34,10 +35,12 @@ public class ArchitectureModelLoader implements SamArchitectureLoader {
 		ImmutableMap.Builder<String, SamCategory> catBuilder = ImmutableMap.builder();
 		ImmutableMap.Builder<ServiceKey, SamService> serviceBuilder = ImmutableMap.builder();
 		ImmutableSet.Builder<Annotation> annotationBuilder = ImmutableSet.builder();
-		if(categories.isEmpty()) throw new IncorrectArchitectureDefinition("No categories defined");
+		if (categories.isEmpty())
+			throw new IncorrectArchitectureDefinition("No categories defined");
 
 		for (SamCategoryLoaderImpl catloader : categories.values()) {
-			if(catloader.services.isEmpty()) throw new IncorrectArchitectureDefinition("Category with no services defined:" +catloader.categoryId);
+			if (catloader.services.isEmpty())
+				throw new IncorrectArchitectureDefinition("Category with no services defined:" + catloader.categoryId);
 			ImmutableSet.Builder<SamService> serviceCategoryBuilder = ImmutableSet.builder();
 			for (SamCategoryLoaderImpl.SamServiceLoaderImpl serviceLoad : catloader.services) {
 				SamServiceObject service = serviceLoad.buildService();
@@ -51,8 +54,8 @@ public class ArchitectureModelLoader implements SamArchitectureLoader {
 		for (SamCategoryLoaderImpl catloader : categories.values()) {
 			SamCategory sourceCategoryAccess = categorySet.get(catloader.categoryId);
 			for (String accessedCatId : catloader.accessible) {
-				if( accessedCatId.compareTo(sourceCategoryAccess.getCategoryId())==0) {
-					throw new IncorrectArchitectureDefinition("Self-accessible category: " + accessedCatId); 
+				if (accessedCatId.compareTo(sourceCategoryAccess.getCategoryId()) == 0) {
+					throw new IncorrectArchitectureDefinition("Self-accessible category: " + accessedCatId);
 				}
 				SamCategory targetCategoryAccess = categorySet.get(accessedCatId);
 				sourceCategoryAccess.getAccessibleCategories().add(targetCategoryAccess);
@@ -60,7 +63,7 @@ public class ArchitectureModelLoader implements SamArchitectureLoader {
 			}
 		}
 		for (SamCategory categoryReady : categorySet.values()) {
-			SamCategoryObject real = (SamCategoryObject)categoryReady;
+			SamCategoryObject real = (SamCategoryObject) categoryReady;
 			real.closeCategory();
 		}
 		SamArchitectureImpl architectue = new SamArchitectureImpl(categorySet, serviceBuilder.build(), annotationBuilder.build());
@@ -106,16 +109,24 @@ public class ArchitectureModelLoader implements SamArchitectureLoader {
 		}
 
 		private class SamServiceLoaderImpl implements SamServiceLoader {
-			
-			private final Set<Class<?>> serviceInterfaces = new HashSet<Class<?>>();
+
+			private final Set<Key<?>> serviceInterfaces = new HashSet<Key<?>>();
 			private Class<? extends SamServiceDefinition> definitionClass = null;
-			
 
 			@Override
 			public void addInterface(Class<?> interfaceReference) {
 				Preconditions.checkNotNull(interfaceReference);
-				Preconditions.checkState(!serviceInterfaces.contains(interfaceReference));
-				serviceInterfaces.add(interfaceReference);
+				Key<?> key = Key.get(interfaceReference);
+				Preconditions.checkState(!serviceInterfaces.contains(key));
+				serviceInterfaces.add(key);
+			}
+
+			@Override
+			public void addInterface(Class<?> interfaceReference, Annotation annotation) {
+				Preconditions.checkNotNull(interfaceReference);
+				Key<?> key = Key.get(interfaceReference, annotation);
+				Preconditions.checkState(!serviceInterfaces.contains(key));
+				serviceInterfaces.add(key);
 			}
 
 			@Override
@@ -124,8 +135,8 @@ public class ArchitectureModelLoader implements SamArchitectureLoader {
 				Preconditions.checkState(this.definitionClass == null);
 				this.definitionClass = definitionClass;
 			}
-			
-			public SamServiceObject buildService(){
+
+			public SamServiceObject buildService() {
 				Preconditions.checkState(definitionClass != null);
 				Preconditions.checkState(serviceInterfaces.size() > 0);
 				ServiceKey key = new ServiceKey(definitionClass);
@@ -140,9 +151,9 @@ public class ArchitectureModelLoader implements SamArchitectureLoader {
 		private final ImmutableMap<String, SamCategory> categoriesMap;
 		private final ImmutableMap<ServiceKey, SamService> servicesMap;
 		private final ImmutableSet<Annotation> architectureAnnotations;
-		
-		SamArchitectureImpl(ImmutableMap<String, SamCategory> categoriesMap,
-				ImmutableMap<ServiceKey, SamService> servicesMap, ImmutableSet<Annotation> architectureAnnotations) {
+
+		SamArchitectureImpl(ImmutableMap<String, SamCategory> categoriesMap, ImmutableMap<ServiceKey, SamService> servicesMap,
+				ImmutableSet<Annotation> architectureAnnotations) {
 			super();
 			this.categoriesMap = categoriesMap;
 			this.servicesMap = servicesMap;
@@ -183,7 +194,7 @@ public class ArchitectureModelLoader implements SamArchitectureLoader {
 		private Set<SamCategory> accesibleInverse = Sets.newHashSet();
 		private final ImmutableSet<SamService> services;
 
-		public SamCategoryObject(String categoryId,ImmutableSet<SamService> services) {
+		public SamCategoryObject(String categoryId, ImmutableSet<SamService> services) {
 			super();
 			this.categoryId = categoryId;
 			this.services = services;
@@ -208,8 +219,8 @@ public class ArchitectureModelLoader implements SamArchitectureLoader {
 		public Set<SamService> getDefinedServices() {
 			return services;
 		}
-		
-		void closeCategory(){
+
+		void closeCategory() {
 			this.accesible = ImmutableSet.copyOf(accesible);
 			this.accesibleInverse = ImmutableSet.copyOf(accesibleInverse);
 		}
@@ -219,9 +230,9 @@ public class ArchitectureModelLoader implements SamArchitectureLoader {
 	private static class SamServiceObject implements SamService {
 
 		private final ServiceKey key;
-		private final ImmutableSet<Class<?>> interfaces;
+		private final ImmutableSet<Key<?>> interfaces;
 
-		public SamServiceObject(ServiceKey key, ImmutableSet<Class<?>> interfaces) {
+		public SamServiceObject(ServiceKey key, ImmutableSet<Key<?>> interfaces) {
 			this.key = key;
 			this.interfaces = interfaces;
 		}
@@ -232,7 +243,7 @@ public class ArchitectureModelLoader implements SamArchitectureLoader {
 		}
 
 		@Override
-		public Set<Class<?>> getServiceInterfaces() {
+		public Set<Key<?>> getServiceContractAPI() {
 			return interfaces;
 		}
 

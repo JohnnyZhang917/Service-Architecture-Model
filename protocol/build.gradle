@@ -24,7 +24,6 @@ configure(subprojects.findAll {it.name != 'definition' && it.name != 'infrastruc
 	}
     }
 }
-
 project(':definition:samModel') {
     dependencies {
         compile project(':definition:samCoreApi')

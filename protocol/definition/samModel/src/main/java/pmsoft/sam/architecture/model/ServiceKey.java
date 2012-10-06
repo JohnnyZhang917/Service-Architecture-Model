@@ -2,7 +2,17 @@ package pmsoft.sam.architecture.model;
 
 import pmsoft.sam.definition.service.SamServiceDefinition;
 
-public class ServiceKey {
+/**
+ * Reference to a service definition.
+ * 
+ * For service implementation declaration it is necessary to order on the set of
+ * binded Services. This order is defined on the ServiceKey set by
+ * implementation of Comparable<ServiceKey>.
+ * 
+ * @author pawel
+ * 
+ */
+public class ServiceKey implements Comparable<ServiceKey> {
 
 	private final String serviceDefinitionSignature;
 
@@ -32,8 +42,7 @@ public class ServiceKey {
 		if (serviceDefinitionSignature == null) {
 			if (other.serviceDefinitionSignature != null)
 				return false;
-		} else if (!serviceDefinitionSignature
-				.equals(other.serviceDefinitionSignature))
+		} else if (!serviceDefinitionSignature.equals(other.serviceDefinitionSignature))
 			return false;
 		return true;
 	}
@@ -41,6 +50,11 @@ public class ServiceKey {
 	@Override
 	public String toString() {
 		return "ServiceKey [" + serviceDefinitionSignature + "]";
+	}
+
+	@Override
+	public int compareTo(ServiceKey that) {
+		return this.serviceDefinitionSignature.compareTo(that.serviceDefinitionSignature);
 	}
 
 }

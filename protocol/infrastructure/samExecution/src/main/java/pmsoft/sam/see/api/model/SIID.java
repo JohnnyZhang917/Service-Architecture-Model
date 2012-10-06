@@ -2,7 +2,7 @@ package pmsoft.sam.see.api.model;
 
 import java.util.UUID;
 
-public class SIID {
+public class SIID implements ServiceInstanceReference {
 
 	private final UUID serviceInstanceID = UUID.randomUUID();
 

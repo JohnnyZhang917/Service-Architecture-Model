@@ -2,6 +2,8 @@ package pmsoft.sam.architecture.model;
 
 import java.util.Set;
 
+import com.google.inject.Key;
+
 
 public interface SamService {
 
@@ -15,6 +17,6 @@ public interface SamService {
 	 * Set of interfaces provided by this service
 	 * @return
 	 */
-	public Set<Class<?>> getServiceInterfaces();
+	public Set<Key<?>> getServiceContractAPI();
 	
 }

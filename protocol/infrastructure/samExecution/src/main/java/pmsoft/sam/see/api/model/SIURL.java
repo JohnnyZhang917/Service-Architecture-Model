@@ -3,7 +3,7 @@ package pmsoft.sam.see.api.model;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class SIURL {
+public class SIURL implements ServiceInstanceReference {
 
 	private final URL serviceInstanceReference;
 
@@ -14,8 +14,7 @@ public class SIURL {
 	public SIURL(String url) throws MalformedURLException {
 		this.serviceInstanceReference = new URL(url);
 	}
-	
-	
+
 	public URL getServiceInstanceReference() {
 		return serviceInstanceReference;
 	}
@@ -46,7 +45,5 @@ public class SIURL {
 			return false;
 		return true;
 	}
-	
-	
-	
+
 }

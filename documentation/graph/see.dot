@@ -6,6 +6,7 @@ subgraph clusterSEE {
 		SI [label="Service Instance"];
 		PH [label="Protocol Handler"];
 		IT [label="Injection Transaction"];
+		EX [label="Execution Context"];
 		SIrec [label="Service Registry"];
 	}
 	subgraph clusterInfrastructure {
@@ -43,19 +44,18 @@ I -> DM;
 SI -> SImpl;
 
 
-
+EX -> IT;
+EX -> PH;
 IT -> SIrec;
 IT -> SI;
-IT -> PH;
-#PH -> IT [arrowhead="onormal"];
-#IT -> PH [arrowhead="onormal"];
-#PH -> IT;
+#IT -> PH;
 
 PH -> TP;
-
 SIrec -> SD;
-SD -> SIrec [arrowhead="onormal"];
-TP -> PH [arrowhead="onormal"];
+
+#SD -> SIrec [arrowhead="onormal"];
+#TP -> PH [arrowhead="onormal"];
+TP -> SD;
 SD -> AR;
 
 }

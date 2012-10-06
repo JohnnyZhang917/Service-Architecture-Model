@@ -1,5 +1,6 @@
 package pmsoft.sam.see.execution.localjvm;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -15,9 +16,10 @@ import pmsoft.sam.see.api.model.SamServiceImplementation;
 import pmsoft.sam.see.api.model.SamServiceImplementationKey;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 import com.google.inject.Module;
@@ -62,7 +64,7 @@ public abstract class SamServiceRegistryLocal implements SamServiceRegistry {
 		private Set<SamServiceImplementationGrammarContractImpl> implementations = Sets.newHashSet();
 
 		Set<ServiceImplementationObject> buildImplementations() {
-			Builder<ServiceImplementationObject> builder = ImmutableSet.builder();
+			ImmutableSet.Builder<ServiceImplementationObject> builder = ImmutableSet.builder();
 			for (SamServiceImplementationGrammarContractImpl definition : implementations) {
 				builder.add(definition.build());
 			}
@@ -94,12 +96,15 @@ public abstract class SamServiceRegistryLocal implements SamServiceRegistry {
 			public ServiceImplementationObject build() {
 				Preconditions.checkState(module != null);
 				ServiceKey contract = new ServiceKey(serviceContract);
-				Builder<ServiceKey> binds = ImmutableSet.builder();
+				ImmutableList.Builder<ServiceKey> binds = ImmutableList.builder();
 				for (Class<? extends SamServiceDefinition> serviceBind : bindings) {
 					binds.add(new ServiceKey(serviceBind));
 				}
 				SamServiceImplementationKey key = new SamServiceImplementationKey(module.getName());
-				return new ServiceImplementationObject(module, key, contract, binds.build());
+				Ordering<ServiceKey> keyOrder = Ordering.natural();
+				ImmutableList<ServiceKey> orderedServiceList = keyOrder.immutableSortedCopy(binds.build());
+				Preconditions.checkState(keyOrder.isStrictlyOrdered(orderedServiceList));
+				return new ServiceImplementationObject(module, key, contract, orderedServiceList);
 			}
 
 			@Override
@@ -126,10 +131,10 @@ public abstract class SamServiceRegistryLocal implements SamServiceRegistry {
 		private final Class<? extends Module> module;
 		private final SamServiceImplementationKey key;
 		private final ServiceKey contract;
-		private final ImmutableSet<ServiceKey> binds;
+		private final ImmutableList<ServiceKey> binds;
 
 		ServiceImplementationObject(Class<? extends Module> module, SamServiceImplementationKey key, ServiceKey contract,
-				ImmutableSet<ServiceKey> binds) {
+				ImmutableList<ServiceKey> binds) {
 			this.module = module;
 			this.key = key;
 			this.contract = contract;
@@ -152,7 +157,7 @@ public abstract class SamServiceRegistryLocal implements SamServiceRegistry {
 		}
 
 		@Override
-		public Set<ServiceKey> getBindedServices() {
+		public List<ServiceKey> getBindedServices() {
 			return binds;
 		}
 

@@ -6,7 +6,7 @@ import java.util.Set;
 import pmsoft.sam.architecture.api.SamArchitectureRegistry;
 import pmsoft.sam.architecture.model.SamService;
 import pmsoft.sam.architecture.model.ServiceKey;
-import pmsoft.sam.inject.free.FreeVariableBindingBuilder;
+import pmsoft.sam.protocol.freebinding.FreeVariableBindingBuilder;
 import pmsoft.sam.see.api.model.SamServiceImplementation;
 
 import com.google.common.base.Throwables;
@@ -28,14 +28,14 @@ public class ServiceInjectionUtils {
 			throw Throwables.propagate(e);
 		}
 		
-		Set<ServiceKey> injectServices = serviceImplementation.getBindedServices();
+		List<ServiceKey> injectServices = serviceImplementation.getBindedServices();
 		List<List<Key<?>>> injectedFreeVariableBinding= Lists.newArrayList();
 		for (ServiceKey externalServiceKey : injectServices) {
 			List<Key<?>> serviceKeys = Lists.newArrayList();
 			SamService externalServiceSpec = architectureService.getService(externalServiceKey);
-			Set<Class<?>> interfaces = externalServiceSpec.getServiceInterfaces();
-			for (Class<?> serviceApi : interfaces) {
-				serviceKeys.add(Key.get(serviceApi));
+			Set<Key<?>> keys = externalServiceSpec.getServiceContractAPI();
+			for (Key<?> serviceApi : keys) {
+				serviceKeys.add(serviceApi);
 			}
 			injectedFreeVariableBinding.add(serviceKeys);
 		}

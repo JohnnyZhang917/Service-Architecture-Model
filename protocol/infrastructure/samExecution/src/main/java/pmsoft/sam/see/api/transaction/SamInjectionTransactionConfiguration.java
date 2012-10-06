@@ -4,7 +4,7 @@ import java.util.Map;
 
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.see.api.model.SIID;
-import pmsoft.sam.see.api.model.SIURL;
+import pmsoft.sam.see.api.model.ServiceInstanceReference;
 
 /**
  * API to access a existing injection transaction.
@@ -12,7 +12,7 @@ import pmsoft.sam.see.api.model.SIURL;
  * @author pawel
  * 
  */
-public interface SamInjectionTransactionConfiguration {
+public interface SamInjectionTransactionConfiguration extends ServiceInstanceReference {
 	
 	/**
 	 * Service contract provided by this transaction to the client. Only one
@@ -30,24 +30,10 @@ public interface SamInjectionTransactionConfiguration {
 	public SIID getExposedServiceInstance();
 
 	/**
-	 * Internal injection binding configuration. Immutable.
+	 * injection binding configuration. Immutable.
 	 * 
 	 * @return
 	 */
-	public Map<ServiceKey, SIID> getInternalInjectionConfiguration();
-
-	/**
-	 * External injection binding configuration. Immutable.
-	 * 
-	 * @return
-	 */
-	public Map<ServiceKey, SIURL> getExternalInjectionConfiguration();
-
-	/**
-	 * External injection binding configuration. Immutable.
-	 * 
-	 * @return
-	 */
-	public Map<ServiceKey, SamInjectionTransactionConfiguration> getNestedConfiguration();
+	public Map<ServiceKey, ServiceInstanceReference> getInjectionConfiguration();
 
 }

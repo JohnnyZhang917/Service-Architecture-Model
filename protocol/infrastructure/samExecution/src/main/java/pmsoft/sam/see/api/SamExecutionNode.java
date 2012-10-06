@@ -41,11 +41,9 @@ public interface SamExecutionNode extends SamServiceRegistry {
 	 * 
 	 * @param configuration
 	 *            Binding configuration between services
-	 * @param metadata
-	 *            Metadata of the injection transaction
 	 * @return
 	 */
-	public void setupInjectionTransaction(SamInjectionTransactionConfiguration configuration, ServiceMetadata metadata, SIURL url);
+	public void setupInjectionTransaction(SamInjectionTransactionConfiguration configuration, SIURL url);
 
 	/**
 	 * Publish to service Transaction on the ServiceDiscovery infrastructure

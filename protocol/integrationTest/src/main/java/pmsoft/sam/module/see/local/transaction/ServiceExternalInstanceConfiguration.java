@@ -7,7 +7,7 @@ import java.util.Collection;
 
 import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.architecture.model.ServiceKey;
-import pmsoft.sam.inject.wrapper.ServiceBindingDefinition;
+import pmsoft.sam.inject.wrapper.deprecated.ServiceBindingDefinition;
 import pmsoft.sam.module.see.ServiceExecutionEnviroment;
 import pmsoft.sam.module.see.transaction.InjectionConfiguration;
 import pmsoft.sam.see.api.model.SIID;

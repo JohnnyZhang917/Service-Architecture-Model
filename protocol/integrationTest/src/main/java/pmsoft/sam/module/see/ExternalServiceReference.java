@@ -1,7 +1,7 @@
 package pmsoft.sam.module.see;
 
-import pmsoft.sam.canonical.model.CanonicalProtocolRequestData;
-import pmsoft.sam.canonical.model.ServiceExecutionRequest;
+import pmsoft.sam.canonical.deprecated.model.CanonicalProtocolRequestData;
+import pmsoft.sam.canonical.deprecated.model.ServiceExecutionRequest;
 
 public interface ExternalServiceReference {
 

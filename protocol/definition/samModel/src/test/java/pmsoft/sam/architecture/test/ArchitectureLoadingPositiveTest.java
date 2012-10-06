@@ -41,7 +41,7 @@ public class ArchitectureLoadingPositiveTest {
 			assertTrue(category.getDefinedServices().size() > 0);
 		}
 		for (SamService service : architecture.getAllService()) {
-			assertTrue(service.getServiceInterfaces().size() > 0);
+			assertTrue(service.getServiceContractAPI().size() > 0);
 		}
 	}
 
@@ -59,7 +59,7 @@ public class ArchitectureLoadingPositiveTest {
 			expectedImmutable.add(category.getDefinedServices());
 		}
 		for (SamService service : architecture.getAllService()) {
-			expectedImmutable.add(service.getServiceInterfaces());
+			expectedImmutable.add(service.getServiceContractAPI());
 		}
 		assertTrue("bad test data, no sets to check", expectedImmutable.size() > 0);
 

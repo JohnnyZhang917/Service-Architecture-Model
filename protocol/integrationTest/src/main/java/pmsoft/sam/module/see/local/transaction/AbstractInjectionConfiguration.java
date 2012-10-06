@@ -8,11 +8,11 @@ import java.util.Set;
 import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.architecture.model.SamService;
 import pmsoft.sam.architecture.model.ServiceKey;
-import pmsoft.sam.canonical.service.CanonicalProtocolExecutionService;
-import pmsoft.sam.inject.wrapper.ServiceBindingDefinition;
-import pmsoft.sam.inject.wrapper.WrappingInjectorBuilder;
-import pmsoft.sam.inject.wrapper.WrappingInjectorLoader;
-import pmsoft.sam.inject.wrapper.WrappingInjectorMainLoader;
+import pmsoft.sam.canonical.deprecated.service.CanonicalProtocolExecutionService;
+import pmsoft.sam.inject.wrapper.deprecated.ServiceBindingDefinition;
+import pmsoft.sam.inject.wrapper.deprecated.WrappingInjectorBuilder;
+import pmsoft.sam.inject.wrapper.deprecated.WrappingInjectorLoader;
+import pmsoft.sam.inject.wrapper.deprecated.WrappingInjectorMainLoader;
 import pmsoft.sam.module.see.ServiceExecutionEnviroment;
 import pmsoft.sam.module.see.local.ServiceExecutionEnviromentInternalAPI;
 
@@ -88,9 +88,9 @@ public abstract class AbstractInjectionConfiguration implements InjectionConfigu
 			ServiceKey serviceSpecification) {
 		SamService rootServiceSpecification = architecture.getService(serviceSpecification);
 		List<Key<?>> serviceKeys = Lists.newArrayList();
-		Set<Class<?>> interfaces = rootServiceSpecification.getServiceInterfaces();
-		for (Class<?> serviceApi : interfaces) {
-			serviceKeys.add(Key.get(serviceApi));
+		Set<Key<?>> keys = rootServiceSpecification.getServiceContractAPI();
+		for (Key<?> serviceApi : keys) {
+			serviceKeys.add(serviceApi);
 		}
 		return serviceKeys;
 	}

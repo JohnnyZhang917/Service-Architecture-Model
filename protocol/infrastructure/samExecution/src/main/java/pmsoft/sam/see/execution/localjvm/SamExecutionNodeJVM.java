@@ -5,7 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import pmsoft.sam.architecture.api.SamArchitectureRegistry;
-import pmsoft.sam.see.api.SamExecutionNode;
+import pmsoft.sam.architecture.model.SamService;
+import pmsoft.sam.see.api.SamExecutionNodeInternalApi;
 import pmsoft.sam.see.api.SamServiceDiscovery;
 import pmsoft.sam.see.api.model.SIID;
 import pmsoft.sam.see.api.model.SIURL;
@@ -25,25 +26,30 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Key;
 
-public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamExecutionNode {
+public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamExecutionNodeInternalApi {
 
 	private final Map<SIID, SamServiceInstanceObject> runningInstances = Maps.newHashMap();
 	private final Multimap<SamServiceImplementationKey, SIID> typeOfRunningInstance = HashMultimap.create();
 	private final Map<SIURL, SamInjectionTransaction> transactions = Maps.newHashMap();
 
+	@Override
+	public SamServiceInstance getInternalServiceInstance(SIID exposedService) {
+		return runningInstances.get(exposedService);
+	}
+	
 	@Inject
 	public SamExecutionNodeJVM(SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry) {
 		super(architectureRegistry, serviceDiscoveryRegistry);
 	}
 
 	@Override
-	public void setupInjectionTransaction(SamInjectionTransactionConfiguration configuration, ServiceMetadata metadata, SIURL url) {
+	public void setupInjectionTransaction(SamInjectionTransactionConfiguration configuration, SIURL url) {
 		Preconditions.checkNotNull(url);
 		Preconditions.checkNotNull(configuration);
 		Preconditions.checkState(!transactions.containsKey(url));
-		ServiceMetadata finalMeta = metadata == null ? new ServiceMetadata() : metadata;
-		SamInjectionTransactionObject transaction = new SamInjectionTransactionObject(configuration, finalMeta);
+		SamInjectionTransactionObject transaction = new SamInjectionTransactionObject(configuration,this, architectureRegistry);
 		transactions.put(url, transaction);
 	}
 
@@ -74,37 +80,12 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 
 		SIID id = new SIID();
 		Injector injector = ServiceInjectionUtils.createServiceInstanceInjector(serviceImplementation, architectureRegistry);
+		SamService contractService = architectureRegistry.getService(serviceImplementation.getSpecificationKey());
 		ServiceMetadata finalMetadata = metadata == null ? new ServiceMetadata() : metadata;
-		SamServiceInstanceObject instance = new SamServiceInstanceObject(id, injector, finalMetadata);
+		SamServiceInstanceObject instance = new SamServiceInstanceObject(id, injector, finalMetadata,contractService.getServiceContractAPI());
 		runningInstances.put(id, instance);
 		typeOfRunningInstance.put(key, id);
 		return instance;
-	}
-
-	private class SamInjectionTransactionObject implements SamInjectionTransaction {
-
-		private final Injector injector;
-		private final SamInjectionTransactionConfiguration configuration;
-		private final ServiceMetadata metadata;
-
-		public SamInjectionTransactionObject(SamInjectionTransactionConfiguration configuration, ServiceMetadata metadata) {
-			super();
-			this.configuration = configuration;
-			this.metadata = metadata;
-			this.injector = createInjector();
-		}
-
-		private Injector createInjector() {
-			SIID headServiceId = configuration.getExposedServiceInstance();
-			SamServiceInstanceObject headService = runningInstances.get(headServiceId);
-			return headService.getInjector();
-		}
-
-		@Override
-		public Injector getTransactionInjector() {
-			return injector;
-		}
-
 	}
 
 	private static class SamServiceInstanceObject implements SamServiceInstance {
@@ -112,12 +93,14 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 		private final SIID id;
 		private final Injector injector;
 		private final ServiceMetadata metadata;
+		private final ImmutableSet<Key<?>> contract;
 
-		public SamServiceInstanceObject(SIID id, Injector injector, ServiceMetadata metadata) {
+		public SamServiceInstanceObject(SIID id, Injector injector, ServiceMetadata metadata, Set<Key<?>> contract) {
 			super();
 			this.id = id;
 			this.injector = injector;
 			this.metadata = metadata;
+			this.contract = ImmutableSet.copyOf(contract);
 		}
 
 		@Override
@@ -133,6 +116,11 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 		@Override
 		public ServiceMetadata getMetadata() {
 			return metadata;
+		}
+
+		@Override
+		public Set<Key<?>> getServiceContract() {
+			return contract;
 		}
 
 	}
