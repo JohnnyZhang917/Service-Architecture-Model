@@ -23,7 +23,7 @@ public interface SamInjectionTransactionDefinitionGrammar {
 
 	public SamInjectionTransactionDefinitionGrammar idBinding(ServiceKey bindedService, SIID instanceId);
 
-	public SamInjectionTransactionDefinitionGrammar transactionBinding(SamInjectionTransactionConfiguration transaction);
+	public SamInjectionTransactionDefinitionGrammar transactionBinding(SamInjectionConfiguration transaction);
 
-	public SamInjectionTransactionConfiguration providedByServiceInstance(SIID serviceInstance);
+	public SamInjectionConfiguration providedByServiceInstance(SIID serviceInstance);
 }

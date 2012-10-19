@@ -3,27 +3,32 @@ package pmsoft.sam.see.execution.localjvm;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import pmsoft.sam.architecture.api.SamArchitectureRegistry;
 import pmsoft.sam.architecture.model.SamService;
+import pmsoft.sam.protocol.injection.CanonicalProtocolExecutionContext;
+import pmsoft.sam.protocol.injection.CanonicalProtocolInfrastructure;
 import pmsoft.sam.see.api.SamExecutionNodeInternalApi;
 import pmsoft.sam.see.api.SamServiceDiscovery;
 import pmsoft.sam.see.api.model.SIID;
 import pmsoft.sam.see.api.model.SIURL;
+import pmsoft.sam.see.api.model.SamInstanceTransaction;
 import pmsoft.sam.see.api.model.SamServiceImplementation;
 import pmsoft.sam.see.api.model.SamServiceImplementationKey;
 import pmsoft.sam.see.api.model.SamServiceInstance;
 import pmsoft.sam.see.api.model.ServiceMetadata;
-import pmsoft.sam.see.api.transaction.SamInjectionTransaction;
-import pmsoft.sam.see.api.transaction.SamInjectionTransactionConfiguration;
+import pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
 import pmsoft.sam.see.injectionUtils.ServiceInjectionUtils;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Table;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
@@ -32,7 +37,8 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 
 	private final Map<SIID, SamServiceInstanceObject> runningInstances = Maps.newHashMap();
 	private final Multimap<SamServiceImplementationKey, SIID> typeOfRunningInstance = HashMultimap.create();
-	private final Map<SIURL, SamInjectionTransaction> transactions = Maps.newHashMap();
+	private final Map<SIURL, SamInstanceTransaction> transactions = Maps.newHashMap();
+	private final CanonicalProtocolInfrastructure canonicalProtocol;
 
 	@Override
 	public SamServiceInstance getInternalServiceInstance(SIID exposedService) {
@@ -40,21 +46,43 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 	}
 	
 	@Inject
-	public SamExecutionNodeJVM(SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry) {
+	public SamExecutionNodeJVM(SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry,CanonicalProtocolInfrastructure canonicalProtocol) {
 		super(architectureRegistry, serviceDiscoveryRegistry);
+		this.canonicalProtocol = canonicalProtocol;
+	}
+	
+	@Override
+	public CanonicalProtocolExecutionContext createTransactionExecutionContext(SIURL url) {
+		SamInstanceTransaction transaction = getTransaction(url);
+		return canonicalProtocol.createExecutionContext(transaction );
+	}
+	
+	private final Table<SIURL, UUID, CanonicalProtocolExecutionContext> protocolExecutionContext = HashBasedTable.create();
+	
+	@Override
+	public CanonicalProtocolExecutionContext openTransactionExecutionContext(SIURL targetUrl, UUID transactionUniqueId) {
+		Preconditions.checkNotNull(transactionUniqueId);
+		if(protocolExecutionContext.contains(targetUrl, transactionUniqueId)) {
+			return protocolExecutionContext.get(targetUrl, transactionUniqueId);
+		}
+		CanonicalProtocolExecutionContext executionContext = canonicalProtocol.bindExecutionContext(getTransaction(targetUrl),transactionUniqueId);
+		protocolExecutionContext.put(targetUrl, transactionUniqueId, executionContext);
+		return executionContext;
 	}
 
 	@Override
-	public void setupInjectionTransaction(SamInjectionTransactionConfiguration configuration, SIURL url) {
+	public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, SIURL url) {
+		// TODO URL provider per execution node
 		Preconditions.checkNotNull(url);
 		Preconditions.checkNotNull(configuration);
 		Preconditions.checkState(!transactions.containsKey(url));
-		SamInjectionTransactionObject transaction = new SamInjectionTransactionObject(configuration,this, architectureRegistry);
+		SamInjectionTransactionObject transaction = new SamInjectionTransactionObject(configuration,url);
 		transactions.put(url, transaction);
+		return url;
 	}
 
 	@Override
-	public SamInjectionTransaction getTransaction(SIURL url) {
+	public SamInstanceTransaction getTransaction(SIURL url) {
 		return transactions.get(url);
 	}
 

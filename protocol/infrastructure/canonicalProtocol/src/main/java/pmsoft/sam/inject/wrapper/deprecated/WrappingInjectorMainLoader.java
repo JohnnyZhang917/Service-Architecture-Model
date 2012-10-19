@@ -2,7 +2,7 @@ package pmsoft.sam.inject.wrapper.deprecated;
 
 import java.net.URL;
 
-import pmsoft.sam.canonical.deprecated.service.CanonicalProtocolExecutionService;
+import pmsoft.sam.protocol.injection.CanonicalProtocolExecutionService;
 
 import com.google.inject.Module;
 

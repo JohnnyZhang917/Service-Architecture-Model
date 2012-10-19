@@ -3,7 +3,7 @@ package pmsoft.sam.inject.wrapper.deprecated;
 import java.net.URL;
 import java.util.List;
 
-import pmsoft.sam.canonical.deprecated.service.CanonicalProtocolExecutionService;
+import pmsoft.sam.protocol.injection.CanonicalProtocolExecutionService;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;

@@ -24,6 +24,7 @@ configure(subprojects.findAll {it.name != 'definition' && it.name != 'infrastruc
 	}
     }
 }
+
 project(':definition:samModel') {
     dependencies {
         compile project(':definition:samCoreApi')
@@ -31,7 +32,6 @@ project(':definition:samModel') {
 }
 project(':infrastructure:samExecution') {
 	dependencies {
-		compile project(':infrastructure:canonicalProtocol')
         	compile project(':definition:samModel')
         	compile project(':definition:samCoreApi')
 	}

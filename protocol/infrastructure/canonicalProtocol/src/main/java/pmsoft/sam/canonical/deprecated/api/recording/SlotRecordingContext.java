@@ -4,11 +4,8 @@ import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;
 
-import pmsoft.sam.canonical.deprecated.CanonicalInstanceRecorder;
-import pmsoft.sam.canonical.deprecated.api.MethodRecordContext;
 import pmsoft.sam.canonical.deprecated.api.common.AbstractSlotContext;
-import pmsoft.sam.canonical.deprecated.api.ir.InstanceRegistry;
-import pmsoft.sam.protocol.freebinding.ExternalBindingSwitch;
+import pmsoft.sam.protocol.injection.MethodRecordContext;
 
 import com.google.inject.Key;
 

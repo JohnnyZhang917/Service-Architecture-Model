@@ -2,9 +2,9 @@ package pmsoft.sam.see.api;
 
 import pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
 import pmsoft.sam.see.api.model.SIURL;
+import pmsoft.sam.see.api.model.SamInstanceTransaction;
 import pmsoft.sam.see.api.model.SamServiceImplementation;
 import pmsoft.sam.see.api.model.SamServiceImplementationKey;
-import pmsoft.sam.see.api.transaction.SamInjectionTransaction;
 
 public interface SamServiceRegistry {
 
@@ -26,6 +26,6 @@ public interface SamServiceRegistry {
 	 * @param oneUrl SIURL identifing this transaction
 	 * @return
 	 */
-	public SamInjectionTransaction getTransaction(SIURL oneUrl);
+	public SamInstanceTransaction getTransaction(SIURL oneUrl);
 	
 }

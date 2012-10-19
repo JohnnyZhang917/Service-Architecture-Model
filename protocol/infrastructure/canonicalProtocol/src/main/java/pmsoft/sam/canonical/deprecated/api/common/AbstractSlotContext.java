@@ -2,10 +2,10 @@ package pmsoft.sam.canonical.deprecated.api.common;
 
 import java.lang.reflect.Method;
 
-import pmsoft.sam.canonical.deprecated.CanonicalInstanceRecorder;
-import pmsoft.sam.canonical.deprecated.api.MethodRecordContext;
-import pmsoft.sam.canonical.deprecated.api.ServiceSlotRecordingContext;
-import pmsoft.sam.canonical.deprecated.model.MethodCall;
+import pmsoft.sam.protocol.injection.MethodRecordContext;
+import pmsoft.sam.protocol.injection.internal.MethodCall;
+import pmsoft.sam.protocol.injection.internal.ir.CanonicalInstanceRecorder;
+import pmsoft.sam.protocol.injection.internal.ir.ServiceSlotRecordingContext;
 
 import com.google.inject.Key;
 

@@ -1,6 +1,6 @@
 package pmsoft.sam.inject.wrapper.deprecated;
 
-import pmsoft.sam.canonical.deprecated.api.CanonicalProtocolRequestHandler;
+import pmsoft.sam.protocol.injection.CanonicalProtocolRequestHandler;
 
 /**
  * Interface to control all ExternalBindingController's of the service instance

@@ -1,22 +1,11 @@
 package pmsoft.sam.see.api.model;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+public class SIURL {
 
-public class SIURL implements ServiceInstanceReference {
+	private final String serviceInstanceReference;
 
-	private final URL serviceInstanceReference;
-
-	public SIURL(URL serviceInstanceReference) {
+	public SIURL(String serviceInstanceReference) {
 		this.serviceInstanceReference = serviceInstanceReference;
-	}
-
-	public SIURL(String url) throws MalformedURLException {
-		this.serviceInstanceReference = new URL(url);
-	}
-
-	public URL getServiceInstanceReference() {
-		return serviceInstanceReference;
 	}
 
 	@Override

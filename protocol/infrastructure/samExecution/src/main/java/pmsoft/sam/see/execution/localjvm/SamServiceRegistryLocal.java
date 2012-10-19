@@ -19,7 +19,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Sets.SetView;
 import com.google.inject.Module;
@@ -101,10 +100,7 @@ public abstract class SamServiceRegistryLocal implements SamServiceRegistry {
 					binds.add(new ServiceKey(serviceBind));
 				}
 				SamServiceImplementationKey key = new SamServiceImplementationKey(module.getName());
-				Ordering<ServiceKey> keyOrder = Ordering.natural();
-				ImmutableList<ServiceKey> orderedServiceList = keyOrder.immutableSortedCopy(binds.build());
-				Preconditions.checkState(keyOrder.isStrictlyOrdered(orderedServiceList));
-				return new ServiceImplementationObject(module, key, contract, orderedServiceList);
+				return new ServiceImplementationObject(module, key, contract, binds.build());
 			}
 
 			@Override

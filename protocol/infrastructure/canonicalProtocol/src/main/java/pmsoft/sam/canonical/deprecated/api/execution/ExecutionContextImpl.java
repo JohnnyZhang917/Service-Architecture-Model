@@ -6,17 +6,17 @@ import static com.google.common.base.Preconditions.checkState;
 import java.util.List;
 import java.util.UUID;
 
-import pmsoft.sam.canonical.deprecated.CanonicalInstanceRecorder;
 import pmsoft.sam.canonical.deprecated.api.ExecutionContextManager;
-import pmsoft.sam.canonical.deprecated.api.common.AbstractMethodRecordContext;
-import pmsoft.sam.canonical.deprecated.api.ir.InstanceMergeVisitor;
-import pmsoft.sam.canonical.deprecated.api.ir.InstanceRegistry;
-import pmsoft.sam.canonical.deprecated.api.ir.ServerExecutionInstanceRegistry;
-import pmsoft.sam.canonical.deprecated.api.ir.model.AbstractInstanceReference;
-import pmsoft.sam.canonical.deprecated.model.CanonicalProtocolRequestData;
-import pmsoft.sam.canonical.deprecated.model.MethodCall;
-import pmsoft.sam.canonical.deprecated.model.ServiceExecutionRequest;
-import pmsoft.sam.canonical.deprecated.service.CanonicalProtocolExecutionService;
+import pmsoft.sam.protocol.injection.CanonicalProtocolExecutionService;
+import pmsoft.sam.protocol.injection.internal.AbstractMethodRecordContext;
+import pmsoft.sam.protocol.injection.internal.CanonicalProtocolRequestData;
+import pmsoft.sam.protocol.injection.internal.MethodCall;
+import pmsoft.sam.protocol.injection.internal.ServerExecutionInstanceRegistry;
+import pmsoft.sam.protocol.injection.internal.ServiceExecutionRequest;
+import pmsoft.sam.protocol.injection.internal.ir.CanonicalInstanceRecorder;
+import pmsoft.sam.protocol.injection.internal.ir.InstanceRegistry;
+import pmsoft.sam.protocol.injection.internal.model.AbstractInstanceReference;
+import pmsoft.sam.protocol.injection.internal.model.InstanceMergeVisitor;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;

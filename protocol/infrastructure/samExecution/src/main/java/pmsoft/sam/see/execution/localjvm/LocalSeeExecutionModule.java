@@ -1,20 +1,31 @@
 package pmsoft.sam.see.execution.localjvm;
 
+import pmsoft.sam.protocol.injection.internal.CanonicalProtocolModule;
 import pmsoft.sam.see.api.SamExecutionNode;
+import pmsoft.sam.see.api.SamExecutionNodeInternalApi;
 import pmsoft.sam.see.api.SamServiceRegistry;
 
-import com.google.inject.AbstractModule;
+import com.google.inject.PrivateModule;
 import com.google.inject.Provides;
 
-public class LocalSeeExecutionModule extends AbstractModule {
+public class LocalSeeExecutionModule extends PrivateModule {
 
 	@Override
 	protected void configure() {
-		bind(SamExecutionNode.class).to(SamExecutionNodeJVM.class).asEagerSingleton();
+		binder().requireExplicitBindings();
+		bind(SamExecutionNodeInternalApi.class).to(SamExecutionNodeJVM.class).asEagerSingleton();
+		install(new CanonicalProtocolModule());
+		expose(SamServiceRegistry.class);
+		expose(SamExecutionNode.class);
 	}
 
 	@Provides
-	public final SamServiceRegistry getSamServiceRegistry(SamExecutionNode executionNode) {
+	public final SamServiceRegistry getSamServiceRegistry(SamExecutionNodeInternalApi executionNode) {
+		return executionNode;
+	}
+
+	@Provides
+	public final SamExecutionNode getSamExecutionNode(SamExecutionNodeInternalApi executionNode) {
 		return executionNode;
 	}
 

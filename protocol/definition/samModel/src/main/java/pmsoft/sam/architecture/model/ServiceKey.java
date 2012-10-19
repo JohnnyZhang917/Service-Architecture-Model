@@ -12,7 +12,7 @@ import pmsoft.sam.definition.service.SamServiceDefinition;
  * @author pawel
  * 
  */
-public class ServiceKey implements Comparable<ServiceKey> {
+public class ServiceKey {
 
 	private final String serviceDefinitionSignature;
 
@@ -50,11 +50,6 @@ public class ServiceKey implements Comparable<ServiceKey> {
 	@Override
 	public String toString() {
 		return "ServiceKey [" + serviceDefinitionSignature + "]";
-	}
-
-	@Override
-	public int compareTo(ServiceKey that) {
-		return this.serviceDefinitionSignature.compareTo(that.serviceDefinitionSignature);
 	}
 
 }

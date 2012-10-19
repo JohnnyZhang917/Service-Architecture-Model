@@ -1,10 +1,10 @@
 package pmsoft.sam.canonical.deprecated.api.execution;
 
 import static com.google.common.base.Preconditions.checkState;
-import pmsoft.sam.canonical.deprecated.CanonicalInstanceRecorder;
-import pmsoft.sam.canonical.deprecated.api.MethodRecordContext;
 import pmsoft.sam.canonical.deprecated.api.common.AbstractSlotContext;
-import pmsoft.sam.canonical.deprecated.api.ir.InstanceRegistry;
+import pmsoft.sam.protocol.injection.MethodRecordContext;
+import pmsoft.sam.protocol.injection.internal.ir.CanonicalInstanceRecorder;
+import pmsoft.sam.protocol.injection.internal.ir.InstanceRegistry;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Key;

@@ -9,11 +9,11 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
-import pmsoft.sam.canonical.deprecated.api.CanonicalProtocolRequestHandler;
 import pmsoft.sam.canonical.deprecated.api.recording.RecordingContextImpl;
-import pmsoft.sam.canonical.deprecated.service.CanonicalProtocolExecutionService;
 import pmsoft.sam.protocol.freebinding.ExternalBindingController;
 import pmsoft.sam.protocol.freebinding.ExternalInstanceProvider;
+import pmsoft.sam.protocol.injection.CanonicalProtocolExecutionService;
+import pmsoft.sam.protocol.injection.CanonicalProtocolRequestHandler;
 import pmsoft.sam.protocol.injection.InstanceProvider;
 
 import com.google.common.collect.Maps;
