@@ -8,7 +8,7 @@ import com.google.inject.Module;
 
 public class SEEConfigurationBuilder {
 
-	public SEEConfigurationGrammar configuration() {
+	public static SEEConfigurationGrammar configuration() {
 		return new SEEConfigurationGrammarObject();
 	}
 

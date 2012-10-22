@@ -73,8 +73,15 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 
 	@Override
 	public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration) {
-		Preconditions.checkNotNull(configuration);
 		SIURL url = createUniqueURL();
+		return setupInjectionTransaction(configuration,url);
+	}
+	
+	@Override
+	public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, SIURL url) {
+		//TODO create a easily testable API without exposition of url
+		Preconditions.checkNotNull(url);
+		Preconditions.checkNotNull(configuration);
 		Preconditions.checkState(!transactions.containsKey(url));
 		SamInjectionTransactionObject transaction = new SamInjectionTransactionObject(configuration,url);
 		transactions.put(url, transaction);

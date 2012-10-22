@@ -45,7 +45,7 @@ public class SEEServer {
 			}
 			architectureManager.registerArchitecture(architecture);
 		}
-		
+
 		for (SamServiceImplementationPackageContract implPackage : configuration.implementationPackages) {
 			samServiceRegistry.registerServiceImplementationPackage(implPackage);
 		}
@@ -58,12 +58,4 @@ public class SEEServer {
 	public void startUpServer() {
 
 	}
-
-	// public static ServiceExecutionInfrastructure setupSEEserver( Module
-	// definitionModule ) {
-	// Injector injector = Guice.createInjector(definitionModule);
-	// ServiceExecutionInfrastructure infrastructure =
-	// injector.getInstance(ServiceExecutionInfrastructure.class);
-	// return infrastructure;
-	// }
 }

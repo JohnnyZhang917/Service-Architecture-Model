@@ -13,8 +13,10 @@ public class LocalSeeInfrastructureModule extends PrivateModule {
 	protected void configure() {
 		binder().requireExplicitBindings();
 		bind(SamArchitectureManagement.class).to(SamArchitectureRegistryLocal.class).asEagerSingleton();
-//		expose(SamArchitectureRegistry.class);
+		expose(SamArchitectureRegistry.class);
+		expose(SamArchitectureManagement.class);
 		bind(SamServiceDiscovery.class).to(SamServiceDiscoveryLocal.class).asEagerSingleton();
+		expose(SamServiceDiscovery.class);
 	}
 
 	@Provides

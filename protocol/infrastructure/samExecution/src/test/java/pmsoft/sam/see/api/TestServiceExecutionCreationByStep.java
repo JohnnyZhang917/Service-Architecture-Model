@@ -125,7 +125,6 @@ public class TestServiceExecutionCreationByStep {
 		SamInjectionConfiguration transactionTwo = TestTransactionDefinition.createServiceTwoConfiguration(siidTwo, siidOne);
 		assertNotNull(transactionTwo);
 		assertEquals(siidTwo, transactionTwo.getExposedServiceInstance());
-//		assertEquals(siidOne, transactionTwo.getInjectionConfiguration().get(serviceOneTypeKey));
 		assertEquals(serviceTwoTypeKey, transactionTwo.getProvidedService());
 		
 		setupAndCheckTransactionRegistration(siurlLocalOne,transactionOne);
@@ -134,15 +133,13 @@ public class TestServiceExecutionCreationByStep {
 		SamInjectionConfiguration transactionTwoRemote = TestTransactionDefinition.createServiceTwoConfiguration(siidTwo, siurlLocalOne);
 		assertNotNull(transactionTwoRemote);
 		assertEquals(siidTwo, transactionTwoRemote.getExposedServiceInstance());
-//		assertEquals(siurlLocalOne, transactionTwoRemote.getInjectionConfiguration().get(serviceOneTypeKey));
 		assertEquals(serviceTwoTypeKey, transactionTwoRemote.getProvidedService());
 
 		setupAndCheckTransactionRegistration(siurlRemoteTwo,transactionTwoRemote);
 	}
-	
 
 	private void setupAndCheckTransactionRegistration(SIURL url, SamInjectionConfiguration transaction) {
-		url = executionNode.setupInjectionTransaction(transaction);
+		url = executionNode.setupInjectionTransaction(transaction,url);
 		SamInstanceTransaction transactionRegistered = executionNode.getTransaction(url);
 		assertNotNull(transactionRegistered);
 		SamInstanceTransaction transanctionOnRegistry = samServiceRegistry.getTransaction(url);
