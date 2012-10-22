@@ -34,6 +34,7 @@ project(':infrastructure:samExecution') {
 	dependencies {
         	compile project(':definition:samModel')
         	compile project(':definition:samCoreApi')
+        	compile project(':infrastructure:samTransport')
 	}
 }
 project(':integrationTest') {
