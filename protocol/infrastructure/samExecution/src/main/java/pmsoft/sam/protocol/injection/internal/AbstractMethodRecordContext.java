@@ -7,8 +7,10 @@ import java.lang.reflect.Method;
 import java.util.Deque;
 import java.util.List;
 
-import pmsoft.sam.protocol.execution.CanonicalProtocolExecutionService;
-import pmsoft.sam.protocol.injection.internal.model.AbstractInstanceReference;
+import pmsoft.sam.protocol.execution.CanonicalProtocolExecutionServiceClientApi;
+import pmsoft.sam.protocol.execution.CanonicalProtocolRequestData;
+import pmsoft.sam.protocol.execution.model.AbstractInstanceReference;
+import pmsoft.sam.protocol.execution.model.MethodCall;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
@@ -19,9 +21,9 @@ public abstract class AbstractMethodRecordContext implements MethodRecordContext
 
 	protected final Deque<MethodCall> serviceCallStack = Lists.newLinkedList();
 
-	protected final CanonicalProtocolExecutionService executionService;
+	protected final CanonicalProtocolExecutionServiceClientApi executionService;
 
-	public AbstractMethodRecordContext(CanonicalProtocolExecutionService executionService) {
+	public AbstractMethodRecordContext(CanonicalProtocolExecutionServiceClientApi executionService) {
 		super();
 		this.executionService = executionService;
 	}

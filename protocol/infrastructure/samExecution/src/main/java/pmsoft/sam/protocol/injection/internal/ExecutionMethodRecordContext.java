@@ -6,9 +6,12 @@ import static com.google.common.base.Preconditions.checkState;
 import java.util.List;
 import java.util.UUID;
 
-import pmsoft.sam.protocol.execution.CanonicalProtocolExecutionService;
-import pmsoft.sam.protocol.injection.internal.model.AbstractInstanceReference;
-import pmsoft.sam.protocol.injection.internal.model.InstanceMergeVisitor;
+import pmsoft.sam.protocol.execution.CanonicalProtocolExecutionServiceClientApi;
+import pmsoft.sam.protocol.execution.CanonicalProtocolRequestData;
+import pmsoft.sam.protocol.execution.CanonicalProtocolRequest;
+import pmsoft.sam.protocol.execution.model.AbstractInstanceReference;
+import pmsoft.sam.protocol.execution.model.InstanceMergeVisitor;
+import pmsoft.sam.protocol.execution.model.MethodCall;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -19,7 +22,7 @@ public class ExecutionMethodRecordContext extends AbstractMethodRecordContext {
 	private final InstanceRegistry executionInstanceRegistry;
 	private final UUID canonicalTransactionIdentificator;
 
-	public ExecutionMethodRecordContext(CanonicalProtocolExecutionService executionService, InstanceRegistry executionInstanceRegistry,
+	public ExecutionMethodRecordContext(CanonicalProtocolExecutionServiceClientApi executionService, InstanceRegistry executionInstanceRegistry,
 			UUID canonicalTransactionIdentificator) {
 		super(executionService);
 		this.executionInstanceRegistry = executionInstanceRegistry;
@@ -47,7 +50,7 @@ public class ExecutionMethodRecordContext extends AbstractMethodRecordContext {
 		return executionInstanceRegistry.getDataInstance(call.getReturnInstanceId());
 	}
 
-	private ServiceExecutionRequest currentRequestOnStack = null;
+	private CanonicalProtocolRequest currentRequestOnStack = null;
 
 	@Override
 	public void flushExecutionStack() {
@@ -59,9 +62,9 @@ public class ExecutionMethodRecordContext extends AbstractMethodRecordContext {
 		}
 		int targetSlot = requestData.getTargetSlot();
 		checkState(targetSlot == 0);
-		ServiceExecutionRequest request = new ServiceExecutionRequest(false, canonicalTransactionIdentificator, currentRequestOnStack.getSourceURL(),
-				currentRequestOnStack.getTargetURL(), requestData, currentRequestOnStack.getServiceSlotNr());
-		CanonicalProtocolRequestData response = executionService.executeCanonicalCalls(request);
+		CanonicalProtocolRequest request = new CanonicalProtocolRequest(false, canonicalTransactionIdentificator, currentRequestOnStack.getSourceLocation(),
+				currentRequestOnStack.getTargetLocation(), requestData, currentRequestOnStack.getServiceSlotNr());
+		CanonicalProtocolRequestData response = executionService.executeExternalCanonicalRequest(request);
 		List<AbstractInstanceReference> returnInstanceReferences = response.getInstanceReferences();
 		mergeInstanceReferenceData(returnInstanceReferences);
 		List<MethodCall> returnCalls = response.getMethodCalls();
@@ -82,8 +85,8 @@ public class ExecutionMethodRecordContext extends AbstractMethodRecordContext {
 		super.pushMethodCall(call);
 	}
 
-	public CanonicalProtocolRequestData handleRequest(ServiceExecutionRequest request) {
-		ServiceExecutionRequest requestStackCache = this.currentRequestOnStack;
+	public CanonicalProtocolRequestData handleRequest(CanonicalProtocolRequest request) {
+		CanonicalProtocolRequest requestStackCache = this.currentRequestOnStack;
 		this.currentRequestOnStack = request;
 		// Slot 0 have the real service instance mapping
 		CanonicalProtocolRequestData data = request.getData();

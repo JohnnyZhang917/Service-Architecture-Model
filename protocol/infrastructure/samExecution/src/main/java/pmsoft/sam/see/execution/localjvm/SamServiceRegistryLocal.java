@@ -4,12 +4,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import pmsoft.sam.architecture.api.SamArchitectureRegistry;
 import pmsoft.sam.architecture.model.SamService;
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.definition.implementation.SamServiceImplementationContractLoader;
 import pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
 import pmsoft.sam.definition.service.SamServiceDefinition;
+import pmsoft.sam.see.api.SamArchitectureRegistry;
 import pmsoft.sam.see.api.SamServiceDiscovery;
 import pmsoft.sam.see.api.SamServiceRegistry;
 import pmsoft.sam.see.api.model.SamServiceImplementation;

@@ -7,7 +7,7 @@ import java.util.UUID;
 
 import org.testng.collections.Lists;
 
-import pmsoft.sam.protocol.execution.CanonicalProtocolExecutionService;
+import pmsoft.sam.protocol.execution.CanonicalProtocolExecutionServiceClientApi;
 import pmsoft.sam.protocol.freebinding.ExternalBindingController;
 import pmsoft.sam.protocol.freebinding.ExternalInstanceProvider;
 import pmsoft.sam.protocol.injection.CanonicalProtocolExecutionContext;
@@ -36,10 +36,10 @@ class CanonicalProtocolModel implements CanonicalProtocolInfrastructure {
 
 	private final SamExecutionNodeInternalApi executionNode;
 
-	private final CanonicalProtocolExecutionService executionService;
+	private final CanonicalProtocolExecutionServiceClientApi executionService;
 
 	@Inject
-	public CanonicalProtocolModel(SamExecutionNodeInternalApi executionNode, CanonicalProtocolExecutionService executionService) {
+	public CanonicalProtocolModel(SamExecutionNodeInternalApi executionNode, CanonicalProtocolExecutionServiceClientApi executionService) {
 		this.executionNode = executionNode;
 		this.executionService = executionService;
 	}

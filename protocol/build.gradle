@@ -9,6 +9,10 @@ configure(subprojects.findAll {it.name != 'definition' && it.name != 'infrastruc
 
 	repositories {
         	mavenCentral()
+		maven {
+			url "http://repository-netty.forge.cloudbees.com/snapshot/"
+		}
+
     	}
 
     	eclipse {

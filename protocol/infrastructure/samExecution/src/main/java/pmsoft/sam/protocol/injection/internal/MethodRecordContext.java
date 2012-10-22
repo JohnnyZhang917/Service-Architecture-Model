@@ -4,7 +4,8 @@ import java.lang.reflect.Method;
 
 import com.google.inject.Key;
 
-import pmsoft.sam.protocol.injection.CanonicalProtocolRequestHandler;
+import pmsoft.sam.protocol.execution.CanonicalProtocolRequestHandler;
+import pmsoft.sam.protocol.execution.model.MethodCall;
 
 interface MethodRecordContext extends CanonicalProtocolRequestHandler {
 

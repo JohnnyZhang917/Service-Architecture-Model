@@ -9,5 +9,7 @@ public interface CanonicalProtocolInfrastructure {
 	public CanonicalProtocolExecutionContext createExecutionContext(final SamInstanceTransaction functionContract);
 
 	public CanonicalProtocolExecutionContext bindExecutionContext(SamInstanceTransaction transaction, UUID transactionUniqueId);
+	
+	
 
 }

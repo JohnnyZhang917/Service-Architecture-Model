@@ -2,7 +2,9 @@ package pmsoft.sam.protocol.injection.internal;
 
 import java.util.UUID;
 
-import pmsoft.sam.protocol.execution.CanonicalProtocolExecutionService;
+import pmsoft.sam.protocol.execution.CanonicalProtocolExecutionServiceClientApi;
+import pmsoft.sam.protocol.execution.CanonicalProtocolRequestData;
+import pmsoft.sam.protocol.execution.CanonicalProtocolRequest;
 import pmsoft.sam.protocol.injection.CanonicalProtocolExecutionContext;
 import pmsoft.sam.protocol.injection.TransactionController;
 import pmsoft.sam.see.api.model.SIURL;
@@ -19,7 +21,7 @@ class CanonicalProtocolExecutionContextObject implements CanonicalProtocolExecut
 	private final Injector headTransactionInjector;
 
 	public CanonicalProtocolExecutionContextObject(SIURL transactionURL, ImmutableList<SIURL> serviceSlotURL, ImmutableList<InstanceRegistry> serviceSlots,
-			CanonicalProtocolExecutionService executionService, InstanceRegistry executionInstanceRegistry, TransactionController controller, Injector headTransactionInjector) {
+			CanonicalProtocolExecutionServiceClientApi executionService, InstanceRegistry executionInstanceRegistry, TransactionController controller, Injector headTransactionInjector) {
 		this.controller = controller;
 		this.canonicalTransactionIdentificator = UUID.randomUUID();
 		this.recordStack = new RecordMethodRecordContext(executionService, serviceSlots, serviceSlotURL, canonicalTransactionIdentificator, transactionURL);
@@ -28,7 +30,7 @@ class CanonicalProtocolExecutionContextObject implements CanonicalProtocolExecut
 	}
 	
 	@Override
-	public CanonicalProtocolRequestData handleRequest(ServiceExecutionRequest request) {
+	public CanonicalProtocolRequestData handleRequest(CanonicalProtocolRequest request) {
 		if(request.isForwardCall()) {
 			return executionStack.handleRequest(request);
 		} else {

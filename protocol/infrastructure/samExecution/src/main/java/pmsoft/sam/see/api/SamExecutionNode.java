@@ -45,7 +45,7 @@ public interface SamExecutionNode extends SamServiceRegistry {
 	 *            Binding configuration between services
 	 * @return
 	 */
-	public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, SIURL url);
+	public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration);
 
 	/**
 	 * Publish to service Transaction on the ServiceDiscovery infrastructure

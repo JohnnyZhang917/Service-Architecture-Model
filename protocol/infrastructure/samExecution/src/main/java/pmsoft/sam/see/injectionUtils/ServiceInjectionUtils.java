@@ -3,10 +3,10 @@ package pmsoft.sam.see.injectionUtils;
 import java.util.List;
 import java.util.Set;
 
-import pmsoft.sam.architecture.api.SamArchitectureRegistry;
 import pmsoft.sam.architecture.model.SamService;
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.protocol.freebinding.FreeVariableBindingBuilder;
+import pmsoft.sam.see.api.SamArchitectureRegistry;
 import pmsoft.sam.see.api.model.SamServiceImplementation;
 
 import com.google.common.base.Throwables;

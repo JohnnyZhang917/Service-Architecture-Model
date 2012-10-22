@@ -6,14 +6,14 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.util.List;
 
-import pmsoft.sam.protocol.injection.internal.model.AbstractInstanceReference;
-import pmsoft.sam.protocol.injection.internal.model.BindingKeyInstanceReference;
-import pmsoft.sam.protocol.injection.internal.model.DataObjectInstanceReference;
-import pmsoft.sam.protocol.injection.internal.model.ExternalSlotInstanceReference;
-import pmsoft.sam.protocol.injection.internal.model.FilledDataInstanceReference;
-import pmsoft.sam.protocol.injection.internal.model.PendingDataInstanceReference;
-import pmsoft.sam.protocol.injection.internal.model.ServerBindingKeyInstanceReference;
-import pmsoft.sam.protocol.injection.internal.model.ServerPendingDataInstanceReference;
+import pmsoft.sam.protocol.execution.model.AbstractInstanceReference;
+import pmsoft.sam.protocol.execution.model.BindingKeyInstanceReference;
+import pmsoft.sam.protocol.execution.model.DataObjectInstanceReference;
+import pmsoft.sam.protocol.execution.model.ExternalSlotInstanceReference;
+import pmsoft.sam.protocol.execution.model.FilledDataInstanceReference;
+import pmsoft.sam.protocol.execution.model.PendingDataInstanceReference;
+import pmsoft.sam.protocol.execution.model.ServerBindingKeyInstanceReference;
+import pmsoft.sam.protocol.execution.model.ServerPendingDataInstanceReference;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;

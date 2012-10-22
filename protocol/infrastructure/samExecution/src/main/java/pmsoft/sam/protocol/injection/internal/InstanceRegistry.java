@@ -2,8 +2,8 @@ package pmsoft.sam.protocol.injection.internal;
 
 import java.util.List;
 
-import pmsoft.sam.protocol.injection.internal.model.AbstractInstanceReference;
-import pmsoft.sam.protocol.injection.internal.model.InstanceMergeVisitor;
+import pmsoft.sam.protocol.execution.model.AbstractInstanceReference;
+import pmsoft.sam.protocol.execution.model.InstanceMergeVisitor;
 
 import com.google.inject.Key;
 

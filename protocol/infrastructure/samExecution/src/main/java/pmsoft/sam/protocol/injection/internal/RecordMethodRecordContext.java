@@ -10,10 +10,14 @@ import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.UUID;
 
-import pmsoft.sam.protocol.execution.CanonicalProtocolExecutionService;
+import pmsoft.sam.protocol.execution.CanonicalProtocolExecutionServiceClientApi;
+import pmsoft.sam.protocol.execution.CanonicalProtocolRequest;
+import pmsoft.sam.protocol.execution.CanonicalProtocolRequestData;
+import pmsoft.sam.protocol.execution.CanonicalProtocolServiceEndpointLocation;
+import pmsoft.sam.protocol.execution.model.AbstractInstanceReference;
+import pmsoft.sam.protocol.execution.model.InstanceMergeVisitor;
+import pmsoft.sam.protocol.execution.model.MethodCall;
 import pmsoft.sam.protocol.freebinding.ExternalBindingSwitch;
-import pmsoft.sam.protocol.injection.internal.model.AbstractInstanceReference;
-import pmsoft.sam.protocol.injection.internal.model.InstanceMergeVisitor;
 import pmsoft.sam.see.api.model.SIURL;
 
 import com.google.common.collect.ImmutableList;
@@ -24,15 +28,15 @@ class RecordMethodRecordContext extends AbstractMethodRecordContext {
 	private final ImmutableList<InstanceRegistry> serviceSlots;
 	private final ImmutableList<SIURL> serviceSlotURL;
 	private final UUID canonicalTransactionIdentificator;
-	private final SIURL transactionURL;
+	private final CanonicalProtocolServiceEndpointLocation transactionLocation;
 
-	public RecordMethodRecordContext(CanonicalProtocolExecutionService executionService, ImmutableList<InstanceRegistry> serviceSlots,
+	public RecordMethodRecordContext(CanonicalProtocolExecutionServiceClientApi executionService, ImmutableList<InstanceRegistry> serviceSlots,
 			ImmutableList<SIURL> serviceSlotURL, UUID canonicalTransactionIdentificator, SIURL transactionURL) {
 		super(executionService);
 		this.serviceSlots = serviceSlots;
 		this.serviceSlotURL = serviceSlotURL;
 		this.canonicalTransactionIdentificator = canonicalTransactionIdentificator;
-		this.transactionURL = transactionURL;
+		this.transactionLocation = new CanonicalProtocolServiceEndpointLocation(transactionURL.getServiceInstanceReference());
 		for (InstanceRegistry instanceRegistry : this.serviceSlots) {
 			instanceRegistry.setMethodRecordContext(this);
 		}
@@ -74,8 +78,9 @@ class RecordMethodRecordContext extends AbstractMethodRecordContext {
 		}
 		int targetSlot = requestData.getTargetSlot();
 		SIURL targetURL = serviceSlotURL.get(targetSlot);
-		ServiceExecutionRequest request = new ServiceExecutionRequest(true, canonicalTransactionIdentificator, targetURL, transactionURL, requestData, targetSlot);
-		CanonicalProtocolRequestData response = executionService.executeCanonicalCalls(request);
+		CanonicalProtocolServiceEndpointLocation target = new CanonicalProtocolServiceEndpointLocation(targetURL.getServiceInstanceReference());
+		CanonicalProtocolRequest request = new CanonicalProtocolRequest(true, canonicalTransactionIdentificator, target , transactionLocation, requestData, targetSlot);
+		CanonicalProtocolRequestData response = executionService.executeExternalCanonicalRequest(request);
 		List<AbstractInstanceReference> returnInstanceReferences = response.getInstanceReferences();
 		InstanceRegistry targetServiceInstanceRegistry = serviceSlots.get(targetSlot);
 		mergeInstanceReferenceData(returnInstanceReferences, targetServiceInstanceRegistry);
@@ -90,13 +95,13 @@ class RecordMethodRecordContext extends AbstractMethodRecordContext {
 		}
 	}
 
-	public CanonicalProtocolRequestData handleRequest(ServiceExecutionRequest request) {
-		SIURL callerServiceURL = request.getSourceURL();
+	public CanonicalProtocolRequestData handleRequest(CanonicalProtocolRequest request) {
+		CanonicalProtocolServiceEndpointLocation callerServiceURL = request.getSourceLocation();
 		checkNotNull(callerServiceURL);
 		int serviceSlotNr = request.getServiceSlotNr();
 		checkPositionIndex(serviceSlotNr, serviceSlotURL.size());
 		SIURL slotURL = serviceSlotURL.get(serviceSlotNr);
-		checkState(slotURL.equals(callerServiceURL));
+		checkState(slotURL.getServiceInstanceReference().equals(callerServiceURL.getEndpointLocation()));
 
 		InstanceRegistry slotInstanceRegistry = serviceSlots.get(serviceSlotNr);
 		CanonicalProtocolRequestData data = request.getData();

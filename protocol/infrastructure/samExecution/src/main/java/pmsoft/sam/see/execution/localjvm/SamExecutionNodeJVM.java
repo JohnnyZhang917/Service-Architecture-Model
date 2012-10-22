@@ -5,10 +5,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import pmsoft.sam.architecture.api.SamArchitectureRegistry;
 import pmsoft.sam.architecture.model.SamService;
 import pmsoft.sam.protocol.injection.CanonicalProtocolExecutionContext;
 import pmsoft.sam.protocol.injection.CanonicalProtocolInfrastructure;
+import pmsoft.sam.see.api.SamArchitectureRegistry;
 import pmsoft.sam.see.api.SamExecutionNodeInternalApi;
 import pmsoft.sam.see.api.SamServiceDiscovery;
 import pmsoft.sam.see.api.model.SIID;
@@ -53,8 +53,9 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 	
 	@Override
 	public CanonicalProtocolExecutionContext createTransactionExecutionContext(SIURL url) {
+		Preconditions.checkNotNull(url);
 		SamInstanceTransaction transaction = getTransaction(url);
-		return canonicalProtocol.createExecutionContext(transaction );
+		return canonicalProtocol.createExecutionContext(transaction);
 	}
 	
 	private final Table<SIURL, UUID, CanonicalProtocolExecutionContext> protocolExecutionContext = HashBasedTable.create();
@@ -71,14 +72,19 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 	}
 
 	@Override
-	public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, SIURL url) {
-		// TODO URL provider per execution node
-		Preconditions.checkNotNull(url);
+	public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration) {
 		Preconditions.checkNotNull(configuration);
+		SIURL url = createUniqueURL();
 		Preconditions.checkState(!transactions.containsKey(url));
 		SamInjectionTransactionObject transaction = new SamInjectionTransactionObject(configuration,url);
 		transactions.put(url, transaction);
 		return url;
+	}
+
+	private SIURL createUniqueURL() {
+		// TODO URL provider per execution node
+		Preconditions.checkState(false);
+		return null;
 	}
 
 	@Override

@@ -5,10 +5,10 @@ import java.util.Set;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
-import pmsoft.sam.architecture.api.SamArchitectureManagement;
 import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.architecture.model.SamService;
 import pmsoft.sam.architecture.model.ServiceKey;
+import pmsoft.sam.see.api.SamArchitectureManagement;
 
 /**
  * The simplest implementation of Architecture Registry, without any validation between registered architectures and model validation.
