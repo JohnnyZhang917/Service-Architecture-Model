@@ -1,12 +1,13 @@
 package pmsoft.sam.test.environment;
 
-import pmsoft.sam.module.canonical.CanonicalProtocolInfrastructure;
 import pmsoft.sam.module.definition.test.oauth.OAuthArchitectureModule;
-import pmsoft.sam.module.see.local.SEELocalModule;
-import pmsoft.sam.module.serviceRegistry.local.LocalVMServiceRegistryModule;
 
 import com.google.guiceberry.GuiceBerryEnvMain;
 import com.google.guiceberry.GuiceBerryModule;
+
+import deprecated.pmsoft.sam.module.canonical.CanonicalProtocolInfrastructure;
+import deprecated.pmsoft.sam.module.see.local.SEELocalModule;
+import deprecated.pmsoft.sam.module.serviceRegistry.local.LocalVMServiceRegistryModule;
 
 public class OAuthTestEnvironmentModule extends GuiceBerryModule {
 	@Override
