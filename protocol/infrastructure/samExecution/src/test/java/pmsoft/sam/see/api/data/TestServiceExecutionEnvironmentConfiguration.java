@@ -1,5 +1,9 @@
 package pmsoft.sam.see.api.data;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.internal.UniqueAnnotations;
+
+import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.see.SEEConfiguration;
 import pmsoft.sam.see.SEEConfigurationBuilder;
 import pmsoft.sam.see.SEEServiceSetupAction;
@@ -11,63 +15,39 @@ import pmsoft.sam.see.api.data.transactions.TestTransactionDefinition;
 import pmsoft.sam.see.api.model.SIID;
 import pmsoft.sam.see.api.model.SIURL;
 import pmsoft.sam.see.api.model.SamInstanceTransaction;
+import pmsoft.sam.see.api.plugin.SamServiceDiscoveryListener;
 import pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
 
 public class TestServiceExecutionEnvironmentConfiguration {
 
 	public static SEEConfiguration createTestConfiguration() {
-		return SEEConfigurationBuilder.configuration().architecture(new SeeTestArchitecture()).implementationPackage(new TestImplementationDeclaration())
-				.setupAction(new SEEServiceSetupAction() {
-
+		return SEEConfigurationBuilder.configuration().withPlugin(new AbstractModule() {
+			@Override
+			protected void configure() {
+				bind(SamServiceDiscoveryListener.class).annotatedWith(UniqueAnnotations.create()).toInstance(new SamServiceDiscoveryListener() {
 					@Override
-					public void setup() {
-						SIID one = createServiceInstance(TestServiceOneModule.class);
-						SIID two = createServiceInstance(TestServiceTwoModule.class);
-
-						SamInjectionConfiguration oneSingle = TestTransactionDefinition.createServiceOneConfiguration(one);
-						SamInstanceTransaction transactionOne = setupServiceTransaction(oneSingle);
-						SIURL oneUrl = transactionOne.getTransactionURL();
-
-						SamInjectionConfiguration twoLocal = TestTransactionDefinition.createServiceTwoConfiguration(two, one);
-						SamInstanceTransaction transactionTwo = setupServiceTransaction(twoLocal);
-						SIURL twoUrl = transactionTwo.getTransactionURL();
-
+					public void serviceInstanceCreated(SIURL url, ServiceKey contract) {
+						System.out.println("serviceCreated: url[" + url + "], contract [" + contract + "]");
 					}
-				}).bindToPort(4999);
-	}
+				});
+			}
+		}).architecture(new SeeTestArchitecture()).implementationPackage(new TestImplementationDeclaration()).setupAction(new SEEServiceSetupAction() {
 
-	//
-	// private void callServiceTwo() {
-	// assertNotNull(twoUrl);
-	// Key<TestInterfaceOne> interfaceOneKey = Key.get(TestInterfaceOne.class);
-	// Key<TestInterfaceTwo0> interfaceTwoKey =
-	// Key.get(TestInterfaceTwo0.class);
-	// CanonicalProtocolExecutionContext executionContext =
-	// executionNode.createTransactionExecutionContext(twoUrl);
-	// Injector injector = executionContext.getInjector();
-	//
-	// assertNotNull(injector);
-	// assertNotNull(injector.getExistingBinding(interfaceTwoKey));
-	// assertNull(injector.getExistingBinding(interfaceOneKey));
-	//
-	// TransactionController transactionController =
-	// executionContext.getTransactionController();
-	// transactionController.enterTransactionContext();
-	// TestInterfaceTwo0 instanceTwo = injector.getInstance(interfaceTwoKey);
-	// assertTrue(instanceTwo.runTest());
-	// transactionController.exitTransactionContext();
-	// }
-	//
-	// private void callServiceOne() {
-	// CanonicalProtocolExecutionContext executionContext =
-	// executionNode.createTransactionExecutionContext(oneUrl);
-	// Key<TestInterfaceOne> interfaceOneKey = Key.get(TestInterfaceOne.class);
-	// Injector injector = executionContext.getInjector();
-	// assertNotNull(injector);
-	// assertNotNull(injector.getExistingBinding(interfaceOneKey));
-	//
-	// TestInterfaceOne instanceOne = injector.getInstance(interfaceOneKey);
-	// assertTrue(instanceOne.runTest());
-	// }
+			@Override
+			public void setup() {
+				SIID one = createServiceInstance(TestServiceOneModule.class);
+				SIID two = createServiceInstance(TestServiceTwoModule.class);
+
+				SamInjectionConfiguration oneSingle = TestTransactionDefinition.createServiceOneConfiguration(one);
+				SamInstanceTransaction transactionOne = setupServiceTransaction(oneSingle);
+				SIURL oneUrl = transactionOne.getTransactionURL();
+
+				SamInjectionConfiguration twoLocal = TestTransactionDefinition.createServiceTwoConfiguration(two, one);
+				SamInstanceTransaction transactionTwo = setupServiceTransaction(twoLocal);
+				SIURL twoUrl = transactionTwo.getTransactionURL();
+
+			}
+		}).bindToPort(4999);
+	}
 
 }

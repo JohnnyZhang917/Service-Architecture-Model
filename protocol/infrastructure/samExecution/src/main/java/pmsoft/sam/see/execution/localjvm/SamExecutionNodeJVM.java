@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import pmsoft.sam.architecture.model.SamService;
+import pmsoft.sam.protocol.execution.ServiceExecutionEnvironment;
 import pmsoft.sam.protocol.injection.CanonicalProtocolExecutionContext;
 import pmsoft.sam.protocol.injection.CanonicalProtocolInfrastructure;
 import pmsoft.sam.see.api.SamArchitectureRegistry;
@@ -39,6 +40,7 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 	private final Multimap<SamServiceImplementationKey, SIID> typeOfRunningInstance = HashMultimap.create();
 	private final Map<SIURL, SamInstanceTransaction> transactions = Maps.newHashMap();
 	private final CanonicalProtocolInfrastructure canonicalProtocol;
+	private final ServiceExecutionEnvironment serviceExecutionEnvironment;
 
 	@Override
 	public SamServiceInstance getInternalServiceInstance(SIID exposedService) {
@@ -46,9 +48,11 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 	}
 	
 	@Inject
-	public SamExecutionNodeJVM(SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry,CanonicalProtocolInfrastructure canonicalProtocol) {
+	public SamExecutionNodeJVM(SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry,CanonicalProtocolInfrastructure canonicalProtocol,
+			ServiceExecutionEnvironment serviceExecutionEnvironment) {
 		super(architectureRegistry, serviceDiscoveryRegistry);
 		this.canonicalProtocol = canonicalProtocol;
+		this.serviceExecutionEnvironment = serviceExecutionEnvironment;
 	}
 	
 	@Override
@@ -73,7 +77,7 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 
 	@Override
 	public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration) {
-		SIURL url = createUniqueURL();
+		SIURL url = serviceExecutionEnvironment.createUniqueURL();
 		return setupInjectionTransaction(configuration,url);
 	}
 	
@@ -85,13 +89,8 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 		Preconditions.checkState(!transactions.containsKey(url));
 		SamInjectionTransactionObject transaction = new SamInjectionTransactionObject(configuration,url);
 		transactions.put(url, transaction);
+		serviceDiscoveryRegistry.serviceTransactionCreated(url, transaction.getInjectionConfiguration().getProvidedService());
 		return url;
-	}
-
-	private SIURL createUniqueURL() {
-		// TODO URL provider per execution node
-		Preconditions.checkState(false);
-		return null;
 	}
 
 	@Override

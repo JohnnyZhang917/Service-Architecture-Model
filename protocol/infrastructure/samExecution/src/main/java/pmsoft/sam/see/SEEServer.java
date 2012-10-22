@@ -9,6 +9,7 @@ import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
 import pmsoft.sam.architecture.loader.IncorrectArchitectureDefinition;
 import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
+import pmsoft.sam.protocol.execution.ServiceExecutionEnvironment;
 import pmsoft.sam.protocol.execution.serial.CanonicalProtocolSerializableModule;
 import pmsoft.sam.see.api.SamArchitectureManagement;
 import pmsoft.sam.see.api.SamExecutionNode;
@@ -16,20 +17,28 @@ import pmsoft.sam.see.api.SamServiceRegistry;
 import pmsoft.sam.see.execution.localjvm.LocalSeeExecutionModule;
 import pmsoft.sam.see.infrastructure.localjvm.LocalSeeInfrastructureModule;
 
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
+import com.google.inject.name.Names;
 
 public class SEEServer {
 
 	private final Injector serverInjector;
 
-	public SEEServer(SEEConfiguration configuration) {
+	public SEEServer(final SEEConfiguration configuration) {
 		List<Module> serverModules = Lists.newArrayList();
 		serverModules.addAll(configuration.pluginModules);
 		serverModules.add(new LocalSeeExecutionModule());
 		serverModules.add(new LocalSeeInfrastructureModule());
 		serverModules.add(new CanonicalProtocolSerializableModule());
+		serverModules.add(new AbstractModule() {
+			@Override
+			protected void configure() {
+				bind(Integer.class).annotatedWith(Names.named(ServiceExecutionEnvironment.SERVICE_PORT_NAMED_BINDING)).toInstance(new Integer(configuration.port));
+			}
+		});
 		serverInjector = Guice.createInjector(serverModules);
 
 		SamArchitectureManagement architectureManager = serverInjector.getInstance(SamArchitectureManagement.class);
@@ -58,4 +67,9 @@ public class SEEServer {
 	public void startUpServer() {
 
 	}
+	
+	public void shutdownServer() {
+		
+	}
+	
 }
