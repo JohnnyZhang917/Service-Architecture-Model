@@ -41,9 +41,3 @@ project(':infrastructure:samExecution') {
         	compile project(':infrastructure:samTransport')
 	}
 }
-project(':integrationTest') {
-    dependencies {
-        compile project(':definition:samModel')
-        compile project(':infrastructure:samExecution')
-    }
-}
