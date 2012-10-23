@@ -10,9 +10,11 @@ import pmsoft.sam.see.api.data.TestServiceExecutionEnvironmentConfiguration;
 
 public class TestSEEsetup {
 
+	private static final int serverPort = 4999;
+	
 	@DataProvider(name = "seeConfigurations")
 	public Object[][] listOfArchitectures() throws IncorrectArchitectureDefinition {
-		return new Object[][] { { TestServiceExecutionEnvironmentConfiguration.createTestConfiguration()} };
+		return new Object[][] { { TestServiceExecutionEnvironmentConfiguration.createTestServerConfiguration(serverPort)} };
 	}
 
 	@Test( dataProvider = "seeConfigurations")

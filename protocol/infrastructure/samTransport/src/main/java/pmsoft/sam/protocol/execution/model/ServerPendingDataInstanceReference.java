@@ -3,6 +3,11 @@ package pmsoft.sam.protocol.execution.model;
 
 public class ServerPendingDataInstanceReference extends PendingDataInstanceReference {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5011356014147884983L;
+
 	public ServerPendingDataInstanceReference(int instanceNr, Class<?> dataType) {
 		super(instanceNr, dataType);
 	}

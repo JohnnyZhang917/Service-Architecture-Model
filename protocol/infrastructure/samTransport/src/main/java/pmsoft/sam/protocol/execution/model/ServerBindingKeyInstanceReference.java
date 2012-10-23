@@ -4,6 +4,11 @@ import com.google.inject.Key;
 
 public class ServerBindingKeyInstanceReference<T> extends BindingKeyInstanceReference<T> {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1641424347343666625L;
+
 	public ServerBindingKeyInstanceReference(int instanceNr, Key<T> key) {
 		super(instanceNr, key);
 	}

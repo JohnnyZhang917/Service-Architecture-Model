@@ -1,8 +1,5 @@
 package pmsoft.sam.see.api.data;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.internal.UniqueAnnotations;
-
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.see.SEEConfiguration;
 import pmsoft.sam.see.SEEConfigurationBuilder;
@@ -18,9 +15,46 @@ import pmsoft.sam.see.api.model.SamInstanceTransaction;
 import pmsoft.sam.see.api.plugin.SamServiceDiscoveryListener;
 import pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.internal.UniqueAnnotations;
+
 public class TestServiceExecutionEnvironmentConfiguration {
 
-	public static SEEConfiguration createTestConfiguration() {
+	public static SEEConfiguration createTestServerConfiguration(int port) {
+		return createArchitectureConfiguration().setupAction(new SEEServiceSetupAction() {
+
+			@Override
+			public void setup() {
+				SIID one = createServiceInstance(TestServiceOneModule.class);
+				SIID two = createServiceInstance(TestServiceTwoModule.class);
+
+				SamInjectionConfiguration oneSingle = TestTransactionDefinition.createServiceOneConfiguration(one);
+				SamInstanceTransaction transactionOne = setupServiceTransaction(oneSingle);
+				transactionOne.getTransactionURL();
+
+				SamInjectionConfiguration twoLocal = TestTransactionDefinition.createServiceTwoConfiguration(two, one);
+				SamInstanceTransaction transactionTwo = setupServiceTransaction(twoLocal);
+				transactionTwo.getTransactionURL();
+
+			}
+		}).bindToPort(port);
+	}
+
+	public static SEEConfiguration createTestClientConfiguration(int port, final SIURL externalServiceInstanceOneURL) {
+		return createArchitectureConfiguration().setupAction(new SEEServiceSetupAction() {
+			
+			@Override
+			public void setup() {
+
+				SIID two = createServiceInstance(TestServiceTwoModule.class);
+				SamInjectionConfiguration twoRemote = TestTransactionDefinition.createServiceTwoConfiguration(two, externalServiceInstanceOneURL);
+				setupServiceTransaction(twoRemote);
+				
+			}
+		}).bindToPort(port);
+	}
+	
+	private static SEEConfigurationBuilder.SEEConfigurationGrammar createArchitectureConfiguration() {
 		return SEEConfigurationBuilder.configuration().withPlugin(new AbstractModule() {
 			@Override
 			protected void configure() {
@@ -31,23 +65,7 @@ public class TestServiceExecutionEnvironmentConfiguration {
 					}
 				});
 			}
-		}).architecture(new SeeTestArchitecture()).implementationPackage(new TestImplementationDeclaration()).setupAction(new SEEServiceSetupAction() {
-
-			@Override
-			public void setup() {
-				SIID one = createServiceInstance(TestServiceOneModule.class);
-				SIID two = createServiceInstance(TestServiceTwoModule.class);
-
-				SamInjectionConfiguration oneSingle = TestTransactionDefinition.createServiceOneConfiguration(one);
-				SamInstanceTransaction transactionOne = setupServiceTransaction(oneSingle);
-				SIURL oneUrl = transactionOne.getTransactionURL();
-
-				SamInjectionConfiguration twoLocal = TestTransactionDefinition.createServiceTwoConfiguration(two, one);
-				SamInstanceTransaction transactionTwo = setupServiceTransaction(twoLocal);
-				SIURL twoUrl = transactionTwo.getTransactionURL();
-
-			}
-		}).bindToPort(4999);
+		}).architecture(new SeeTestArchitecture()).implementationPackage(new TestImplementationDeclaration());
 	}
-
+	
 }

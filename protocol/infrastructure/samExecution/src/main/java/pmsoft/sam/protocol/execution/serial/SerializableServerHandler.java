@@ -24,7 +24,7 @@ public class SerializableServerHandler extends ChannelInboundMessageHandlerAdapt
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-		System.out.println("Unexpected exception from downstream.");
+		System.out.println("Unexpected exception in SerializableServerHandler.");
 		ctx.close();
 	}
 }

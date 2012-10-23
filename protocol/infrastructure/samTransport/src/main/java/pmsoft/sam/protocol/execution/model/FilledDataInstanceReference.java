@@ -3,6 +3,11 @@ package pmsoft.sam.protocol.execution.model;
 
 public class FilledDataInstanceReference extends DataObjectInstanceReference{
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 6303415163708224368L;
+
 	public FilledDataInstanceReference(int instanceNr, Object objectReference) {
 		super(instanceNr, objectReference);
 	}

@@ -1,5 +1,6 @@
 package pmsoft.sam.protocol.execution;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
@@ -7,8 +8,12 @@ import java.util.UUID;
  * @author Pawel Cesar Sanjuan Szklarz
  * 
  */
-public class CanonicalProtocolRequest {
+public class CanonicalProtocolRequest implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4587497476926601312L;
 	/**
 	 * forwardCall true for requests from client service to final implementation
 	 * forwardCall false for requests generated execution of method calls to external instance references

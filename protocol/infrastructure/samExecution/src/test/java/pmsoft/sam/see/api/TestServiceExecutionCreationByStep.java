@@ -155,7 +155,7 @@ public class TestServiceExecutionCreationByStep {
 		Injector injector = executionContext.getInjector();
 		assertNotNull(injector);
 		assertNotNull(injector.getExistingBinding(interfaceOneKey));
-		
+		// no transaction controller because this is a single local instance
 		TestInterfaceOne instanceOne = injector.getInstance(interfaceOneKey);
 		assertTrue(instanceOne.runTest());
 		

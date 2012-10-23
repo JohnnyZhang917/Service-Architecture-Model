@@ -8,4 +8,8 @@ public interface ServiceExecutionEnvironment {
 
 	public SIURL createUniqueURL();
 	
+	public void startUpServices();
+	
+	public void shutdownServices();
+	
 }

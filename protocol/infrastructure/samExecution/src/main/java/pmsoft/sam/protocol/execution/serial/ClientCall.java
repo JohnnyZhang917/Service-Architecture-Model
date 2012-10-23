@@ -8,6 +8,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import pmsoft.sam.protocol.execution.CanonicalProtocolRequest;
 import pmsoft.sam.protocol.execution.CanonicalProtocolRequestData;
 
@@ -30,17 +32,15 @@ public class ClientCall {
 			b.group(new NioEventLoopGroup()).channel(NioSocketChannel.class).remoteAddress(host, port).handler(new ChannelInitializer<SocketChannel>() {
 				@Override
 				public void initChannel(SocketChannel ch) throws Exception {
-
-					ch.pipeline().addLast(new ObjectEncoder(), new ObjectDecoder(ClassResolvers.cacheDisabled(null)), handler);
+					ch.pipeline().addLast(new LoggingHandler(LogLevel.TRACE))
+							.addLast(new ObjectEncoder(), new ObjectDecoder(ClassResolvers.cacheDisabled(null)), handler);
 				}
 			});
-
-			// Start the connection attempt.
-			b.connect().sync().channel().closeFuture().sync();
+			b.connect().sync().channel();
+			return handler.getResponce();
 		} finally {
 			b.shutdown();
 		}
-		return handler.getResponce();
 	}
 
 }

@@ -12,4 +12,14 @@ public class LocalServiceExecutionEnvironment implements ServiceExecutionEnviron
 		return new SIURL("http://localhost/service"+counter++);
 	}
 
+	@Override
+	public void startUpServices() {
+		
+	}
+
+	@Override
+	public void shutdownServices() {
+		
+	}
+
 }

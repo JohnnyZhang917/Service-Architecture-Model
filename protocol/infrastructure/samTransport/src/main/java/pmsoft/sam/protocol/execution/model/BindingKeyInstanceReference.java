@@ -4,11 +4,15 @@ import com.google.inject.Key;
 
 public class BindingKeyInstanceReference<T> extends AbstractInstanceReference {
 
-	protected final Key<T> key;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7482158120617411694L;
+	protected final SerializableKey<T> key;
 
 	public BindingKeyInstanceReference(int instanceNr, Key<T> key) {
 		super(instanceNr);
-		this.key = key;
+		this.key = new SerializableKey<T>(key);
 	}
 
 	@Override
@@ -16,8 +20,9 @@ public class BindingKeyInstanceReference<T> extends AbstractInstanceReference {
 		api.visitBindingKey(this);
 	}
 
+	@SuppressWarnings("unchecked")
 	public Key<T> getKey() {
-		return key;
+		return (Key<T>) key.getKey();
 	}
 
 	@Override

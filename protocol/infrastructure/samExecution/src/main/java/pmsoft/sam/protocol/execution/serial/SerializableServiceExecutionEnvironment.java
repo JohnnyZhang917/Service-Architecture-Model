@@ -33,6 +33,21 @@ public class SerializableServiceExecutionEnvironment implements ServiceExecution
 	}
 
 	@Override
+	public void startUpServices() {
+		try {
+			server.runServer();
+		} catch (Exception e) {
+			//TODO
+			throw new RuntimeException(e);
+		}
+	}
+
+	@Override
+	public void shutdownServices() {
+		server.shutdown();
+	}
+
+	@Override
 	public SIURL createUniqueURL() {
 		try {
 			return new SIURL(new URL("http", host, port, "/service" + counter.addAndGet(1)));

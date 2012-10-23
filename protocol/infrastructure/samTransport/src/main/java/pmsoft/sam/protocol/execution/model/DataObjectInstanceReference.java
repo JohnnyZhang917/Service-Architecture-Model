@@ -3,6 +3,11 @@ package pmsoft.sam.protocol.execution.model;
 
 public class DataObjectInstanceReference extends AbstractInstanceReference {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5920336088558722442L;
+
 	public DataObjectInstanceReference(int instanceNr, Object objectReference) {
 		super(instanceNr);
 		this.objectReference = objectReference;
