@@ -1,14 +1,18 @@
 package pmsoft.sam.see.infrastructure.localjvm;
 
 import java.util.List;
+import java.util.Map;
+
 
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.see.api.SamServiceDiscovery;
 import pmsoft.sam.see.api.model.SIURL;
 import pmsoft.sam.see.api.plugin.SamServiceDiscoveryListener;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
+import com.google.common.collect.Maps;
 import com.google.inject.Binding;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
@@ -17,6 +21,7 @@ import com.google.inject.TypeLiteral;
 public class SamServiceDiscoveryLocal implements SamServiceDiscovery {
 
 	private final ImmutableSet<SamServiceDiscoveryListener> listeners;
+	private final Map<SIURL, ServiceKey> running = Maps.newHashMap();
 
 	@Inject
 	public SamServiceDiscoveryLocal(Injector infrastructureInjector) {
@@ -32,9 +37,15 @@ public class SamServiceDiscoveryLocal implements SamServiceDiscovery {
 
 	@Override
 	public void serviceTransactionCreated(SIURL url, ServiceKey contract) {
+		running.put(url, contract);
 		for (SamServiceDiscoveryListener listener : listeners) {
 			listener.serviceInstanceCreated(url, contract);
 		}
+	}
+	
+	@Override
+	public Map<SIURL, ServiceKey> getServiceRunningStatus() {
+		return ImmutableMap.copyOf(running);
 	}
 
 }

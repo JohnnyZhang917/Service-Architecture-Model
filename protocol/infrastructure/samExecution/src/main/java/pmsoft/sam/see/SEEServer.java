@@ -2,7 +2,6 @@ package pmsoft.sam.see;
 
 import java.util.List;
 
-import org.testng.collections.Lists;
 
 import pmsoft.sam.architecture.definition.SamArchitectureDefinition;
 import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
@@ -13,10 +12,12 @@ import pmsoft.sam.protocol.execution.ServiceExecutionEnvironment;
 import pmsoft.sam.protocol.execution.serial.CanonicalProtocolSerializableModule;
 import pmsoft.sam.see.api.SamArchitectureManagement;
 import pmsoft.sam.see.api.SamExecutionNode;
+import pmsoft.sam.see.api.SamServiceDiscovery;
 import pmsoft.sam.see.api.SamServiceRegistry;
 import pmsoft.sam.see.execution.localjvm.LocalSeeExecutionModule;
 import pmsoft.sam.see.infrastructure.localjvm.LocalSeeInfrastructureModule;
 
+import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -36,7 +37,8 @@ public class SEEServer {
 		serverModules.add(new AbstractModule() {
 			@Override
 			protected void configure() {
-				bind(Integer.class).annotatedWith(Names.named(ServiceExecutionEnvironment.SERVICE_PORT_NAMED_BINDING)).toInstance(new Integer(configuration.port));
+				bind(Integer.class).annotatedWith(Names.named(ServiceExecutionEnvironment.SERVICE_PORT_NAMED_BINDING)).toInstance(
+						new Integer(configuration.port));
 			}
 		});
 		serverInjector = Guice.createInjector(serverModules);
@@ -64,12 +66,16 @@ public class SEEServer {
 
 	}
 
+	public SamServiceDiscovery getServiceDiscovery() {
+		return serverInjector.getInstance(SamServiceDiscovery.class);
+	}
+
 	public void startUpServer() {
 
 	}
-	
+
 	public void shutdownServer() {
-		
+
 	}
-	
+
 }

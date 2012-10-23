@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
 
-import org.testng.collections.Lists;
 
 import pmsoft.sam.protocol.execution.CanonicalProtocolExecutionServiceClientApi;
 import pmsoft.sam.protocol.freebinding.ExternalBindingController;
@@ -25,6 +24,7 @@ import pmsoft.sam.see.api.transaction.SamInjectionModelVisitor;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Inject;
