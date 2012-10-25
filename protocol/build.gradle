@@ -4,7 +4,7 @@ repositories {
      add(new org.apache.ivy.plugins.resolver.FileSystemResolver()) {
             name = 'localRepo'
             addIvyPattern "$projectDir/../../localRepo/[organisation]/[module]/ivys/ivy-[revision].xml"
-            addArtifactPattern "$projectDir/../../localRepo/[organisation]/[module]/[type]s/[artifact]-[revision](-[classifier]).[ext]"
+            addArtifactPattern "$projectDir/../../localRepo/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"
             checkmodified = false
         }
 }

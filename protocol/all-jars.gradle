@@ -8,7 +8,7 @@ apply plugin:'java'
 // custom task for creating source jar
 task sourcesJar(type: Jar, dependsOn:classes) {
   classifier = 'source'
-  type = 'source'
+  type = 'javadoc'
   from new ArrayList(sourceSets).find({ it.name != "test" })*.allSource
 }
 
@@ -24,7 +24,11 @@ project.tasks.withType(Javadoc).all { task ->
 
 // add the jars as artifacts
 artifacts {
-  archives sourcesJar
-  archives docJar
+  archives(sourcesJar) {
+	type = 'source'
+	}
+  archives(docJar) {
+	type = 'javadoc'
+	}
 }
 
