@@ -31,4 +31,9 @@ public class SerializableKey<T> implements Serializable {
 
 	}
 
+	@Override
+	public String toString() {
+		return "SerializableKey [type=" + type + ", annotationType=" + annotationType + ", annotationInstance=" + annotationInstance + "]";
+	}
+
 }
