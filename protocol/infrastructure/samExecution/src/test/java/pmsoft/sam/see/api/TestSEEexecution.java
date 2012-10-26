@@ -61,6 +61,7 @@ public class TestSEEexecution {
 				@Override
 				public void executeInteraction(TestInterfaceTwo0 service) {
 					testResult = service.runTest();
+					testResult = service.runTest();
 				}
 			};
 			clientNode.executeServiceInteraction(interaction);

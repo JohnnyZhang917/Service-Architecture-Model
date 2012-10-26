@@ -1,5 +1,6 @@
 package pmsoft.sam.protocol.execution.serial;
 
+import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundMessageHandlerAdapter;
 import pmsoft.sam.protocol.execution.CanonicalProtocolExecutionServiceProviderApi;
@@ -7,6 +8,7 @@ import pmsoft.sam.protocol.execution.CanonicalProtocolRequest;
 
 import com.google.inject.Inject;
 
+@Sharable
 public class SerializableServerHandler extends ChannelInboundMessageHandlerAdapter<CanonicalProtocolRequest> {
 
 	private final CanonicalProtocolExecutionServiceProviderApi handler;
@@ -14,6 +16,7 @@ public class SerializableServerHandler extends ChannelInboundMessageHandlerAdapt
 	@Inject
 	public SerializableServerHandler(CanonicalProtocolExecutionServiceProviderApi handler) {
 		this.handler = handler;
+		
 	}
 
 	@Override
