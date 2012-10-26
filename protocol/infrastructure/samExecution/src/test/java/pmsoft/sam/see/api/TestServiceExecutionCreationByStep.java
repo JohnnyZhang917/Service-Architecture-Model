@@ -1,6 +1,9 @@
 package pmsoft.sam.see.api;
 
-import static org.testng.AssertJUnit.*;
+import static org.testng.AssertJUnit.assertEquals;
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertNull;
+import static org.testng.AssertJUnit.assertTrue;
 
 import java.net.MalformedURLException;
 import java.util.Set;
@@ -15,16 +18,18 @@ import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
 import pmsoft.sam.protocol.execution.local.PrototypeCanonicalExecutionModule;
-import pmsoft.sam.protocol.injection.TransactionController;
 import pmsoft.sam.protocol.injection.CanonicalProtocolExecutionContext;
+import pmsoft.sam.protocol.injection.TransactionController;
 import pmsoft.sam.see.api.data.architecture.SeeTestArchitecture;
 import pmsoft.sam.see.api.data.architecture.TestInterfaceOne;
 import pmsoft.sam.see.api.data.architecture.TestInterfaceTwo0;
 import pmsoft.sam.see.api.data.architecture.TestServiceOne;
 import pmsoft.sam.see.api.data.architecture.TestServiceTwo;
+import pmsoft.sam.see.api.data.architecture.TestServiceZero;
 import pmsoft.sam.see.api.data.impl.TestImplementationDeclaration;
 import pmsoft.sam.see.api.data.impl.TestServiceOneModule;
 import pmsoft.sam.see.api.data.impl.TestServiceTwoModule;
+import pmsoft.sam.see.api.data.impl.TestServiceZeroModule;
 import pmsoft.sam.see.api.data.transactions.TestTransactionDefinition;
 import pmsoft.sam.see.api.model.SIID;
 import pmsoft.sam.see.api.model.SIURL;
@@ -63,7 +68,9 @@ public class TestServiceExecutionCreationByStep {
 
 	@DataProvider(name = "registeredImplementations")
 	public Object[][] listOfProvidedImplementationKeys() {
-		return new Object[][] { { new SamServiceImplementationKey(TestServiceOneModule.class) }, { new SamServiceImplementationKey(TestServiceTwoModule.class) } };
+		return new Object[][] { { new SamServiceImplementationKey(TestServiceZeroModule.class) },
+								{ new SamServiceImplementationKey(TestServiceOneModule.class) },
+								{ new SamServiceImplementationKey(TestServiceTwoModule.class) } };
 	}
 
 	@Test(dataProvider = "architecturesToSetup", groups = "architectureSetup")
@@ -101,36 +108,45 @@ public class TestServiceExecutionCreationByStep {
 		return instance.getKey();
 	}
 
-
+	SIURL siurlLocalZero = new SIURL("http://localhost/zero");
 	SIURL siurlLocalOne = new SIURL("http://localhost/one");
 	SIURL siurlLocalTwo = new SIURL("http://localhost/two");
 
+	SIURL siurlRemoteZero = new SIURL("http://remote/zero");
 	SIURL siurlRemoteOne = new SIURL("http://remote/one");
 	SIURL siurlRemoteTwo = new SIURL("http://remote/two");
 
 	
 	@Test( groups = "transactionsCreation", dependsOnGroups="architectureLoadCheck")
 	public void testInjectionTransactionCreation() throws MalformedURLException {
+		SIID siidZero = getUniqueServiceInstance(TestServiceZeroModule.class);
 		SIID siidOne = getUniqueServiceInstance(TestServiceOneModule.class);
 		SIID siidTwo = getUniqueServiceInstance(TestServiceTwoModule.class);
 
+		ServiceKey serviceZeroTypeKey = new ServiceKey(TestServiceZero.class);
 		ServiceKey serviceOneTypeKey = new ServiceKey(TestServiceOne.class);
 		ServiceKey serviceTwoTypeKey = new ServiceKey(TestServiceTwo.class);
+
+		SamInjectionConfiguration transactionZero = TestTransactionDefinition.createServiceZeroConfiguration(siidZero);
+		assertNotNull(transactionZero);
+		assertEquals(siidZero, transactionZero.getExposedServiceInstance());
+		assertEquals(serviceZeroTypeKey, transactionZero.getProvidedService());
 		
 		SamInjectionConfiguration transactionOne = TestTransactionDefinition.createServiceOneConfiguration(siidOne);
 		assertNotNull(transactionOne);
 		assertEquals(siidOne, transactionOne.getExposedServiceInstance());
 		assertEquals(serviceOneTypeKey, transactionOne.getProvidedService());
 		
-		SamInjectionConfiguration transactionTwo = TestTransactionDefinition.createServiceTwoConfiguration(siidTwo, siidOne);
+		SamInjectionConfiguration transactionTwo = TestTransactionDefinition.createServiceTwoConfiguration(siidTwo, siidOne,siidZero);
 		assertNotNull(transactionTwo);
 		assertEquals(siidTwo, transactionTwo.getExposedServiceInstance());
 		assertEquals(serviceTwoTypeKey, transactionTwo.getProvidedService());
 		
+		setupAndCheckTransactionRegistration(siurlLocalZero,transactionZero);
 		setupAndCheckTransactionRegistration(siurlLocalOne,transactionOne);
 		setupAndCheckTransactionRegistration(siurlLocalTwo,transactionTwo);
 
-		SamInjectionConfiguration transactionTwoRemote = TestTransactionDefinition.createServiceTwoConfiguration(siidTwo, siurlLocalOne);
+		SamInjectionConfiguration transactionTwoRemote = TestTransactionDefinition.createServiceTwoConfiguration(siidTwo, siurlLocalOne,siurlLocalZero);
 		assertNotNull(transactionTwoRemote);
 		assertEquals(siidTwo, transactionTwoRemote.getExposedServiceInstance());
 		assertEquals(serviceTwoTypeKey, transactionTwoRemote.getProvidedService());

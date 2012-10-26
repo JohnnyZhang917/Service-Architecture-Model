@@ -10,6 +10,7 @@ public class SeeTestArchitecture extends AbstractSamArchitectureDefinition {
 		SamCategoryLoader test = createCategory("Test");
 		test.withService(new TestServiceOne());
 		test.withService(new TestServiceTwo());
+		test.withService(new TestServiceZero());
 	}
 
 }

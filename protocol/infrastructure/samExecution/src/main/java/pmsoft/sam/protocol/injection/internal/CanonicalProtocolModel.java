@@ -6,6 +6,7 @@ import java.util.Stack;
 import java.util.UUID;
 
 
+import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.protocol.execution.CanonicalProtocolExecutionServiceClientApi;
 import pmsoft.sam.protocol.freebinding.ExternalBindingController;
 import pmsoft.sam.protocol.freebinding.ExternalInstanceProvider;
@@ -22,6 +23,7 @@ import pmsoft.sam.see.api.transaction.BindPointTransaction;
 import pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
 import pmsoft.sam.see.api.transaction.SamInjectionModelVisitor;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
@@ -73,9 +75,10 @@ class CanonicalProtocolModel implements CanonicalProtocolInfrastructure {
 				SIURL transactionURL = functionContract.getTransactionURL();
 				ImmutableList<SIURL> serviceSlotURL = siurlBuilder.build();
 				ImmutableList<InstanceRegistry> serviceSlots = intanceRegistryBuilder.build();
-				SIID headSIID = functionContract.getInjectionConfiguration().getExposedServiceInstance();
+				SamInjectionConfiguration injectionConfiguration = functionContract.getInjectionConfiguration();
+				SIID headSIID = injectionConfiguration.getExposedServiceInstance();
 				Injector realServiceInjector = lookForRealInjector(headSIID);
-				Injector glueInjector = createGlueInjector(realServiceInjector, getServiceContract(headSIID));
+				Injector glueInjector = createGlueInjector(realServiceInjector, getServiceContract(headSIID,injectionConfiguration.getProvidedService()));
 				InstanceRegistry executionInstanceRegistry = new ServerExecutionInstanceRegistry(realServiceInjector);
 				CanonicalProtocolExecutionContextObject mainContext = new CanonicalProtocolExecutionContextObject(transactionURL, serviceSlotURL, serviceSlots,
 						executionService, executionInstanceRegistry, controller, glueInjector);
@@ -92,8 +95,11 @@ class CanonicalProtocolModel implements CanonicalProtocolInfrastructure {
 				return serviceInstance.getInjector();
 			}
 
-			private Set<Key<?>> getServiceContract(SIID instance) {
+			private Set<Key<?>> getServiceContract(SIID instance, ServiceKey serviceKey) {
 				SamServiceInstance serviceInstance = executionNode.getInternalServiceInstance(instance);
+				Preconditions.checkState(
+						serviceInstance.getServiceKeyContract().getServiceDefinitionSignature().compareTo(serviceKey.getServiceDefinitionSignature())==0,
+						"ServiceTransaction configuration is mapping a service contract to a instance SIID with other contract. Check configuration");
 				return serviceInstance.getServiceContract();
 			}
 
@@ -113,7 +119,7 @@ class CanonicalProtocolModel implements CanonicalProtocolInfrastructure {
 			public void visit(BindPointSIID bindPointSIID) {
 				SIID siid = bindPointSIID.getSiid();
 				Injector directServiceInjector = lookForRealInjector(siid);
-				Set<Key<?>> serviceApiKeys = getServiceContract(siid);
+				Set<Key<?>> serviceApiKeys = getServiceContract(siid,bindPointSIID.getContract());
 				listOfInstanceProviders.add(new DirectInstanceProvider(directServiceInjector, serviceApiKeys));
 			}
 			

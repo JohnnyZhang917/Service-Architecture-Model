@@ -3,6 +3,7 @@ package pmsoft.sam.see.api.data.impl;
 import pmsoft.sam.see.api.data.architecture.TestInterfaceOne;
 import pmsoft.sam.see.api.data.architecture.TestInterfaceTwo0;
 import pmsoft.sam.see.api.data.architecture.TestInterfaceTwo1;
+import pmsoft.sam.see.api.data.architecture.TestInterfaceZero;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
@@ -20,8 +21,12 @@ public class TestServiceTwoModule extends AbstractModule {
 		@Inject
 		private TestInterfaceOne serviceOne;
 		
+		@Inject
+		private TestInterfaceZero serviceZero;
+		
 		@Override
 		public boolean runTest() {
+			serviceZero.ping("ping");
 			return serviceOne.runTest();
 		}
 		

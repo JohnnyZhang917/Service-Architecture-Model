@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import pmsoft.sam.architecture.model.SamService;
+import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.protocol.execution.ServiceExecutionEnvironment;
 import pmsoft.sam.protocol.injection.CanonicalProtocolExecutionContext;
 import pmsoft.sam.protocol.injection.CanonicalProtocolInfrastructure;
@@ -70,7 +71,9 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 		if(protocolExecutionContext.contains(targetUrl, transactionUniqueId)) {
 			return protocolExecutionContext.get(targetUrl, transactionUniqueId);
 		}
-		CanonicalProtocolExecutionContext executionContext = canonicalProtocol.bindExecutionContext(getTransaction(targetUrl),transactionUniqueId);
+		SamInstanceTransaction transaction = getTransaction(targetUrl);
+		Preconditions.checkNotNull(transaction, "Request to non registered transaction, URL: %s", targetUrl);
+		CanonicalProtocolExecutionContext executionContext = canonicalProtocol.bindExecutionContext(transaction,transactionUniqueId);
 		protocolExecutionContext.put(targetUrl, transactionUniqueId, executionContext);
 		return executionContext;
 	}
@@ -122,7 +125,7 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 		Injector injector = ServiceInjectionUtils.createServiceInstanceInjector(serviceImplementation, architectureRegistry);
 		SamService contractService = architectureRegistry.getService(serviceImplementation.getSpecificationKey());
 		ServiceMetadata finalMetadata = metadata == null ? new ServiceMetadata() : metadata;
-		SamServiceInstanceObject instance = new SamServiceInstanceObject(id, injector, finalMetadata,contractService.getServiceContractAPI());
+		SamServiceInstanceObject instance = new SamServiceInstanceObject(id, injector, finalMetadata,contractService.getServiceContractAPI(),contractService.getServiceKey());
 		runningInstances.put(id, instance);
 		typeOfRunningInstance.put(key, id);
 		return instance;
@@ -134,13 +137,15 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 		private final Injector injector;
 		private final ServiceMetadata metadata;
 		private final ImmutableSet<Key<?>> contract;
+		private final ServiceKey serviceKey;
 
-		public SamServiceInstanceObject(SIID id, Injector injector, ServiceMetadata metadata, Set<Key<?>> contract) {
+		public SamServiceInstanceObject(SIID id, Injector injector, ServiceMetadata metadata, Set<Key<?>> contract,ServiceKey serviceKey) {
 			super();
 			this.id = id;
 			this.injector = injector;
 			this.metadata = metadata;
 			this.contract = ImmutableSet.copyOf(contract);
+			this.serviceKey = serviceKey;
 		}
 
 		@Override
@@ -161,6 +166,11 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 		@Override
 		public Set<Key<?>> getServiceContract() {
 			return contract;
+		}
+		
+		@Override
+		public ServiceKey getServiceKeyContract() {
+			return serviceKey;
 		}
 
 	}

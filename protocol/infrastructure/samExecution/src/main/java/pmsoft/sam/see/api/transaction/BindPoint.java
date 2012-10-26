@@ -1,6 +1,7 @@
 package pmsoft.sam.see.api.transaction;
 
 import pmsoft.sam.architecture.model.ServiceKey;
+import pmsoft.sam.see.injectionUtils.ServiceKeyOrder;
 
 public abstract class BindPoint implements Comparable<BindPoint>, SamTransactionModelVisitable {
 
@@ -12,7 +13,7 @@ public abstract class BindPoint implements Comparable<BindPoint>, SamTransaction
 
 	@Override
 	public int compareTo(BindPoint that) {
-		return this.contract.getServiceDefinitionSignature().compareTo(that.contract.getServiceDefinitionSignature());
+		return ServiceKeyOrder.serviceKeyComparator.compare(this.contract, that.contract);
 	}
 
 	public ServiceKey getContract() {

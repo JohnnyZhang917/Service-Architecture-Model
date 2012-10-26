@@ -9,8 +9,6 @@ import java.util.Map.Entry;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import com.google.inject.Key;
-
 import pmsoft.sam.architecture.loader.IncorrectArchitectureDefinition;
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.see.SEEConfiguration;
@@ -20,7 +18,10 @@ import pmsoft.sam.see.api.data.TestServiceExecutionEnvironmentConfiguration;
 import pmsoft.sam.see.api.data.architecture.TestInterfaceTwo0;
 import pmsoft.sam.see.api.data.architecture.TestServiceOne;
 import pmsoft.sam.see.api.data.architecture.TestServiceTwo;
+import pmsoft.sam.see.api.data.architecture.TestServiceZero;
 import pmsoft.sam.see.api.model.SIURL;
+
+import com.google.inject.Key;
 
 public class TestSEEexecution {
 
@@ -44,13 +45,15 @@ public class TestSEEexecution {
 
 			SamServiceDiscovery serviceDiscovery = server.getServiceDiscovery();
 			Map<SIURL, ServiceKey> services = serviceDiscovery.getServiceRunningStatus();
+			SIURL serviceZero = findService(new ServiceKey(TestServiceZero.class), services);
+			assertNotNull(serviceZero);
 			SIURL serviceOne = findService(new ServiceKey(TestServiceOne.class), services);
 			assertNotNull(serviceOne);
 			SIURL serviceTwo = findService(new ServiceKey(TestServiceTwo.class), services);
 			assertNotNull(serviceTwo);
 
 			
-			SEEConfiguration clientConfiguration = TestServiceExecutionEnvironmentConfiguration.createTestClientConfiguration(clientPort, serviceOne);
+			SEEConfiguration clientConfiguration = TestServiceExecutionEnvironmentConfiguration.createTestClientConfiguration(clientPort, serviceOne,serviceZero);
 			clientNode = new SEEServer(clientConfiguration);
 			clientNode.startUpServer();
 

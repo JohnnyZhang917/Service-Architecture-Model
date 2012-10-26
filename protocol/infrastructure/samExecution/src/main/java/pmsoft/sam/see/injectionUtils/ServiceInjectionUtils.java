@@ -10,6 +10,7 @@ import pmsoft.sam.see.api.SamArchitectureRegistry;
 import pmsoft.sam.see.api.model.SamServiceImplementation;
 
 import com.google.common.base.Throwables;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -29,8 +30,9 @@ public class ServiceInjectionUtils {
 		}
 		
 		List<ServiceKey> injectServices = serviceImplementation.getBindedServices();
-		List<List<Key<?>>> injectedFreeVariableBinding= Lists.newArrayList();
-		for (ServiceKey externalServiceKey : injectServices) {
+		ImmutableList<ServiceKey> orderedInjectServices = ServiceKeyOrder.orderAndRequiereUnique(injectServices);
+		List<List<Key<?>>> injectedFreeVariableBinding= Lists.newLinkedList();
+		for (ServiceKey externalServiceKey : orderedInjectServices) {
 			List<Key<?>> serviceKeys = Lists.newArrayList();
 			SamService externalServiceSpec = architectureService.getService(externalServiceKey);
 			Set<Key<?>> keys = externalServiceSpec.getServiceContractAPI();
