@@ -33,7 +33,6 @@ interface MethodRecordContext extends CanonicalProtocolRequestHandler {
 	int createExternalInstanceBinding(int targetSlot, CanonicalInstanceRecorder<?> externalSlotRecordReference);
 
 	
-	
 	<T> void recordExternalMethodCall(int serviceSlotNr,Key<T> key, int serviceInstanceNr, Method method, Object[] args);
 
 	<T, S> CanonicalInstanceRecorder<S> recordExternalMethodCallWithInterfaceReturnType(int serviceSlotNr,Key<T> key, int serviceInstanceNr,

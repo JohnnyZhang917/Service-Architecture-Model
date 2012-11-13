@@ -43,9 +43,14 @@ class RecordMethodRecordContext extends AbstractMethodRecordContext {
 		}
 	}
 
-	public int createExternalInstanceBinding(int targetSlot, CanonicalInstanceRecorder<?> externalSlotRecordReference) {
-		checkPositionIndex(targetSlot, serviceSlots.size());
-		InstanceRegistry targetInstanceRegistry = serviceSlots.get(targetSlot);
+	/**
+	 * A method execution on slot executionSlotNr have a argument that is a reference to a external binding.
+	 * 
+	 * Calls realized in the external service must go on top of the execution stack.
+	 */
+	public int createExternalInstanceBinding(int executionSlotNr, CanonicalInstanceRecorder<?> externalSlotRecordReference) {
+		checkPositionIndex(executionSlotNr, serviceSlots.size());
+		InstanceRegistry targetInstanceRegistry = serviceSlots.get(executionSlotNr);
 		int externalInstanceNr = targetInstanceRegistry.createExternalInstanceBinding(externalSlotRecordReference.getKey(),
 				externalSlotRecordReference.getInstance());
 		// Is it necessary to save more information about the mapping?? the slot

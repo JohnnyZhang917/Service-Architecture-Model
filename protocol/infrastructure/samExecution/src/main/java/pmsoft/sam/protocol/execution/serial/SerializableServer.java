@@ -57,8 +57,8 @@ class SerializableServer implements Runnable {
 	}
 
 	void shutdown() {
-		channel.awaitUninterruptibly();
-		b.shutdown();
+		if( channel != null ) channel.awaitUninterruptibly();
+		if( b != null ) b.shutdown();
 	}
 
 }

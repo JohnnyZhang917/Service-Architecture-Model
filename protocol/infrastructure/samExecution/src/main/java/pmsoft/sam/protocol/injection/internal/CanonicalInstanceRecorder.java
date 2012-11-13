@@ -24,7 +24,7 @@ public class CanonicalInstanceRecorder<T> implements InvocationHandler {
 		Class<T> returnedType = (Class<T>) key.getTypeLiteral().getRawType();
 		instance = (T) Proxy.newProxyInstance(returnedType.getClassLoader(), new Class[] { returnedType }, this);
 	}
-
+	
 	public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 		Class<?> returnType = method.getReturnType();
 		if (returnType.equals(Void.TYPE)) {

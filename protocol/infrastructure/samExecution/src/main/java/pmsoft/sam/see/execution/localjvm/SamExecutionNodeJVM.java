@@ -95,10 +95,15 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 		Preconditions.checkNotNull(url);
 		Preconditions.checkNotNull(configuration);
 		Preconditions.checkState(!transactions.containsKey(url));
+		validateConfiguration(configuration);
 		SamInjectionTransactionObject transaction = new SamInjectionTransactionObject(configuration,url);
 		transactions.put(url, transaction);
 		serviceDiscoveryRegistry.serviceTransactionCreated(url, transaction.getInjectionConfiguration().getProvidedService());
 		return url;
+	}
+
+	private void validateConfiguration(SamInjectionConfiguration configuration) {
+		// TODO: validate configuration before creating the execution context
 	}
 
 	@Override
@@ -130,7 +135,7 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 		Injector injector = ServiceInjectionUtils.createServiceInstanceInjector(serviceImplementation, architectureRegistry);
 		SamService contractService = architectureRegistry.getService(serviceImplementation.getSpecificationKey());
 		ServiceMetadata finalMetadata = metadata == null ? new ServiceMetadata() : metadata;
-		SamServiceInstanceObject instance = new SamServiceInstanceObject(id, injector, finalMetadata,contractService.getServiceContractAPI(),contractService.getServiceKey());
+		SamServiceInstanceObject instance = new SamServiceInstanceObject(key,id, injector, finalMetadata,contractService.getServiceContractAPI(),contractService.getServiceKey());
 		runningInstances.put(id, instance);
 		typeOfRunningInstance.put(key, id);
 		return instance;
@@ -143,14 +148,21 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 		private final ServiceMetadata metadata;
 		private final ImmutableSet<Key<?>> contract;
 		private final ServiceKey serviceKey;
+		private final SamServiceImplementationKey implementationKey;
 
-		public SamServiceInstanceObject(SIID id, Injector injector, ServiceMetadata metadata, Set<Key<?>> contract,ServiceKey serviceKey) {
+		public SamServiceInstanceObject(SamServiceImplementationKey implementationKey, SIID id, Injector injector, ServiceMetadata metadata, Set<Key<?>> contract,ServiceKey serviceKey) {
 			super();
+			this.implementationKey = implementationKey;
 			this.id = id;
 			this.injector = injector;
 			this.metadata = metadata;
 			this.contract = ImmutableSet.copyOf(contract);
 			this.serviceKey = serviceKey;
+		}
+		
+		@Override
+		public SamServiceImplementationKey getImplementationKey() {
+			return implementationKey;
 		}
 
 		@Override

@@ -15,6 +15,7 @@ import com.google.common.collect.Sets;
 
 public class SamTransactionConfigurationUtil {
 
+	//FIXME Transaction configuration must be related to implementation definition, so error on configuration give compilation error
 	public static SamInjectionTransactionDefinitionGrammar createTransactionOn(Class<? extends SamServiceDefinition> serviceContract) {
 		return createTransactionOn(new ServiceKey(serviceContract));
 	}

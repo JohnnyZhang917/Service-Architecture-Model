@@ -4,7 +4,7 @@ import pmsoft.sam.see.api.data.architecture.contract.shopping.ShoppingStoreWithC
 
 import com.google.inject.AbstractModule;
 
-public class ShoppingModule extends AbstractModule {
+public class TestShoppingModule extends AbstractModule {
 
 	@Override
 	protected void configure() {

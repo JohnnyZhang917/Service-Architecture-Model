@@ -31,7 +31,7 @@ public abstract class AbstractMethodRecordContext implements MethodRecordContext
 	public void pushMethodCall(MethodCall call) {
 		serviceCallStack.addLast(call);
 	}
-
+	
 	public final Object flushMethodCall(MethodCall call) {
 		pushMethodCall(call);
 		flushExecution();

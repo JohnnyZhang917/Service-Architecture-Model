@@ -20,6 +20,8 @@ public interface SamServiceInstance {
 	
 	public ServiceKey getServiceKeyContract();
 	
+	public SamServiceImplementationKey getImplementationKey();
+	
 	// TODO maybe not necessary
 	// public ServiceImplementation getImplementation();
 }

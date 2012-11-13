@@ -2,7 +2,7 @@ package pmsoft.sam.see.api.data.architecture;
 
 import pmsoft.sam.architecture.definition.AbstractSamArchitectureDefinition;
 import pmsoft.sam.architecture.definition.SamArchitectureLoader.SamCategoryLoader;
-import pmsoft.sam.see.api.data.architecture.service.ShoppingInteractionStoreCourierService;
+import pmsoft.sam.see.api.data.architecture.service.ShoppingService;
 import pmsoft.sam.see.api.data.architecture.service.CourierService;
 import pmsoft.sam.see.api.data.architecture.service.StoreService;
 import pmsoft.sam.see.api.data.architecture.service.TestServiceOne;
@@ -19,7 +19,7 @@ public class SeeTestArchitecture extends AbstractSamArchitectureDefinition {
 		test.withService(new TestServiceZero());
 
 		SamCategoryLoader shopping = createCategory("Shopping");
-		shopping.withService(new ShoppingInteractionStoreCourierService());
+		shopping.withService(new ShoppingService());
 		shopping.withService(new CourierService());
 		shopping.withService(new StoreService());
 
