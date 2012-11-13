@@ -8,11 +8,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import pmsoft.sam.protocol.execution.model.AbstractInstanceReference;
 import pmsoft.sam.protocol.execution.model.BindingKeyInstanceReference;
-import pmsoft.sam.protocol.execution.model.DataObjectInstanceReference;
+import pmsoft.sam.protocol.execution.model.ClientDataObjectInstanceReference;
 import pmsoft.sam.protocol.execution.model.ExternalSlotInstanceReference;
 import pmsoft.sam.protocol.execution.model.FilledDataInstanceReference;
 import pmsoft.sam.protocol.execution.model.InstanceMergeVisitor;
 import pmsoft.sam.protocol.execution.model.PendingDataInstanceReference;
+import pmsoft.sam.protocol.execution.model.ServerDataObjectInstanceReference;
 import pmsoft.sam.protocol.execution.model.ServerPendingDataInstanceReference;
 
 import com.google.common.base.Preconditions;
@@ -73,14 +74,6 @@ public abstract class AbstractInstanceRegistry implements InstanceRegistry,Insta
 		return serviceInstanceNr;
 	}
 
-	public int createDataBinding(Object arg) {
-		int serviceInstanceNr = getNextInstanceNumber();
-		DataObjectInstanceReference dataInstance = new DataObjectInstanceReference(serviceInstanceNr, arg);
-		instanceReferenceList.add(dataInstance);
-		instanceObjectList.add(arg);
-		return serviceInstanceNr;
-	}
-
 	public Object getInstance(int instanceNumber) {
 		int instancePosition = getInstanceNumberPosition(instanceNumber);
 		return instanceObjectList.get(instancePosition);
@@ -89,7 +82,7 @@ public abstract class AbstractInstanceRegistry implements InstanceRegistry,Insta
 	public Object getDataInstance(int instanceNr) {
 		int position = getInstanceNumberPosition(instanceNr);
 		AbstractInstanceReference reference = instanceReferenceList.get(position);
-		checkState(reference instanceof DataObjectInstanceReference);
+		checkState(reference instanceof ClientDataObjectInstanceReference || reference instanceof ServerDataObjectInstanceReference );
 		return instanceObjectList.get(position);
 	}
 	

@@ -1,17 +1,20 @@
 package pmsoft.sam.protocol.injection.internal;
 
-import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
+import java.io.Serializable;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.UUID;
 
 import pmsoft.sam.protocol.execution.CanonicalProtocolExecutionServiceClientApi;
-import pmsoft.sam.protocol.execution.CanonicalProtocolRequestData;
 import pmsoft.sam.protocol.execution.CanonicalProtocolRequest;
+import pmsoft.sam.protocol.execution.CanonicalProtocolRequestData;
 import pmsoft.sam.protocol.execution.model.AbstractInstanceReference;
 import pmsoft.sam.protocol.execution.model.InstanceMergeVisitor;
 import pmsoft.sam.protocol.execution.model.MethodCall;
+import pmsoft.sam.protocol.freebinding.ExternalBindingSwitch;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
@@ -37,7 +40,8 @@ public class ExecutionMethodRecordContext extends AbstractMethodRecordContext {
 
 	@Override
 	protected List<AbstractInstanceReference> getInstanceReferenceToTransfer(int targetSlot) {
-		checkArgument(targetSlot == 0);
+		// Target slot correspond to client size slot.
+		// In execution, only one slot is created
 		Builder<AbstractInstanceReference> executionInstances = ImmutableList.builder();
 		executionInstances.addAll(executionInstanceRegistry.getInstanceReferenceToTransfer());
 		return executionInstances.build();
@@ -60,8 +64,6 @@ public class ExecutionMethodRecordContext extends AbstractMethodRecordContext {
 			// NO external calls recorded
 			return;
 		}
-		int targetSlot = requestData.getTargetSlot();
-		checkState(targetSlot == 0);
 		CanonicalProtocolRequest request = new CanonicalProtocolRequest(false, canonicalTransactionIdentificator, currentRequestOnStack.getSourceLocation(),
 				currentRequestOnStack.getTargetLocation(), requestData, currentRequestOnStack.getServiceSlotNr());
 		CanonicalProtocolRequestData response = executionService.executeExternalCanonicalRequest(request);
@@ -81,7 +83,7 @@ public class ExecutionMethodRecordContext extends AbstractMethodRecordContext {
 	@Override
 	public void pushMethodCall(MethodCall call) {
 		checkState(call.getServiceSlotNr() == 0,
-				"On execution context slot 0 is the unique, how it is possible to get a method call to other slot??, critical error");
+				"On execution context slot 0 is the external recording slot, how it is possible to get a method call to other slot??, critical error");
 		super.pushMethodCall(call);
 	}
 
@@ -100,9 +102,42 @@ public class ExecutionMethodRecordContext extends AbstractMethodRecordContext {
 
 	@Override
 	protected int[] parseArguments(int serviceSlotNrContext, Object[] args) {
-		// TODO this must not be used
-		checkState(false, "TODO");
-		return null;
+		int[] argumentNrs = new int[args.length];
+		for (int i = 0; i < args.length; i++) {
+			Object arg = args[i];
+			if (arg == null) {
+				argumentNrs[i] = 0;
+			}
+			// Extract the real object from switching proxy's
+			if (arg instanceof Proxy) {
+				Proxy parg = (Proxy) arg;
+				InvocationHandler handler = Proxy.getInvocationHandler(parg);
+				if (handler instanceof ExternalBindingSwitch) {
+					ExternalBindingSwitch<?> switchProxy = (ExternalBindingSwitch<?>) handler;
+					arg = switchProxy.getInternalInstance();
+				}
+			}
+
+			if (arg instanceof Proxy) {
+				Proxy parg = (Proxy) arg;
+				InvocationHandler handler = Proxy.getInvocationHandler(parg);
+				if (handler instanceof CanonicalInstanceRecorder) {
+					CanonicalInstanceRecorder<?> recorder = (CanonicalInstanceRecorder<?>) handler;
+					if (recorder.getServiceSlotNr() == serviceSlotNrContext) {
+						argumentNrs[i] = recorder.getServiceInstanceNr();
+					} else {
+						argumentNrs[i] = createExternalInstanceBinding(serviceSlotNrContext, recorder);
+					}
+				} else {
+					throw new RuntimeException("Unknow Proxy type");
+				}
+			} else if (arg instanceof Serializable) {
+				argumentNrs[i] = executionInstanceRegistry.createDataBinding(arg);
+			} else {
+				throw new RuntimeException("argument not serializable be canonical protocol");
+			}
+		}
+		return argumentNrs;
 	}
 
 	@Override

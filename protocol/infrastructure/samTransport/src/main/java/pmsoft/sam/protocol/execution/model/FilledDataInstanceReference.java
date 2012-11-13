@@ -1,7 +1,7 @@
 package pmsoft.sam.protocol.execution.model;
 
 
-public class FilledDataInstanceReference extends DataObjectInstanceReference{
+public class FilledDataInstanceReference extends ClientDataObjectInstanceReference{
 
 	/**
 	 * 

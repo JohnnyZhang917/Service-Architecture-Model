@@ -15,21 +15,15 @@ public interface SamInjectionConfiguration extends SamTransactionModelVisitable 
 	 * Service contract provided by this transaction to the client. Only one
 	 * contract is provided to client.
 	 * 
-	 * @return
+	 * @return key of the service provided by the head of the configuration
 	 */
 	public ServiceKey getProvidedService();
 
 	/**
 	 * Service Instance providing the main contract exposed by this transaction
 	 * 
-	 * @return
+	 * @return Unique local SIID for the head service instance
 	 */
 	public SIID getExposedServiceInstance();
-	
-	/**
-	 * Inform if there is some binding point used to inject services
-	 * @return
-	 */
-	public boolean hasBindingPoints();
 	
 }

@@ -59,7 +59,7 @@ public abstract class AbstractMethodRecordContext implements MethodRecordContext
 				"the serviceCallStack is not empty and list of method calls is empty???, critical error");
 		int targetSlot = methodCalls.get(0).getServiceSlotNr();
 		List<AbstractInstanceReference> instanceReference = getInstanceReferenceToTransfer(targetSlot);
-		CanonicalProtocolRequestData data = new CanonicalProtocolRequestData(instanceReference, methodCalls, targetSlot);
+		CanonicalProtocolRequestData data = new CanonicalProtocolRequestData(instanceReference, methodCalls);
 		return data;
 	}
 
@@ -94,7 +94,7 @@ public abstract class AbstractMethodRecordContext implements MethodRecordContext
 		}
 		ImmutableList<MethodCall> calls = methodBuilder.build();
 		List<AbstractInstanceReference> instanceReference = getInstanceReferenceToTransfer(targetSlot);
-		CanonicalProtocolRequestData data = new CanonicalProtocolRequestData(instanceReference, calls, targetSlot);
+		CanonicalProtocolRequestData data = new CanonicalProtocolRequestData(instanceReference, calls);
 		return data;
 	}
 

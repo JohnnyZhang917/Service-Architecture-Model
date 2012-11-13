@@ -1,6 +1,6 @@
 package pmsoft.sam.see.api.data.impl;
 
-import pmsoft.sam.see.api.data.architecture.TestInterfaceZero;
+import pmsoft.sam.see.api.data.architecture.contract.TestInterfaceZero;
 
 import com.google.inject.AbstractModule;
 

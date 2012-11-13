@@ -56,15 +56,14 @@ public class CanonicalProtocolRequest implements Serializable {
 		return forwardCall;
 	}
 
-	@Override
-	public String toString() {
-		return "ServiceExecutionRequest [forwardCall=" + forwardCall + ", canonicalTransactionIdentificator="
-				+ canonicalTransactionIdentificator + ", target=" + target + ", source=" + source + ", data=" + data
-				+ "]";
-	}
-
 	public int getServiceSlotNr() {
 		return serviceSlotNr;
+	}
+
+	@Override
+	public String toString() {
+		return "CanonicalProtocolRequest [serviceSlotNr=" + serviceSlotNr + "forwardCall=" + forwardCall + ", canonicalTransactionIdentificator=" + canonicalTransactionIdentificator
+				+ ", target=" + target + ", source=" + source + ", data=" + data + "]";
 	}
 
 }

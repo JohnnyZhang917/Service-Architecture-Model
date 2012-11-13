@@ -1,9 +1,9 @@
-package pmsoft.sam.see.api.data.transactions;
+package pmsoft.sam.see.api.data;
 
 import static pmsoft.sam.see.api.transaction.SamTransactionConfigurationUtil.createTransactionOn;
-import pmsoft.sam.see.api.data.architecture.TestServiceOne;
-import pmsoft.sam.see.api.data.architecture.TestServiceTwo;
-import pmsoft.sam.see.api.data.architecture.TestServiceZero;
+import pmsoft.sam.see.api.data.architecture.service.TestServiceOne;
+import pmsoft.sam.see.api.data.architecture.service.TestServiceTwo;
+import pmsoft.sam.see.api.data.architecture.service.TestServiceZero;
 import pmsoft.sam.see.api.model.SIID;
 import pmsoft.sam.see.api.model.SIURL;
 import pmsoft.sam.see.api.transaction.SamInjectionConfiguration;

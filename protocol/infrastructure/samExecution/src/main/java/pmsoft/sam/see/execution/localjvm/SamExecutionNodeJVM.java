@@ -60,16 +60,21 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 	public CanonicalProtocolExecutionContext createTransactionExecutionContext(SIURL url) {
 		Preconditions.checkNotNull(url);
 		SamInstanceTransaction transaction = getTransaction(url);
-		return canonicalProtocol.createExecutionContext(transaction);
+		CanonicalProtocolExecutionContext executionContext = canonicalProtocol.createExecutionContext(transaction);
+		protocolExecutionContext.put(url, executionContext.getContextUniqueID(), executionContext);
+		return executionContext;
 	}
 	
 	private final Table<SIURL, UUID, CanonicalProtocolExecutionContext> protocolExecutionContext = HashBasedTable.create();
 	
 	@Override
-	public CanonicalProtocolExecutionContext openTransactionExecutionContext(SIURL targetUrl, UUID transactionUniqueId) {
+	public CanonicalProtocolExecutionContext openTransactionExecutionContext(SIURL targetUrl, UUID transactionUniqueId, boolean isForward) {
 		Preconditions.checkNotNull(transactionUniqueId);
 		if(protocolExecutionContext.contains(targetUrl, transactionUniqueId)) {
 			return protocolExecutionContext.get(targetUrl, transactionUniqueId);
+		}
+		if( !isForward ) {
+			throw new RuntimeException("returning calls must have a existing execution context");
 		}
 		SamInstanceTransaction transaction = getTransaction(targetUrl);
 		Preconditions.checkNotNull(transaction, "Request to non registered transaction, URL: %s", targetUrl);

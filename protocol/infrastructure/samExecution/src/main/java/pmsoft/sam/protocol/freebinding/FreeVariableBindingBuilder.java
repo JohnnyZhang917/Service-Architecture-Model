@@ -15,13 +15,14 @@ public class FreeVariableBindingBuilder {
 
 	/**
 	 * Create a module with providers of all passed Keys.
-	 * The providers will refer to a ExternalBindingSwitch that will look for the real instance at real time by meaning of the Canonical Protocol.
+	 * The providers will refer to a ExternalBindingSwitch that will look for the real instance at runtime by meaning of the Canonical Protocol.
 	 * 
 	 * At runtime, instance switching is make be the ExternalBindingSwitch instance returned by the providers.
 	 * 
 	 * The ExtrenalBindingInfrastructureModule provide a special scope and a controller to setup on thread local ExternalInstanceProvider.
+	 * 
 	 * @param injectedFreeVariableBinding
-	 * @return
+	 * @return module with key to provided configuration
 	 */
 	public final static Module createFreeBindingModule(final List<List<Key<?>>> injectedFreeVariableBinding) {
 		return new PrivateModule() {

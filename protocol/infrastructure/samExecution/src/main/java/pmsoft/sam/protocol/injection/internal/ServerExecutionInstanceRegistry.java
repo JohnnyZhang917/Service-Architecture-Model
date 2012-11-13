@@ -8,11 +8,12 @@ import java.util.List;
 
 import pmsoft.sam.protocol.execution.model.AbstractInstanceReference;
 import pmsoft.sam.protocol.execution.model.BindingKeyInstanceReference;
-import pmsoft.sam.protocol.execution.model.DataObjectInstanceReference;
+import pmsoft.sam.protocol.execution.model.ClientDataObjectInstanceReference;
 import pmsoft.sam.protocol.execution.model.ExternalSlotInstanceReference;
 import pmsoft.sam.protocol.execution.model.FilledDataInstanceReference;
 import pmsoft.sam.protocol.execution.model.PendingDataInstanceReference;
 import pmsoft.sam.protocol.execution.model.ServerBindingKeyInstanceReference;
+import pmsoft.sam.protocol.execution.model.ServerDataObjectInstanceReference;
 import pmsoft.sam.protocol.execution.model.ServerPendingDataInstanceReference;
 
 import com.google.common.collect.ImmutableList;
@@ -42,6 +43,9 @@ public class ServerExecutionInstanceRegistry extends AbstractInstanceRegistry {
 			if (instanceRef instanceof ServerBindingKeyInstanceReference<?>) {
 				builder.add(instanceRef);
 			}
+			if (instanceRef instanceof ServerDataObjectInstanceReference) {
+				builder.add(instanceRef);
+			}
 		}
 		transferedInstanceReferenceMark = position;
 
@@ -55,6 +59,7 @@ public class ServerExecutionInstanceRegistry extends AbstractInstanceRegistry {
 			if (instanceRef instanceof FilledDataInstanceReference) {
 				builder.add(instanceRef);
 			}
+
 		}
 		pendingDataTransferReferenceMark = position;
 		return builder.build();
@@ -66,6 +71,14 @@ public class ServerExecutionInstanceRegistry extends AbstractInstanceRegistry {
 		ServerPendingDataInstanceReference pendingInstance = new ServerPendingDataInstanceReference(serviceInstanceNr, returnType);
 		instanceReferenceList.add(pendingInstance);
 		instanceObjectList.add(null);
+		return serviceInstanceNr;
+	}
+	
+	public int createDataBinding(Object arg) {
+		int serviceInstanceNr = getNextInstanceNumber();
+		ServerDataObjectInstanceReference dataInstance = new ServerDataObjectInstanceReference(serviceInstanceNr, arg);
+		instanceReferenceList.add(dataInstance);
+		instanceObjectList.add(arg);
 		return serviceInstanceNr;
 	}
 
@@ -126,7 +139,7 @@ public class ServerExecutionInstanceRegistry extends AbstractInstanceRegistry {
 		int currentInstanceNumber = getNextInstanceNumber();
 		checkState(externalSlotInstanceReference.getInstanceNr() == currentInstanceNumber);
 		Key<T> key = externalSlotInstanceReference.getKey();
-		CanonicalInstanceRecorder<T> recorder = new CanonicalInstanceRecorder<T>(executionContext, key, currentInstanceNumber, 1);
+		CanonicalInstanceRecorder<T> recorder = new CanonicalInstanceRecorder<T>(executionContext, key, currentInstanceNumber, 0);
 		ExternalSlotInstanceReference<T> reference = new ExternalSlotInstanceReference<T>(currentInstanceNumber, key);
 		instanceReferenceList.add(reference);
 		instanceObjectList.add(recorder.getInstance());
@@ -143,7 +156,7 @@ public class ServerExecutionInstanceRegistry extends AbstractInstanceRegistry {
 		AbstractInstanceReference instance = instanceReferenceList.get(position);
 		checkState(instance instanceof ServerPendingDataInstanceReference, "A server pending data position should be found, critical protocol error");
 		Object objectReference = filledDataInstanceReference.getObjectReference();
-		DataObjectInstanceReference dataRef = new DataObjectInstanceReference(filledInstance, objectReference);
+		ClientDataObjectInstanceReference dataRef = new ClientDataObjectInstanceReference(filledInstance, objectReference);
 		instanceReferenceList.set(position, dataRef);
 		instanceObjectList.set(position, objectReference);
 	}
@@ -160,13 +173,19 @@ public class ServerExecutionInstanceRegistry extends AbstractInstanceRegistry {
 		instanceObjectList.add(null);
 	}
 
-	public void visitDataObjectInstance(DataObjectInstanceReference dataObjectInstanceReference) {
+	@Override
+	public void visitClientDataObjectInstance(ClientDataObjectInstanceReference dataObjectInstanceReference) {
 		int currentInstanceNumber = getNextInstanceNumber();
 		checkState(dataObjectInstanceReference.getInstanceNr() == currentInstanceNumber);
 		Object objectReference = dataObjectInstanceReference.getObjectReference();
-		DataObjectInstanceReference dataRef = new DataObjectInstanceReference(currentInstanceNumber, objectReference);
+		ClientDataObjectInstanceReference dataRef = new ClientDataObjectInstanceReference(currentInstanceNumber, objectReference);
 		instanceReferenceList.add(dataRef);
 		instanceObjectList.add(objectReference);
 	}
 
+	@Override
+	public void visitServerDataObjectInstance(ServerDataObjectInstanceReference dataObjectInstanceReference) {
+		throw new RuntimeException("not allowed type");
+	}
+	
 }

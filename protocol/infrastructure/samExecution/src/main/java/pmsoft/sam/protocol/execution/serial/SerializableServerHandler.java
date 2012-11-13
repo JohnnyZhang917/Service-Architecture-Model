@@ -21,7 +21,6 @@ public class SerializableServerHandler extends ChannelInboundMessageHandlerAdapt
 
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, CanonicalProtocolRequest msg) throws Exception {
-		System.out.println(msg);
 		ctx.write(handler.handleCanonicalRequest(msg));
 	}
 

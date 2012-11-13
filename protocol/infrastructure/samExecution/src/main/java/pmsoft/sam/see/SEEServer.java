@@ -66,7 +66,11 @@ public class SEEServer {
 		for (SEEServiceSetupAction setup : configuration.setupActions) {
 			setup.setupService(executionNode);
 		}
-
+	}
+	
+	public void executeSetupAction(SEEServiceSetupAction setup){
+		SamExecutionNode executionNode = serverInjector.getInstance(SamExecutionNode.class);
+		setup.setupService(executionNode);
 	}
 
 	public <T> void executeServiceInteraction(ServiceInteracion<T> interaction) {

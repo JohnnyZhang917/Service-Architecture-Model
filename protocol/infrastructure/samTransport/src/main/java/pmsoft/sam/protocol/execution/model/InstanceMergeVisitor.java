@@ -15,6 +15,8 @@ public interface InstanceMergeVisitor {
 
 	public void visitServerPendingDataInstance(ServerPendingDataInstanceReference serverPendingDataInstanceReference);
 
-	public void visitDataObjectInstance(DataObjectInstanceReference dataObjectInstanceReference);
+	public void visitClientDataObjectInstance(ClientDataObjectInstanceReference dataObjectInstanceReference);
+	
+	public void visitServerDataObjectInstance(ServerDataObjectInstanceReference dataObjectInstanceReference);
 
 }

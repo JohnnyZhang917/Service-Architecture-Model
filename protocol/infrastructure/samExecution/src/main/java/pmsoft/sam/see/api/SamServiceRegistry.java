@@ -17,15 +17,15 @@ public interface SamServiceRegistry {
 	/**
 	 * Get information about a specific implementations. The implementation must be already registered
 	 * @param key Key identifying the implementation
-	 * @return
+	 * @return implementation by key
 	 */
 	public SamServiceImplementation getImplementation(SamServiceImplementationKey key);
 
 	/**
 	 * Get a currently running transaction
-	 * @param oneUrl SIURL identifing this transaction
-	 * @return
+	 * @param url SIURL identifying this transaction
+	 * @return transaction by url
 	 */
-	public SamInstanceTransaction getTransaction(SIURL oneUrl);
+	public SamInstanceTransaction getTransaction(SIURL url);
 	
 }

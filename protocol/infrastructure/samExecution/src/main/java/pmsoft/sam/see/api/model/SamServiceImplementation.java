@@ -15,25 +15,25 @@ public interface SamServiceImplementation {
 
 	/**
 	 * Implementation injection configuration provided as a Guice module
-	 * @return
+	 * @return class defining implementation module
 	 */
 	public Class<? extends Module> getModule();
 
 	/**
 	 * Identification key of implementation
-	 * @return
+	 * @return key of the implementation
 	 */
 	public SamServiceImplementationKey getKey();
 	
 	/**
 	 * Service contract provided by this service
-	 * @return
+	 * @return key of the service contract
 	 */
 	public ServiceKey getSpecificationKey();
 	
 	/**
 	 * List of binded services in natural order
-	 * @return
+	 * @return list of used services keys
 	 */
 	public List<ServiceKey> getBindedServices();
 }

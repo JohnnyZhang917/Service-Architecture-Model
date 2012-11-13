@@ -21,9 +21,9 @@ class CanonicalProtocolExecutionContextObject implements CanonicalProtocolExecut
 	private final Injector headTransactionInjector;
 
 	public CanonicalProtocolExecutionContextObject(SIURL transactionURL, ImmutableList<SIURL> serviceSlotURL, ImmutableList<InstanceRegistry> serviceSlots,
-			CanonicalProtocolExecutionServiceClientApi executionService, InstanceRegistry executionInstanceRegistry, TransactionController controller, Injector headTransactionInjector) {
+			CanonicalProtocolExecutionServiceClientApi executionService, InstanceRegistry executionInstanceRegistry, TransactionController controller, Injector headTransactionInjector, UUID canonicalTransactionIdentificator) {
 		this.controller = controller;
-		this.canonicalTransactionIdentificator = UUID.randomUUID();
+		this.canonicalTransactionIdentificator = canonicalTransactionIdentificator;
 		this.recordStack = new RecordMethodRecordContext(executionService, serviceSlots, serviceSlotURL, canonicalTransactionIdentificator, transactionURL);
 		this.executionStack = new ExecutionMethodRecordContext(executionService, executionInstanceRegistry, canonicalTransactionIdentificator);
 		this.headTransactionInjector = headTransactionInjector;

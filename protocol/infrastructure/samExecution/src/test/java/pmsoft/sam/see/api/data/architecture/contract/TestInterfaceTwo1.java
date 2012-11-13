@@ -1,4 +1,4 @@
-package pmsoft.sam.see.api.data.architecture;
+package pmsoft.sam.see.api.data.architecture.contract;
 
 public interface TestInterfaceTwo1 {
 	

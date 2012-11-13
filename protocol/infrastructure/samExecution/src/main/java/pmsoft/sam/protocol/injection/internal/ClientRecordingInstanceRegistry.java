@@ -7,11 +7,12 @@ import java.util.List;
 
 import pmsoft.sam.protocol.execution.model.AbstractInstanceReference;
 import pmsoft.sam.protocol.execution.model.BindingKeyInstanceReference;
-import pmsoft.sam.protocol.execution.model.DataObjectInstanceReference;
+import pmsoft.sam.protocol.execution.model.ClientDataObjectInstanceReference;
 import pmsoft.sam.protocol.execution.model.ExternalSlotInstanceReference;
 import pmsoft.sam.protocol.execution.model.FilledDataInstanceReference;
 import pmsoft.sam.protocol.execution.model.PendingDataInstanceReference;
 import pmsoft.sam.protocol.execution.model.ServerBindingKeyInstanceReference;
+import pmsoft.sam.protocol.execution.model.ServerDataObjectInstanceReference;
 import pmsoft.sam.protocol.execution.model.ServerPendingDataInstanceReference;
 
 import com.google.common.collect.ImmutableList;
@@ -21,6 +22,14 @@ public class ClientRecordingInstanceRegistry extends AbstractInstanceRegistry {
 
 	public ClientRecordingInstanceRegistry(int serviceSlotNr) {
 		super(serviceSlotNr);
+	}
+	
+	public int createDataBinding(Object arg) {
+		int serviceInstanceNr = getNextInstanceNumber();
+		ClientDataObjectInstanceReference dataInstance = new ClientDataObjectInstanceReference(serviceInstanceNr, arg);
+		instanceReferenceList.add(dataInstance);
+		instanceObjectList.add(arg);
+		return serviceInstanceNr;
 	}
 
 	public List<AbstractInstanceReference> getInstanceReferenceToTransfer() {
@@ -82,7 +91,7 @@ public class ClientRecordingInstanceRegistry extends AbstractInstanceRegistry {
 		checkState(instance instanceof PendingDataInstanceReference,
 				"A pending data position should be found, critical protocol error");
 		Object objectReference = filledDataInstanceReference.getObjectReference();
-		DataObjectInstanceReference dataRef = new DataObjectInstanceReference(filledInstance, objectReference );
+		ClientDataObjectInstanceReference dataRef = new ClientDataObjectInstanceReference(filledInstance, objectReference );
 		instanceReferenceList.set(position, dataRef);
 		instanceObjectList.set(position,objectReference);
 		
@@ -92,8 +101,19 @@ public class ClientRecordingInstanceRegistry extends AbstractInstanceRegistry {
 		throw new RuntimeException("not allowed type");	
 	}
 
-	public void visitDataObjectInstance(DataObjectInstanceReference dataObjectInstanceReference) {
+	@Override
+	public void visitClientDataObjectInstance(ClientDataObjectInstanceReference dataObjectInstanceReference) {
 		throw new RuntimeException("not allowed type");			
+	}
+	
+	@Override
+	public void visitServerDataObjectInstance(ServerDataObjectInstanceReference dataObjectInstanceReference) {
+		int currentInstanceNumber = getNextInstanceNumber();
+		checkState(dataObjectInstanceReference.getInstanceNr() == currentInstanceNumber);
+		Object objectReference = dataObjectInstanceReference.getObjectReference();
+		ServerDataObjectInstanceReference dataRef = new ServerDataObjectInstanceReference(currentInstanceNumber, objectReference);
+		instanceReferenceList.add(dataRef);
+		instanceObjectList.add(objectReference);
 	}
 
 }

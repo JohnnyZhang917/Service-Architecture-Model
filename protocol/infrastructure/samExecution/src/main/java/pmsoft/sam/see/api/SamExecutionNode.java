@@ -34,7 +34,8 @@ public interface SamExecutionNode extends SamServiceRegistry {
 	 *            Service Implementation used to create the service Instances
 	 * @param metadata
 	 *            Required matching Metadata
-	 * @return
+	 * @return ServiceInstances that match the given key and metadata
+	 * 
 	 */
 	public Set<SamServiceInstance> searchInstance(SamServiceImplementationKey key, ServiceMetadata metadata);
 
@@ -43,22 +44,26 @@ public interface SamExecutionNode extends SamServiceRegistry {
 	 * 
 	 * @param configuration
 	 *            Binding configuration between services
-	 * @return
+	 * @param url
+	 *            expected URL for this transaction
+	 * 
+	 * @return Confirmed URL for the new created transaction, it may differ from
+	 *         url
 	 */
 	public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, SIURL url);
+
 	public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration);
 
 	/**
 	 * Publish to service Transaction on the ServiceDiscovery infrastructure
 	 * binded to the ExecutionNode
 	 * 
-	 * @param transaction
-	 * @param url
+	 * @param url URL of the transaction
 	 */
 	public SamInstanceTransaction getTransaction(SIURL url);
-	
+
 	public CanonicalProtocolExecutionContext createTransactionExecutionContext(SIURL url);
 
-	public CanonicalProtocolExecutionContext openTransactionExecutionContext(SIURL targetUrl, UUID transactionUniqueId);
+	public CanonicalProtocolExecutionContext openTransactionExecutionContext(SIURL targetUrl, UUID transactionUniqueId, boolean forwardCall);
 
 }

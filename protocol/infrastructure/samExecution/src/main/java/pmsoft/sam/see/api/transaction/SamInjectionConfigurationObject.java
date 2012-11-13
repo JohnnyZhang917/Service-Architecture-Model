@@ -29,11 +29,6 @@ class SamInjectionConfigurationObject implements SamInjectionConfiguration {
 	}
 	
 	@Override
-	public boolean hasBindingPoints() {
-		return ! bindPoints.isEmpty();
-	}
-
-	@Override
 	public <T> void accept(SamInjectionModelVisitor<T> visitor) {
 		visitor.enterNested(this);
 		for (BindPoint bindPoint : bindPoints) {

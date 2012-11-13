@@ -23,13 +23,14 @@ public class StandardCanonicalProtocolExecutionServiceProviderApi implements Can
 
 	@Override
 	public CanonicalProtocolRequestData handleCanonicalRequest(CanonicalProtocolRequest request) {
-		System.out.println("Execution Request:\n" + request);
+		System.out.println("Handling Request to service provider:\n" + request);
 		CanonicalProtocolServiceEndpointLocation target = request.getTargetLocation();
 		UUID transactionUniqueId = request.getCanonicalTransactionIdentificator();
 		SIURL targetUrl = new SIURL(target.getEndpointLocation().toString());
-		CanonicalProtocolExecutionContext remoteContext = localExecutionNode.openTransactionExecutionContext(targetUrl ,transactionUniqueId);
+		
+		CanonicalProtocolExecutionContext remoteContext = localExecutionNode.openTransactionExecutionContext(targetUrl ,transactionUniqueId,request.isForwardCall());
 		CanonicalProtocolRequestData responce = remoteContext.handleRequest(request);
-		System.out.println("Responce is:\n" + responce);
+		System.out.println("Hnadling done. Responce from service provider:\n" + responce);
 		return responce;
 	}
 

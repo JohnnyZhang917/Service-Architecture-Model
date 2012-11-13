@@ -55,7 +55,7 @@ class CanonicalProtocolModel implements CanonicalProtocolInfrastructure {
 		return internalCreateExecutionContext(functionContract,UUID.randomUUID());
 	}
 	
-	public CanonicalProtocolExecutionContext internalCreateExecutionContext(final SamInstanceTransaction functionContract, UUID transactionUniqueId) {
+	public CanonicalProtocolExecutionContext internalCreateExecutionContext(final SamInstanceTransaction functionContract, final UUID transactionUniqueId) {
 
 		CanonicalProtocolExecutionContext context = functionContract.accept(new SamInjectionModelVisitor<CanonicalProtocolExecutionContext>() {
 			private final ImmutableMap.Builder<ExternalBindingController, ExternalInstanceProvider> builder = ImmutableMap.builder();
@@ -81,7 +81,7 @@ class CanonicalProtocolModel implements CanonicalProtocolInfrastructure {
 				Injector glueInjector = createGlueInjector(realServiceInjector, getServiceContract(headSIID,injectionConfiguration.getProvidedService()));
 				InstanceRegistry executionInstanceRegistry = new ServerExecutionInstanceRegistry(realServiceInjector);
 				CanonicalProtocolExecutionContextObject mainContext = new CanonicalProtocolExecutionContextObject(transactionURL, serviceSlotURL, serviceSlots,
-						executionService, executionInstanceRegistry, controller, glueInjector);
+						executionService, executionInstanceRegistry, controller, glueInjector,transactionUniqueId);
 				return mainContext;
 			}
 
@@ -141,7 +141,7 @@ class CanonicalProtocolModel implements CanonicalProtocolInfrastructure {
 
 			@Override
 			public void exitNested(SamInjectionConfiguration samInjectionTransactionConfiguration) {
-				if (samInjectionTransactionConfiguration.hasBindingPoints()) {
+				if (!listOfInstanceProviders.isEmpty()) {
 					InstanceProviderTransactionContext serviceContext = new InstanceProviderTransactionContext(listOfInstanceProviders);
 					builder.put(controller, serviceContext);
 				}

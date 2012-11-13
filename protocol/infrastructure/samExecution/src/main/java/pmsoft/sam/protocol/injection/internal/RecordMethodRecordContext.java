@@ -20,6 +20,7 @@ import pmsoft.sam.protocol.execution.model.MethodCall;
 import pmsoft.sam.protocol.freebinding.ExternalBindingSwitch;
 import pmsoft.sam.see.api.model.SIURL;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Key;
 
@@ -76,7 +77,8 @@ class RecordMethodRecordContext extends AbstractMethodRecordContext {
 		if (requestData == null) {
 			return;
 		}
-		int targetSlot = requestData.getTargetSlot();
+		Preconditions.checkState(requestData.getMethodCalls().size() > 0, "Recording context should not send empty requests");
+		int targetSlot = requestData.getMethodCalls().get(0).getServiceSlotNr();
 		SIURL targetURL = serviceSlotURL.get(targetSlot);
 		CanonicalProtocolServiceEndpointLocation target = new CanonicalProtocolServiceEndpointLocation(targetURL.getServiceInstanceReference());
 		CanonicalProtocolRequest request = new CanonicalProtocolRequest(true, canonicalTransactionIdentificator, target , transactionLocation, requestData, targetSlot);

@@ -1,9 +1,9 @@
 package pmsoft.sam.see.api.data.impl;
 
 import pmsoft.sam.definition.implementation.AbstractSamImplementationPackage;
-import pmsoft.sam.see.api.data.architecture.TestServiceOne;
-import pmsoft.sam.see.api.data.architecture.TestServiceTwo;
-import pmsoft.sam.see.api.data.architecture.TestServiceZero;
+import pmsoft.sam.see.api.data.architecture.service.TestServiceOne;
+import pmsoft.sam.see.api.data.architecture.service.TestServiceTwo;
+import pmsoft.sam.see.api.data.architecture.service.TestServiceZero;
 
 public class TestImplementationDeclaration extends AbstractSamImplementationPackage {
 

@@ -1,14 +1,14 @@
 package pmsoft.sam.protocol.execution.model;
 
 
-public class DataObjectInstanceReference extends AbstractInstanceReference {
+public class ClientDataObjectInstanceReference extends AbstractInstanceReference {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 5920336088558722442L;
 
-	public DataObjectInstanceReference(int instanceNr, Object objectReference) {
+	public ClientDataObjectInstanceReference(int instanceNr, Object objectReference) {
 		super(instanceNr);
 		this.objectReference = objectReference;
 	}
@@ -21,12 +21,12 @@ public class DataObjectInstanceReference extends AbstractInstanceReference {
 
 	@Override
 	public void visitToMergeOnInstanceRegistry(InstanceMergeVisitor api) {
-		api.visitDataObjectInstance(this);
+		api.visitClientDataObjectInstance(this);
 	}
 
 	@Override
 	public String toString() {
-		return "#" + instanceNr + "->DataObjectInstanceReference [ instanceNr=" + instanceNr + "]objectReference="
+		return "#" + instanceNr + "->ClientDataObjectInstanceReference [ instanceNr=" + instanceNr + "]objectReference="
 				+ objectReference;
 	}
 
