@@ -12,13 +12,5 @@ public class IncorrectArchitectureDefinition extends Exception {
 	public IncorrectArchitectureDefinition(String error) {
 		super(error);
 	}
-	
-	
-
-	public IncorrectArchitectureDefinition() {
-		super();
-	}
-
-
 
 }

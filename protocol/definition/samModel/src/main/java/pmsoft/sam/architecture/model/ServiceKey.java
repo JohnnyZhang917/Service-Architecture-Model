@@ -30,26 +30,16 @@ public class ServiceKey {
 		return serviceDefinitionSignature.hashCode();
 	}
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ServiceKey other = (ServiceKey) obj;
-		if (serviceDefinitionSignature == null) {
-			if (other.serviceDefinitionSignature != null)
-				return false;
-		} else if (!serviceDefinitionSignature.equals(other.serviceDefinitionSignature))
-			return false;
-		return true;
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
-	@Override
-	public String toString() {
-		return "ServiceKey [" + serviceDefinitionSignature + "]";
-	}
+        ServiceKey that = (ServiceKey) o;
 
+        if (serviceDefinitionSignature != null ? !serviceDefinitionSignature.equals(that.serviceDefinitionSignature) : that.serviceDefinitionSignature != null)
+            return false;
+
+        return true;
+    }
 }

@@ -1,21 +1,7 @@
-
-
-repositories {
-     add(new org.apache.ivy.plugins.resolver.FileSystemResolver()) {
-            name = 'localRepo'
-            addIvyPattern "$projectDir/../../localRepo/[organisation]/[module]/ivys/ivy-[revision].xml"
-            addArtifactPattern "$projectDir/../../localRepo/[organisation]/[module]/[type]s/[artifact]-[revision].[ext]"
-            checkmodified = false
-        }
-}
-
-
-configure(subprojects.findAll {it.name != 'definition' && it.name != 'infrastructure'}) {
-	apply plugin: 'eclipse'
-	apply from: "${rootProject.projectDir}/all-jars.gradle"
-
+configure(subprojects.findAll {it.name != 'definition'}) {
+	apply plugin: 'java'
 	sourceCompatibility = 1.6
-	version = '0.3.2.alpha'
+	version = '0.3.3.beta'
 	group = 'eu.pmsoft'
 
 	repositories {
@@ -23,29 +9,14 @@ configure(subprojects.findAll {it.name != 'definition' && it.name != 'infrastruc
 		maven {
 			url "http://repository-netty.forge.cloudbees.com/snapshot/"
 		}
-		add rootProject.repositories.localRepo
 
     	}
-
-    	eclipse {
-        	classpath {
-        	downloadSources = true
-        	downloadJavadoc = true
-        }
 
 	test {
 		useTestNG()
 		options {
 		}
 	}
-	uploadArchives {
-    		repositories {
-       			add rootProject.repositories.localRepo
-    		}
-	}
-
-
-    }
 }
 
 project(':definition:samModel') {
@@ -53,10 +24,9 @@ project(':definition:samModel') {
         compile project(':definition:samCoreApi')
     }
 }
-project(':infrastructure:samExecution') {
+project(':samExecution') {
 	dependencies {
         	compile project(':definition:samModel')
         	compile project(':definition:samCoreApi')
-        	compile project(':infrastructure:samTransport')
 	}
 }
