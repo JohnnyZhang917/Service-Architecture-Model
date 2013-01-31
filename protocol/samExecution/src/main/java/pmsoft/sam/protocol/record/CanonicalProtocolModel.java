@@ -92,24 +92,11 @@ class CanonicalProtocolModel implements CanonicalProtocolInfrastructure {
 			}
 
             private ProviderExecutionStackManager createProviderExecutor(ExecutionStrategy executionStrategy, ImmutableList<InstanceRegistry> instanceRegistries) {
-                // TODO strategies
-//                switch (executionStrategy) {
-//                    case PROCEDURAL:
-//                        return new ProceduralExecutionStackManager(instanceRegistries);
-//                    case SIMPLE_LAZY:
-//                        return new SimpleLazyExecutionStackManager(instanceRegistries);
-//                    case FUNCTIONAL:
-//                        throw  new RuntimeException("not implemented");
-//                    case PURE_FUNCTIONAL:
-//                        throw  new RuntimeException("not implemented");
-//                }
-//                throw  new RuntimeException("unknown strategy");
-//                return new ExecutionStackManager(instanceRegistries);
-                return modelFactory.providerExecutionStackManager(instanceRegistries);
+                return modelFactory.providerExecutionStackManager(instanceRegistries,executionStrategy);
             }
 
             private ClientExecutionStackManager createClientExecutor(ExecutionStrategy executionStrategy, ImmutableList<InstanceRegistry> instanceRegistries){
-                return modelFactory.clientExecutionStackManager(instanceRegistries);
+                return modelFactory.clientExecutionStackManager(instanceRegistries,executionStrategy);
             }
 
 

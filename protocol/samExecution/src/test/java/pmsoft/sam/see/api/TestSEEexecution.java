@@ -8,15 +8,19 @@ import java.util.Map.Entry;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import pmsoft.execution.ServiceAction;
+import pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
+import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.exceptions.SamException;
 import pmsoft.sam.see.SEEServer;
 import pmsoft.sam.see.SEEServiceSetupAction;
 import pmsoft.sam.see.api.data.TestServiceExecutionEnvironmentConfiguration;
 import pmsoft.sam.see.api.data.TestTransactionDefinition;
+import pmsoft.sam.see.api.data.architecture.SeeTestArchitecture;
 import pmsoft.sam.see.api.data.architecture.contract.TestInterfaceTwo0;
 import pmsoft.sam.see.api.data.architecture.contract.shopping.ShoppingStoreWithCourierInteraction;
 import pmsoft.sam.see.api.data.architecture.service.CourierService;
@@ -41,8 +45,13 @@ import com.google.inject.Key;
 
 public class TestSEEexecution {
 
-	@Test
-	public void testCourierSetup() throws ExecutionException, SamException {
+    @DataProvider(name = "executionStrategies")
+    public Object[][] listOfArchitectures() throws IncorrectArchitectureDefinition {
+        return new Object[][] { { ExecutionStrategy.FUNCTIONAL },{ ExecutionStrategy.PROCEDURAL },{ ExecutionStrategy.PURE_FUNCTIONAL },{ ExecutionStrategy.SIMPLE_LAZY } };
+    }
+
+    @Test(dataProvider = "executionStrategies", sequential = true)
+    public void testCourierSetup(final ExecutionStrategy strategy) throws ExecutionException, SamException {
 		int clientPort = 4989;
 		int storePort = 4988;
 		int courierPort = 4987;
@@ -53,7 +62,7 @@ public class TestSEEexecution {
             @Override
             public void setup() {
                 SIID storeInstanceId = createServiceInstance(TestStoreServiceModule.class);
-                setupServiceTransaction(SamTransactionConfigurationUtil.createTransactionOn(StoreService.class).providedByServiceInstance(storeInstanceId), ExecutionStrategy.PROCEDURAL);
+                setupServiceTransaction(SamTransactionConfigurationUtil.createTransactionOn(StoreService.class).providedByServiceInstance(storeInstanceId), strategy);
             }
         };
 		SEEServer store = new SEEServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(storePort,storeSetupAction));
@@ -76,7 +85,7 @@ public class TestSEEexecution {
 				public void setup() {
 					SIID courierInstanceId = createServiceInstance(TestCourierServiceModule.class);
 					setupServiceTransaction(SamTransactionConfigurationUtil.createTransactionOn(CourierService.class).providedByServiceInstance(
-							courierInstanceId), ExecutionStrategy.PROCEDURAL);
+							courierInstanceId), strategy);
 				}
 			});
 			final SIURL storeURL = extractServiceURL(store, new ServiceKey(StoreService.class));
@@ -86,7 +95,7 @@ public class TestSEEexecution {
 				public void setup() {
 					SIID shoppingInstanceId = createServiceInstance(TestShoppingModule.class);
 					setupServiceTransaction(SamTransactionConfigurationUtil.createTransactionOn(ShoppingService.class).urlBinding(StoreService.class, storeURL)
-							.urlBinding(CourierService.class, courierURL).providedByServiceInstance(shoppingInstanceId), ExecutionStrategy.PROCEDURAL);
+							.urlBinding(CourierService.class, courierURL).providedByServiceInstance(shoppingInstanceId), strategy);
 				}
 			});
 

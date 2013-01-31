@@ -35,6 +35,7 @@ import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import org.slf4j.Logger;
 import pmsoft.injectionUtils.logger.InjectLogger;
+import pmsoft.sam.exceptions.SamOperationContext;
 
 import javax.annotation.Nullable;
 
@@ -138,6 +139,7 @@ class ProviderConnectionHandler extends ChannelInboundMessageHandlerAdapter<Thre
     }
 
     private void closeTransaction(ChannelHandlerContext ctx, ThreadMessage msg) {
+        // FIXME close of transaction have some errors
         Preconditions.checkState(transactionBinding.containsKey(msg.getSignature()));
         ThreadExecutionContext context = transactionBinding.remove(msg.getSignature());
         context.exitGrobalTransactionContext();

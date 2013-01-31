@@ -12,6 +12,7 @@ import pmsoft.sam.protocol.transport.data.AbstractInstanceReference;
 import pmsoft.sam.protocol.transport.data.CanonicalProtocolRequestData;
 import pmsoft.sam.protocol.transport.data.InstanceMergeVisitor;
 import pmsoft.sam.protocol.transport.data.MethodCall;
+import pmsoft.sam.see.api.model.ExecutionStrategy;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -26,9 +27,11 @@ abstract class AbstractExecutionStackManager {
     protected final Logger logger;
     protected ImmutableList<ThreadMessagePipe> pipes;
     private final StackOfStack stack;
+    private final ExecutionStrategy executionStrategy;
 
-    AbstractExecutionStackManager(ImmutableList<InstanceRegistry> instanceRegistries, Logger logger) {
+    AbstractExecutionStackManager(ImmutableList<InstanceRegistry> instanceRegistries, Logger logger, ExecutionStrategy executionStrategy) {
         this.instanceRegistries = instanceRegistries;
+        this.executionStrategy = executionStrategy;
         this.stack = new StackOfStack();
         this.logger = logger;
     }
@@ -90,9 +93,23 @@ abstract class AbstractExecutionStackManager {
         MethodExecutionStack currentStack = stack.getCurrentStack();
         logger.debug("recording call {}", call);
         boolean slotChange = currentStack.addCall(call);
-        if(slotChange) {
-            logger.debug("slotChange");
-            pushProtocolExecution(false, currentStack);
+        switch (executionStrategy) {
+            case PROCEDURAL:
+//                pushProtocolExecution(false, currentStack);
+                flushExecution();
+                break;
+            case SIMPLE_LAZY:
+                if(slotChange) {
+                    logger.debug("slotChange");
+                    pushProtocolExecution(false, currentStack);
+                }
+                break;
+            case FUNCTIONAL:
+                //TODO implement strategy
+                throw new RuntimeException("non implemented");
+            case PURE_FUNCTIONAL:
+                //TODO implement strategy
+                throw new RuntimeException("non implemented");
         }
     }
 

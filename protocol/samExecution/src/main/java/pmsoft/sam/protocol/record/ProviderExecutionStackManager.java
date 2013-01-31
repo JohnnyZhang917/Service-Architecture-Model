@@ -8,14 +8,15 @@ import pmsoft.execution.ThreadMessage;
 import pmsoft.execution.ThreadMessagePipe;
 import pmsoft.sam.protocol.transport.data.AbstractInstanceReference;
 import pmsoft.sam.protocol.transport.data.CanonicalProtocolRequestData;
+import pmsoft.sam.see.api.model.ExecutionStrategy;
 
 import java.util.List;
 
 class ProviderExecutionStackManager extends AbstractExecutionStackManager {
 
     @Inject
-    public ProviderExecutionStackManager(@Assisted ImmutableList<InstanceRegistry> instanceRegistries) {
-        super(instanceRegistries, LoggerFactory.getLogger(ProviderExecutionStackManager.class));
+    public ProviderExecutionStackManager(@Assisted ImmutableList<InstanceRegistry> instanceRegistries, @Assisted ExecutionStrategy executionStrategy) {
+        super(instanceRegistries, LoggerFactory.getLogger(ProviderExecutionStackManager.class), executionStrategy);
     }
 
     @Override
