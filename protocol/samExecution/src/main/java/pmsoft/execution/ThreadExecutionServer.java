@@ -72,7 +72,7 @@ public final class ThreadExecutionServer {
 
     public void startServer() {
         logger.debug("starting local server on address {}", serverAddress);
-        // TODO bind to socket address
+        // TODO async bind to socket address
         serverBootstrap.group(new NioEventLoopGroup(), new NioEventLoopGroup()).channel(NioServerSocketChannel.class).localAddress(serverAddress)
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
@@ -101,7 +101,7 @@ class ProviderConnectionHandler extends ChannelInboundMessageHandlerAdapter<Thre
     private Logger logger;
     private final ExecutionContextManager contextManager;
     private final ThreadExecutionManager executionManager;
-    // FIXME make something more efficient to multiplex the connection
+    // TODO make something more efficient to multiplex the connection
     private Map<String,ThreadExecutionContext> transactionBinding = Maps.newHashMap();
 
     @Inject
@@ -381,15 +381,15 @@ class ThreadExecutionManager {
                     return executionContext.executeInteraction(interaction);
                 }
             } catch (Exception e) {
-                logger.error("execution error", e);
+                logger.error("execution exceptions", e);
             } finally {
                 executionContext.exitTransactionContext();
                 executionContext.exitGrobalTransactionContext();
                 logger.trace("execution closed");
             }
             // this should not happen
-            logger.error("it was not possible to open the transaction for service interaction. Fatal error");
-            throw new RuntimeException("fatal error on transaction open for service interaction");
+            logger.error("it was not possible to open the transaction for service interaction. Fatal exceptions");
+            throw new RuntimeException("fatal exceptions on transaction open for service interaction");
         }
     }
 
@@ -412,14 +412,14 @@ class ThreadExecutionManager {
                         return null;
                     }
                 } catch (Exception e) {
-                    logger.error("execution error", e);
-                    // TODO expand error to global transaction context
+                    logger.error("execution exceptions", e);   // FIXME exception policy.
+                    // TODO expand exceptions to global transaction context
                 } finally {
                     executionContext.exitTransactionContext();
                     logger.trace("execution closed");
                 }
             logger.info("execution already open, ignoring duplicate execution start");
-            // TODO exceptions policy
+            // FIXME exception policy.
             return null;
         }
     }

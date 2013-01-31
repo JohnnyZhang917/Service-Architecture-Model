@@ -12,6 +12,7 @@ import org.testng.annotations.Test;
 
 import pmsoft.execution.ServiceAction;
 import pmsoft.sam.architecture.model.ServiceKey;
+import pmsoft.sam.exceptions.SamException;
 import pmsoft.sam.see.SEEServer;
 import pmsoft.sam.see.SEEServiceSetupAction;
 import pmsoft.sam.see.api.data.TestServiceExecutionEnvironmentConfiguration;
@@ -41,7 +42,7 @@ import com.google.inject.Key;
 public class TestSEEexecution {
 
 	@Test
-	public void testCourierSetup() throws ExecutionException {
+	public void testCourierSetup() throws ExecutionException, SamException {
 		int clientPort = 4989;
 		int storePort = 4988;
 		int courierPort = 4987;
@@ -118,7 +119,7 @@ public class TestSEEexecution {
 	}
 
 	@Test
-	public void testSEEConfigurationSetup() throws ExecutionException {
+	public void testSEEConfigurationSetup() throws ExecutionException, SamException {
 		int serverPort = 4996;
 		int clientPort = 4995;
 

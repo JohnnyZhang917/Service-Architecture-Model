@@ -11,15 +11,17 @@ import java.util.Set;
 
 import com.google.inject.*;
 import com.google.inject.name.Names;
+import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
 import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
-import pmsoft.sam.architecture.loader.IncorrectArchitectureDefinition;
+import pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
 import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
+import pmsoft.sam.exceptions.SamOperationContextModule;
 import pmsoft.sam.protocol.CanonicalProtocolExecutionContext;
 import pmsoft.sam.protocol.TransactionController;
 import pmsoft.sam.see.SEEServer;
@@ -39,7 +41,7 @@ import pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
 import pmsoft.sam.see.execution.localjvm.LocalSeeExecutionModule;
 import pmsoft.sam.see.infrastructure.localjvm.LocalSeeInfrastructureModule;
 
-@Guice(modules = {LocalSeeExecutionModule.class,LocalSeeInfrastructureModule.class,TestServiceExecutionCreationByStep.PortBindModule.class})
+@Guice(modules = {SamOperationContextModule.class,LocalSeeExecutionModule.class,LocalSeeInfrastructureModule.class,TestServiceExecutionCreationByStep.PortBindModule.class})
 public class TestServiceExecutionCreationByStep {
 
     public static class PortBindModule extends AbstractModule {
@@ -75,7 +77,17 @@ public class TestServiceExecutionCreationByStep {
 								{ new SamServiceImplementationKey(TestServiceTwoModule.class) } };
 	}
 
-	@Test(dataProvider = "architecturesToSetup", groups = "architectureSetup")
+    @BeforeMethod
+    public void setUp() throws Exception {
+        siurlRemoteTwo = SIURL.fromUrlString("http://remote/two");
+        siurlRemoteOne = SIURL.fromUrlString("http://remote/one");
+        siurlRemoteZero = SIURL.fromUrlString("http://remote/zero");
+        siurlLocalTwo = SIURL.fromUrlString("http://localhost/two");
+        siurlLocalOne = SIURL.fromUrlString("http://localhost/one");
+        siurlLocalZero = SIURL.fromUrlString("http://localhost/zero");
+    }
+
+    @Test(dataProvider = "architecturesToSetup", groups = "architectureSetup")
 	public void testLoadOfArchitectureInformation(SamArchitecture architecture) {
 		architectureManager.registerArchitecture(architecture);
 	}
@@ -110,13 +122,13 @@ public class TestServiceExecutionCreationByStep {
 		return instance.getKey();
 	}
 
-	SIURL siurlLocalZero = SIURL.fromUrlString("http://localhost/zero");
-	SIURL siurlLocalOne = SIURL.fromUrlString("http://localhost/one");
-	SIURL siurlLocalTwo = SIURL.fromUrlString("http://localhost/two");
+	SIURL siurlLocalZero;
+	SIURL siurlLocalOne;
+	SIURL siurlLocalTwo;
 
-	SIURL siurlRemoteZero = SIURL.fromUrlString("http://remote/zero");
-	SIURL siurlRemoteOne = SIURL.fromUrlString("http://remote/one");
-	SIURL siurlRemoteTwo = SIURL.fromUrlString("http://remote/two");
+	SIURL siurlRemoteZero;
+	SIURL siurlRemoteOne;
+	SIURL siurlRemoteTwo;
 
 	
 	@Test( groups = "transactionsCreation", dependsOnGroups="architectureLoadCheck")
@@ -186,9 +198,6 @@ public class TestServiceExecutionCreationByStep {
 	
 	@Test( groups = "transactionsExecution", dependsOnGroups="transactionsCreation", dataProvider = "transactionTypeTwo")
 	public void testInjectionTransactionExecutionForServiceTwo(SIURL transactionURL) throws MalformedURLException {
-		
-		// FIXME create a fake execution bus to run test locally
-
 		Key<TestInterfaceOne> interfaceOneKey = Key.get(TestInterfaceOne.class);
 		Key<TestInterfaceTwo0> interfaceTwoKey = Key.get(TestInterfaceTwo0.class);
 		CanonicalProtocolExecutionContext executionContext = executionNode.createTransactionExecutionContext(transactionURL);

@@ -93,7 +93,7 @@ abstract class AbstractInstanceRegistry implements InstanceRegistry,InstanceMerg
 			instanceObjectList.set(returnInstance,returnObject);
 			return;
 		}
-		throw new RuntimeException("bind of returning object not possible, canonical protocol critical error");
+		throw new RuntimeException("bind of returning object not possible, canonical protocol critical exceptions");
 		
 	}
 	
@@ -111,7 +111,7 @@ abstract class AbstractInstanceRegistry implements InstanceRegistry,InstanceMerg
 	protected void fillInstanceKeyReference(int returnInstance, Object returnObject) {
 		AbstractInstanceReference reference = instanceReferenceList.get(returnInstance);
 		Preconditions.checkState(reference instanceof BindingKeyInstanceReference,
-				"For this instance number there is not a BindingKeyInstanceReference reference, critical protocol error.");	
+				"For this instance number there is not a BindingKeyInstanceReference reference, critical protocol exceptions.");
 		instanceObjectList.set(returnInstance,returnObject);
 	}
 

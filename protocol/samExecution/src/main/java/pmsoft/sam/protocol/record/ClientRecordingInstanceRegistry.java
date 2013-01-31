@@ -95,7 +95,7 @@ class ClientRecordingInstanceRegistry extends AbstractInstanceRegistry implement
 		checkPositionIndex(position, instanceReferenceList.size());
 		AbstractInstanceReference instance = instanceReferenceList.get(position);
 		checkState(instance instanceof PendingDataInstanceReference,
-				"A pending data position should be found, critical protocol error");
+				"A pending data position should be found, critical protocol exceptions");
 		Object objectReference = filledDataInstanceReference.getObjectReference();
         FilledDataInstanceReference dataRef = new FilledDataInstanceReference(position, objectReference );
 		instanceReferenceList.set(position, dataRef);
@@ -115,7 +115,7 @@ class ClientRecordingInstanceRegistry extends AbstractInstanceRegistry implement
 	@Override
 	public void visitServerDataObjectInstance(ServerDataObjectInstanceReference dataObjectInstanceReference) {
 		int currentInstanceNumber = getNextInstanceNumber();
-		checkState(dataObjectInstanceReference.getInstanceNr() == currentInstanceNumber, "error on merge of %s. currentInstanceNumber = %s", dataObjectInstanceReference,currentInstanceNumber);
+		checkState(dataObjectInstanceReference.getInstanceNr() == currentInstanceNumber, "exceptions on merge of %s. currentInstanceNumber = %s", dataObjectInstanceReference,currentInstanceNumber);
 		Object objectReference = dataObjectInstanceReference.getObjectReference();
 		ServerDataObjectInstanceReference dataRef = new ServerDataObjectInstanceReference(currentInstanceNumber, objectReference);
 		instanceReferenceList.add(dataRef);

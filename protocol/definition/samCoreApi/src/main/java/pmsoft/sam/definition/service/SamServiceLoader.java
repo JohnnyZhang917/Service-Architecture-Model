@@ -4,7 +4,8 @@ import java.lang.annotation.Annotation;
 
 public interface SamServiceLoader {
 	// regular grammar:
-	// Service: interface* definitionClass
+	// Service: definitionClass Key*
+    // Key : interface | interface annotation
 
 	void addInterface(Class<?> interfaceReference);
 	

@@ -110,11 +110,11 @@ class ServerExecutionInstanceRegistry extends AbstractInstanceRegistry {
 				BindingKeyInstanceReference<?> keyReference = (BindingKeyInstanceReference<?>) reference;
 				Key<?> key = keyReference.getKey();
 				checkArgument(realServiceInjector.getExistingBinding(key) != null,
-						"A Key binding not exposed by the service has not been filled by any previous method call. Canonical protocol critical error");
+						"A Key binding not exposed by the service has not been filled by any previous method call. Canonical protocol critical exceptions");
 				existingInstance = realServiceInjector.getInstance(key);
 				fillInstanceKeyReference(instanceNumber, existingInstance);
 			} else {
-				throw new RuntimeException("Instance creation is not possible, canonical protocol critical error");
+				throw new RuntimeException("Instance creation is not possible, canonical protocol critical exceptions");
 			}
 		}
 		return existingInstance;
@@ -154,7 +154,7 @@ class ServerExecutionInstanceRegistry extends AbstractInstanceRegistry {
 		int position = filledDataInstanceReference.getInstanceNr();
 		checkPositionIndex(position, instanceReferenceList.size());
 		AbstractInstanceReference instance = instanceReferenceList.get(position);
-		checkState(instance instanceof ServerPendingDataInstanceReference, "A server pending data position should be found, critical protocol error");
+		checkState(instance instanceof ServerPendingDataInstanceReference, "A server pending data position should be found, critical protocol exceptions");
 		Object objectReference = filledDataInstanceReference.getObjectReference();
 		ClientDataObjectInstanceReference dataRef = new ClientDataObjectInstanceReference(position, objectReference);
 		instanceReferenceList.set(position, dataRef);

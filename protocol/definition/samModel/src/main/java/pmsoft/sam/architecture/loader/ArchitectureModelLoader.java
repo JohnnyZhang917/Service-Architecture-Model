@@ -9,6 +9,7 @@ import java.util.Set;
 
 import pmsoft.sam.architecture.definition.SamArchitectureDefinition;
 import pmsoft.sam.architecture.definition.SamArchitectureLoader;
+import pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
 import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.architecture.model.SamCategory;
 import pmsoft.sam.architecture.model.SamService;

@@ -60,7 +60,7 @@ class TransactionControllerImpl implements TransactionController {
 			logger.trace("unbind done");
 		} else {
 			logger.error("transaction context is already closed. FATAL ERROR");
-			// TODO exception policy.
+			// FIXME exception policy.
 			throw new RuntimeException("FATAL LOGIC ERROR");
 		}
 	}

@@ -219,6 +219,7 @@ abstract class AbstractExecutionStackManager {
                     returnObject = targetMethod.invoke(headObject, argumentsObjects);
                 }
             } catch (IllegalArgumentException e) {
+                // FIXME exception policy.
                 // FIXME how to handle errors on invocations to real services??
                 e.printStackTrace();
                 throw new RuntimeException(e);
@@ -263,7 +264,7 @@ abstract class AbstractExecutionStackManager {
                 return prepareMergeInstanceRequest();
             }
             List<MethodCall> methodCalls = getAccesibleCalls();
-            assert methodCalls.size() > 0 : "the serviceCallStack is not empty and list of method calls is empty???, critical error";
+            assert methodCalls.size() > 0 : "the serviceCallStack is not empty and list of method calls is empty???, critical exceptions";
             sendMark += methodCalls.size();
             int targetSlot = methodCalls.get(0).getServiceSlotNr();
             List<AbstractInstanceReference> instanceReference = instanceRegistries.get(targetSlot).getInstanceReferenceToTransfer();

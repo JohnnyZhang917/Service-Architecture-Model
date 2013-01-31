@@ -16,13 +16,8 @@ public class SIURL implements Serializable {
 		return new SIURL(serviceLocation);
 	}
 	
-	public static SIURL fromUrlString(String serviceInstanceReference){
-		try {
-			return new SIURL(new URL(serviceInstanceReference));
-		} catch (MalformedURLException e) {
-			//TODO exception policy
-			throw new RuntimeException(serviceInstanceReference);
-		}
+	public static SIURL fromUrlString(String serviceInstanceReference) throws MalformedURLException {
+		return new SIURL(new URL(serviceInstanceReference));
 	}
 	
 	private SIURL( URL serviceLocation) {

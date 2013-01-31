@@ -1,5 +1,6 @@
 package pmsoft.sam.definition.service;
 
+import com.google.inject.name.Names;
 import org.mockito.Mockito;
 import org.testng.annotations.Test;
 
@@ -14,7 +15,9 @@ public class SamServiceDefinitionTest {
 		@Override
 		public void loadServiceDefinition() {
 			addInterface(AnyInterface1.class);
-			addInterface(AnyInterface2.class);
+            addInterface(AnyInterface2.class);
+            addInterface(AnyInterface1.class, Names.named("test1"));
+            addInterface(AnyInterface2.class, Names.named("test2"));
 		}
 	}
 
@@ -26,6 +29,8 @@ public class SamServiceDefinitionTest {
 		verify(loader).setupLoadContext(TestServiceDefinition.class);
 		verify(loader).addInterface(AnyInterface1.class);
 		verify(loader).addInterface(AnyInterface2.class);
+        verify(loader).addInterface(AnyInterface1.class, Names.named("test1"));
+        verify(loader).addInterface(AnyInterface2.class, Names.named("test2"));
 	}
 	
 	

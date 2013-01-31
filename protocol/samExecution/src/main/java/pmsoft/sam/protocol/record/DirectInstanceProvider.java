@@ -27,7 +27,7 @@ class DirectInstanceProvider implements InstanceProvider {
 
 	@Override
 	public <T> T getInstance(Key<T> key) {
-		Preconditions.checkState(serviceApiKeys.contains(key),"This service don't provide a implementation of this key. Routing error.");
+		Preconditions.checkState(serviceApiKeys.contains(key),"This service don't provide a implementation of this key. Routing exceptions.");
 		return directServiceInjector.getInstance(key);
 	}
 

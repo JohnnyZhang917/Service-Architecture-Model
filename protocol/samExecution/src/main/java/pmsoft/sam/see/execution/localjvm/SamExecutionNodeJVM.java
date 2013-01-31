@@ -1,6 +1,7 @@
 package pmsoft.sam.see.execution.localjvm;
 
 import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,8 @@ import java.util.UUID;
 import com.google.inject.name.Named;
 import pmsoft.sam.architecture.model.SamService;
 import pmsoft.sam.architecture.model.ServiceKey;
+import pmsoft.sam.exceptions.SamOperationContext;
+import pmsoft.sam.exceptions.SamOperationContextFactory;
 import pmsoft.sam.protocol.CanonicalProtocolExecutionContext;
 import pmsoft.sam.protocol.CanonicalProtocolInfrastructure;
 import pmsoft.sam.see.SEEServer;
@@ -43,13 +46,15 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 	private final Map<SIURL, SamInstanceTransaction> transactions = Maps.newHashMap();
 	private final CanonicalProtocolInfrastructure canonicalProtocol;
     private final InetSocketAddress serverAddress;
+    private final SamOperationContextFactory operationContextFactory;
 
 	@Inject
 	public SamExecutionNodeJVM(SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry,
-                               CanonicalProtocolInfrastructure canonicalProtocol, @Named(SEEServer.SERVER_ADDRESS_BIND) InetSocketAddress serverAddress) {
+                               CanonicalProtocolInfrastructure canonicalProtocol, @Named(SEEServer.SERVER_ADDRESS_BIND) InetSocketAddress serverAddress, SamOperationContextFactory operationContextFactory) {
 		super(architectureRegistry, serviceDiscoveryRegistry);
 		this.canonicalProtocol = canonicalProtocol;
         this.serverAddress = serverAddress;
+        this.operationContextFactory = operationContextFactory;
     }
 
     @Override
@@ -86,7 +91,14 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
     int counter = 0;
 	@Override
 	public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, ExecutionStrategy executionStrategy) {
-        SIURL url = SIURL.fromUrlString("http://"+serverAddress.getHostName() + ":" + serverAddress.getPort()+"/service"+counter++);
+        SamOperationContext samOperationContext = operationContextFactory.openExistingContext();
+        SIURL url = null;
+        try {
+            //TODO create a real service registry related to the server bind port and address, maybe in configuration must be set
+            url = SIURL.fromUrlString("http://" + serverAddress.getHostName() + ":" + serverAddress.getPort() + "/service" + counter++);
+        } catch (MalformedURLException e) {
+            samOperationContext.getErrors().addError(e,"Error creating service address");
+        }
         return setupInjectionTransaction(configuration, url, executionStrategy);
 	}
 
@@ -122,7 +134,7 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
             }
         });
 		if (!errors.isEmpty()) {
-			// TODO a business logic error
+			// TODO a business logic exceptions
 			throw new RuntimeException(Joiner.on("\n").join(errors.iterator()));
 		}
 	}

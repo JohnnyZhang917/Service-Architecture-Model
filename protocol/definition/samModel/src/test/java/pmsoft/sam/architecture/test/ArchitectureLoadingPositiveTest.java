@@ -14,7 +14,7 @@ import pmsoft.sam.architecture.definition.AbstractSamArchitectureDefinition;
 import pmsoft.sam.architecture.definition.SamArchitectureDefinition;
 import pmsoft.sam.architecture.definition.SamArchitectureLoader.SamCategoryLoader;
 import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
-import pmsoft.sam.architecture.loader.IncorrectArchitectureDefinition;
+import pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
 import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.architecture.model.SamCategory;
 import pmsoft.sam.architecture.model.SamService;
