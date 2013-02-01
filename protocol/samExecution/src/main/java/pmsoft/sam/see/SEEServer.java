@@ -7,13 +7,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import com.google.inject.name.Names;
+import pmsoft.exceptions.*;
 import pmsoft.execution.*;
 import pmsoft.sam.architecture.definition.SamArchitectureDefinition;
 import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
 import pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
 import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
-import pmsoft.sam.exceptions.*;
 import pmsoft.sam.see.api.SamArchitectureManagement;
 import pmsoft.sam.see.api.SamExecutionNode;
 import pmsoft.sam.see.api.SamServiceDiscovery;
@@ -35,7 +35,7 @@ public class SEEServer {
 	private final Injector serverInjector;
     private final ThreadExecutionServer server;
     private final InetSocketAddress address;
-    private final SamOperationContextFactory operationContextFactory;
+    private final OperationReportingFactory operationReportingFactory;
 
     /**
 	 * Visible for testing
@@ -53,7 +53,7 @@ public class SEEServer {
             }
         });
 		serverModules.add(new LocalSeeExecutionModule());
-        serverModules.add(new SamOperationContextModule());
+        serverModules.add(new OperationReportingModule());
         serverModules.add(new LocalSeeInfrastructureModule());
         //TODO setup this some where else, without inner class
         serverModules.add(new AbstractModule() {
@@ -65,19 +65,19 @@ public class SEEServer {
 		return Modules.combine(serverModules);
 	}
 
-	public SEEServer(final SEEConfiguration configuration) throws SamException {
-        ErrorsContext initializationContext = new ErrorsContext();
+	public SEEServer(final SEEConfiguration configuration) throws OperationCheckedException {
+        ErrorsReport initializationContext = new ErrorsReport();
         this.address = configuration.address;
 		Module pluginsModule = Modules.combine(configuration.pluginModules);
 		serverInjector = Guice.createInjector(createServerModule(configuration.address),pluginsModule);
         ThreadExecutionInfrastructure infrastructure = serverInjector.getInstance(ThreadExecutionInfrastructure.class);
         this.server = infrastructure.createServer(address);
-        this.operationContextFactory = serverInjector.getInstance(SamOperationContextFactory.class);
+        this.operationReportingFactory = serverInjector.getInstance(OperationReportingFactory.class);
         initializeServerNode(configuration);
     }
 
-    private void initializeServerNode(SEEConfiguration configuration) throws SamException {
-        SamOperationContext samOperationContext = operationContextFactory.ensureEmptyContext();
+    private void initializeServerNode(SEEConfiguration configuration) throws OperationCheckedException {
+        OperationContext operationContext = operationReportingFactory.ensureEmptyContext();
         try {
             SamArchitectureManagement architectureManager = serverInjector.getInstance(SamArchitectureManagement.class);
             SamExecutionNode executionNode = serverInjector.getInstance(SamExecutionNode.class);
@@ -89,7 +89,7 @@ public class SEEServer {
                     architecture = ArchitectureModelLoader.loadArchitectureModel(architectureDef);
                     architectureManager.registerArchitecture(architecture);
                 } catch (IncorrectArchitectureDefinition e) {
-                    samOperationContext.getErrors().addError(e, "error on load of architecture {}", architectureDef);
+                    operationContext.getErrors().addError(e, "error on load of architecture {}", architectureDef);
                 }
             }
             for (SamServiceImplementationPackageContract implPackage : configuration.implementationPackages) {
@@ -98,22 +98,24 @@ public class SEEServer {
             for (SEEServiceSetupAction setup : configuration.setupActions) {
                 setup.setupService(executionNode);
             }
-        } catch (Throwable anyOther) {
-            samOperationContext.getErrors().addError(anyOther);
+        } catch (OperationRuntimeException operationError) {
+            operationContext.getErrors().addError(operationError);
         } finally {
-            samOperationContext.throwOnErrors();
+            operationReportingFactory.closeContext(operationContext);
+            operationContext.throwOnErrors();
         }
     }
 
-    public void executeSetupAction(SEEServiceSetupAction setup) throws SamException {
-        SamOperationContext samOperationContext = operationContextFactory.openNewContext();
+    public void executeSetupAction(SEEServiceSetupAction setup) throws OperationCheckedException {
+        OperationContext operationContext = operationReportingFactory.openNestedContext();
         try {
             SamExecutionNode executionNode = serverInjector.getInstance(SamExecutionNode.class);
             setup.setupService(executionNode);
-        } catch (Throwable anyOther) {
-            samOperationContext.getErrors().addError(anyOther);
+        } catch (OperationRuntimeException operationError) {
+            operationContext.getErrors().addError(operationError);
         } finally {
-            samOperationContext.throwOnErrors();
+            operationReportingFactory.closeContext(operationContext);
+            operationContext.throwOnErrors();
         }
 	}
 

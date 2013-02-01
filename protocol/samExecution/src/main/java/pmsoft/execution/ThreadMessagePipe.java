@@ -1,5 +1,6 @@
 package pmsoft.execution;
 
+import com.google.common.base.Preconditions;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import io.netty.channel.Channel;
@@ -80,7 +81,11 @@ public final class ThreadMessagePipe {
         connection.write(initConnectionMessage);
     }
 
+    private volatile boolean closed = false;
+
     public void closeTransactionConnection() {
+        Preconditions.checkState(!closed);
+        this.closed = true;
         ThreadMessage closeTransactionMessage = new ThreadMessage();
         closeTransactionMessage.setSignature(signature);
         closeTransactionMessage.setMessageType(ThreadMessage.ThreadProtocolMessageType.CLOSE_TRANSACTION);

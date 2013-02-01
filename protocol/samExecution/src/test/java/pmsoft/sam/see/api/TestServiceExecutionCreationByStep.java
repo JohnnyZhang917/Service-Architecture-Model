@@ -16,12 +16,12 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
+import pmsoft.exceptions.OperationReportingModule;
 import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
 import pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
 import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
-import pmsoft.sam.exceptions.SamOperationContextModule;
 import pmsoft.sam.protocol.CanonicalProtocolExecutionContext;
 import pmsoft.sam.protocol.TransactionController;
 import pmsoft.sam.see.SEEServer;
@@ -41,7 +41,7 @@ import pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
 import pmsoft.sam.see.execution.localjvm.LocalSeeExecutionModule;
 import pmsoft.sam.see.infrastructure.localjvm.LocalSeeInfrastructureModule;
 
-@Guice(modules = {SamOperationContextModule.class,LocalSeeExecutionModule.class,LocalSeeInfrastructureModule.class,TestServiceExecutionCreationByStep.PortBindModule.class})
+@Guice(modules = {OperationReportingModule.class,LocalSeeExecutionModule.class,LocalSeeInfrastructureModule.class,TestServiceExecutionCreationByStep.PortBindModule.class})
 public class TestServiceExecutionCreationByStep {
 
     public static class PortBindModule extends AbstractModule {

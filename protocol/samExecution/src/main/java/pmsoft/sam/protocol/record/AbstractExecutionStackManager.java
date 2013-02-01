@@ -54,10 +54,9 @@ abstract class AbstractExecutionStackManager {
 
     public void unbindPipe() {
         Preconditions.checkNotNull(pipes);
-        for (Iterator<ThreadMessagePipe> iterator = pipes.iterator(); iterator.hasNext(); ) {
-            ThreadMessagePipe pipe  =  iterator.next();
-            pipe.closeTransactionConnection();
-        }
+        // after this call, transaction is closed and pipes are closed. Maybe deleted in future is not necessary at all
+        // setting pipes to null just to get errors if it is used
+        pipes = null;
     }
 
     private class StackOfStack {
@@ -104,12 +103,6 @@ abstract class AbstractExecutionStackManager {
                     pushProtocolExecution(false, currentStack);
                 }
                 break;
-            case FUNCTIONAL:
-                //TODO implement strategy
-                throw new RuntimeException("non implemented");
-            case PURE_FUNCTIONAL:
-                //TODO implement strategy
-                throw new RuntimeException("non implemented");
         }
     }
 

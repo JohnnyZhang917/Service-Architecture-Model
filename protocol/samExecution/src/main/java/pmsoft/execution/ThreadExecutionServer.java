@@ -35,7 +35,6 @@ import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import org.slf4j.Logger;
 import pmsoft.injectionUtils.logger.InjectLogger;
-import pmsoft.sam.exceptions.SamOperationContext;
 
 import javax.annotation.Nullable;
 
@@ -113,17 +112,25 @@ class ProviderConnectionHandler extends ChannelInboundMessageHandlerAdapter<Thre
 
     @Override
     public void messageReceived(ChannelHandlerContext ctx, ThreadMessage msg) throws Exception {
-        ThreadMessage.ThreadProtocolMessageType messageType = msg.getMessageType();
-        switch (messageType) {
-            case INITIALIZE_TRANSACTION:
-                initializeTransaction(ctx,msg);
-                break;
-            case CLOSE_TRANSACTION:
-                closeTransaction(ctx, msg);
-                break;
-            case CANONICAL_PROTOCOL_EXECUTION:
-                execute(msg);
-                break;
+        try {
+            ThreadMessage.ThreadProtocolMessageType messageType = msg.getMessageType();
+            switch (messageType) {
+                case INITIALIZE_TRANSACTION:
+                    initializeTransaction(ctx,msg);
+                    break;
+                case CLOSE_TRANSACTION:
+                    closeTransaction(ctx, msg);
+                    break;
+                case CANONICAL_PROTOCOL_EXECUTION:
+                    execute(msg);
+                    break;
+            }
+        } catch (Exception anyException) {
+            ThreadMessage exception = new ThreadMessage();
+            exception.setMessageType(ThreadMessage.ThreadProtocolMessageType.EXCEPTION_MESSAGE);
+            exception.setPayload(anyException);
+            ctx.write(exception);
+            throw anyException;
         }
     }
 
@@ -135,14 +142,13 @@ class ProviderConnectionHandler extends ChannelInboundMessageHandlerAdapter<Thre
         if (!context.isExecutionRunning()) {
             executionManager.runExecutionContext(context);
         }
-
     }
 
     private void closeTransaction(ChannelHandlerContext ctx, ThreadMessage msg) {
         // FIXME close of transaction have some errors
         Preconditions.checkState(transactionBinding.containsKey(msg.getSignature()));
         ThreadExecutionContext context = transactionBinding.remove(msg.getSignature());
-        context.exitGrobalTransactionContext();
+//        context.exitGrobalTransactionContext();
         // this is a normal stop for the transaction, so expect it not running any more
         Preconditions.checkState(!context.isExecutionRunning());
     }
@@ -155,15 +161,6 @@ class ProviderConnectionHandler extends ChannelInboundMessageHandlerAdapter<Thre
         context = contextManager.openExecutionContextForProtocolExecution(msg.getSignature(), msg.getUuid(), msg.getTargetUrl(), ctx.channel());
         context.initGrobalTransactionContext();
         transactionBinding.put(msg.getSignature(), context);
-    }
-
-    private void cleanupConnectionData() {
-        Collection<ThreadExecutionContext> runningTransaction = transactionBinding.values();
-        for (Iterator<ThreadExecutionContext> iterator = runningTransaction.iterator(); iterator.hasNext(); ) {
-            ThreadExecutionContext context = iterator.next();
-            context.exitGrobalTransactionContext();
-        }
-        transactionBinding = null;
     }
 
 }
@@ -227,7 +224,26 @@ class ClientConnectionHandler extends ChannelInboundMessageHandlerAdapter<Thread
     }
 
     @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        super.exceptionCaught(ctx, cause);
+    }
+
+    @Override
     public void messageReceived(ChannelHandlerContext ctx, ThreadMessage msg) throws Exception {
+        ThreadMessage.ThreadProtocolMessageType messageType = msg.getMessageType();
+        switch (messageType) {
+            case INITIALIZE_TRANSACTION:
+            case CLOSE_TRANSACTION:
+                throw new IllegalStateException();
+            case CANONICAL_PROTOCOL_EXECUTION:
+                routeMessage(msg);
+                break;
+            case EXCEPTION_MESSAGE:
+                throw (Exception) msg.getPayload();
+        }
+    }
+
+    private void routeMessage(ThreadMessage msg) {
         // TODO multiplex responce on calls
         ThreadMessagePipe clientPipe = pipeRoutingMap.get(msg.getSignature());
         Preconditions.checkNotNull(clientPipe);

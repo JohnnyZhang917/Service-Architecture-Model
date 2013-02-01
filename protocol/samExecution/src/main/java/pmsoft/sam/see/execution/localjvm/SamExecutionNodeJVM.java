@@ -9,10 +9,10 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.google.inject.name.Named;
+import pmsoft.exceptions.OperationContext;
+import pmsoft.exceptions.OperationReportingFactory;
 import pmsoft.sam.architecture.model.SamService;
 import pmsoft.sam.architecture.model.ServiceKey;
-import pmsoft.sam.exceptions.SamOperationContext;
-import pmsoft.sam.exceptions.SamOperationContextFactory;
 import pmsoft.sam.protocol.CanonicalProtocolExecutionContext;
 import pmsoft.sam.protocol.CanonicalProtocolInfrastructure;
 import pmsoft.sam.see.SEEServer;
@@ -46,15 +46,15 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 	private final Map<SIURL, SamInstanceTransaction> transactions = Maps.newHashMap();
 	private final CanonicalProtocolInfrastructure canonicalProtocol;
     private final InetSocketAddress serverAddress;
-    private final SamOperationContextFactory operationContextFactory;
+    private final OperationReportingFactory operationReportingFactory;
 
 	@Inject
 	public SamExecutionNodeJVM(SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry,
-                               CanonicalProtocolInfrastructure canonicalProtocol, @Named(SEEServer.SERVER_ADDRESS_BIND) InetSocketAddress serverAddress, SamOperationContextFactory operationContextFactory) {
+                               CanonicalProtocolInfrastructure canonicalProtocol, @Named(SEEServer.SERVER_ADDRESS_BIND) InetSocketAddress serverAddress, OperationReportingFactory operationReportingFactory) {
 		super(architectureRegistry, serviceDiscoveryRegistry);
 		this.canonicalProtocol = canonicalProtocol;
         this.serverAddress = serverAddress;
-        this.operationContextFactory = operationContextFactory;
+        this.operationReportingFactory = operationReportingFactory;
     }
 
     @Override
@@ -91,13 +91,13 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
     int counter = 0;
 	@Override
 	public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, ExecutionStrategy executionStrategy) {
-        SamOperationContext samOperationContext = operationContextFactory.openExistingContext();
+        OperationContext operationContext = operationReportingFactory.openExistingContext();
         SIURL url = null;
         try {
             //TODO create a real service registry related to the server bind port and address, maybe in configuration must be set
             url = SIURL.fromUrlString("http://" + serverAddress.getHostName() + ":" + serverAddress.getPort() + "/service" + counter++);
         } catch (MalformedURLException e) {
-            samOperationContext.getErrors().addError(e,"Error creating service address");
+            operationContext.getErrors().addError(e,"Error creating service address");
         }
         return setupInjectionTransaction(configuration, url, executionStrategy);
 	}

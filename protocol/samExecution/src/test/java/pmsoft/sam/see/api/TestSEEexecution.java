@@ -11,16 +11,14 @@ import java.util.concurrent.Future;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
+import pmsoft.exceptions.OperationCheckedException;
 import pmsoft.execution.ServiceAction;
 import pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
-import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
 import pmsoft.sam.architecture.model.ServiceKey;
-import pmsoft.sam.exceptions.SamException;
 import pmsoft.sam.see.SEEServer;
 import pmsoft.sam.see.SEEServiceSetupAction;
 import pmsoft.sam.see.api.data.TestServiceExecutionEnvironmentConfiguration;
 import pmsoft.sam.see.api.data.TestTransactionDefinition;
-import pmsoft.sam.see.api.data.architecture.SeeTestArchitecture;
 import pmsoft.sam.see.api.data.architecture.contract.TestInterfaceTwo0;
 import pmsoft.sam.see.api.data.architecture.contract.shopping.ShoppingStoreWithCourierInteraction;
 import pmsoft.sam.see.api.data.architecture.service.CourierService;
@@ -47,11 +45,11 @@ public class TestSEEexecution {
 
     @DataProvider(name = "executionStrategies")
     public Object[][] listOfArchitectures() throws IncorrectArchitectureDefinition {
-        return new Object[][] { { ExecutionStrategy.FUNCTIONAL },{ ExecutionStrategy.PROCEDURAL },{ ExecutionStrategy.PURE_FUNCTIONAL },{ ExecutionStrategy.SIMPLE_LAZY } };
+        return new Object[][] { { ExecutionStrategy.PROCEDURAL },{ ExecutionStrategy.SIMPLE_LAZY } };
     }
 
     @Test(dataProvider = "executionStrategies", sequential = true)
-    public void testCourierSetup(final ExecutionStrategy strategy) throws ExecutionException, SamException {
+    public void testCourierSetup(final ExecutionStrategy strategy) throws ExecutionException, OperationCheckedException {
 		int clientPort = 4989;
 		int storePort = 4988;
 		int courierPort = 4987;
@@ -72,14 +70,6 @@ public class TestSEEexecution {
 		courier.startUpServer();
 
 		try {
-
-//			store.executeSetupAction(new SEEServiceSetupAction() {
-//				@Override
-//				public void setup() {
-//					SIID storeInstanceId = createServiceInstance(TestStoreServiceModule.class);
-//					setupServiceTransaction(SamTransactionConfigurationUtil.createTransactionOn(StoreService.class).providedByServiceInstance(storeInstanceId), ExecutionStrategy.PROCEDURAL);
-//				}
-//			});
 			courier.executeSetupAction(new SEEServiceSetupAction() {
 				@Override
 				public void setup() {
@@ -128,7 +118,7 @@ public class TestSEEexecution {
 	}
 
 	@Test
-	public void testSEEConfigurationSetup() throws ExecutionException, SamException {
+	public void testSEEConfigurationSetup() throws ExecutionException, OperationCheckedException {
 		int serverPort = 4996;
 		int clientPort = 4995;
 

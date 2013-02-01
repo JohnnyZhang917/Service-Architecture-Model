@@ -10,7 +10,8 @@ public class ThreadMessage implements Serializable {
 
     public enum ThreadProtocolMessageType {
         INITIALIZE_TRANSACTION, CLOSE_TRANSACTION,
-        CANONICAL_PROTOCOL_EXECUTION
+        CANONICAL_PROTOCOL_EXECUTION,
+        EXCEPTION_MESSAGE
     }
 
     private static final long serialVersionUID = 8462213620673547714L;
