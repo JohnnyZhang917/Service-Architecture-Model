@@ -18,6 +18,7 @@ import pmsoft.sam.see.api.SamArchitectureManagement;
 import pmsoft.sam.see.api.SamExecutionNode;
 import pmsoft.sam.see.api.SamServiceDiscovery;
 import pmsoft.sam.see.api.SamServiceRegistry;
+import pmsoft.sam.see.configuration.SEEConfiguration;
 import pmsoft.sam.see.execution.localjvm.LocalSeeExecutionModule;
 
 import com.google.common.collect.Lists;
@@ -89,7 +90,7 @@ public class SEEServer {
                     architecture = ArchitectureModelLoader.loadArchitectureModel(architectureDef);
                     architectureManager.registerArchitecture(architecture);
                 } catch (IncorrectArchitectureDefinition e) {
-                    operationContext.getErrors().addError(e, "error on load of architecture {}", architectureDef);
+                    operationContext.getErrors().addError(e, "error on load of architecture %s", architectureDef);
                 }
             }
             for (SamServiceImplementationPackageContract implPackage : configuration.implementationPackages) {

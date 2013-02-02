@@ -1,10 +1,11 @@
-package pmsoft.sam.see;
+package pmsoft.sam.see.configuration;
 
 import pmsoft.sam.architecture.definition.SamArchitectureDefinition;
 import pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Module;
+import pmsoft.sam.see.SEEServiceSetupAction;
 
 import java.net.InetSocketAddress;
 
@@ -14,20 +15,7 @@ public class SEEConfigurationBuilder {
 		return new SEEConfigurationGrammarObject();
 	}
 
-	public static interface SEEConfigurationGrammar {
-
-		public SEEConfigurationGrammar withPlugin(Module plugin);
-
-		public SEEConfigurationGrammar architecture(SamArchitectureDefinition architecture);
-
-		public SEEConfigurationGrammar implementationPackage(SamServiceImplementationPackageContract implementationPackage);
-
-		public SEEConfigurationGrammar setupAction(SEEServiceSetupAction action);
-
-		public SEEConfiguration bindToAddress(InetSocketAddress address);
-	}
-
-	public static class SEEConfigurationGrammarObject implements SEEConfigurationGrammar {
+    public static class SEEConfigurationGrammarObject implements SEEConfigurationGrammar {
 		private final ImmutableList.Builder<Module> pluginModules = ImmutableList.builder();
 		private final ImmutableList.Builder<SamArchitectureDefinition> architectures = ImmutableList.builder();
 		private final ImmutableList.Builder<SamServiceImplementationPackageContract> implementationPackages = ImmutableList.builder();

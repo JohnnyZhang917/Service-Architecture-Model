@@ -1,20 +1,20 @@
-package pmsoft.sam.see;
+package pmsoft.sam.see.configuration;
 
 import pmsoft.sam.architecture.definition.SamArchitectureDefinition;
 import pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
 
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Module;
+import pmsoft.sam.see.SEEServiceSetupAction;
 
 import java.net.InetSocketAddress;
 
 public class SEEConfiguration {
-
-    final ImmutableList<Module> pluginModules;
-	final ImmutableList<SamArchitectureDefinition> architectures;
-	final ImmutableList<SamServiceImplementationPackageContract> implementationPackages;
-	final ImmutableList<SEEServiceSetupAction> setupActions;
-    final InetSocketAddress address;
+    public final ImmutableList<Module> pluginModules;
+    public final ImmutableList<SamArchitectureDefinition> architectures;
+    public final ImmutableList<SamServiceImplementationPackageContract> implementationPackages;
+    public final ImmutableList<SEEServiceSetupAction> setupActions;
+    public final InetSocketAddress address;
 
     SEEConfiguration(ImmutableList<Module> pluginModules, ImmutableList<SamArchitectureDefinition> architectures,
                      ImmutableList<SamServiceImplementationPackageContract> implementationPackages, ImmutableList<SEEServiceSetupAction> setupActions, InetSocketAddress address) {

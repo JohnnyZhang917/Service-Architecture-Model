@@ -1,35 +1,27 @@
 package pmsoft.sam.definition.implementation;
 
-import pmsoft.sam.definition.implementation.SamServiceImplementationContractLoader.SamServiceImplementationGrammarContract;
 import pmsoft.sam.definition.service.SamServiceDefinition;
 
-/**
- * Definition of many implementations of services.
- * 
- * @author pawel
- * 
- */
 public abstract class AbstractSamImplementationPackage implements
 		SamServiceImplementationPackageContract {
 
-	private SamServiceImplementationContractLoader reader;
+	private SamServicePackageLoader reader;
 
 	@Override
-	public void loadContractPackage(SamServiceImplementationContractLoader reader) {
+	public void loadContractPackage(SamServicePackageLoader reader) {
 		try {
 			this.reader = reader;
-			implementationDefinition();
+			packageDefinition();
 		} finally {
 			this.reader = null;
 		}
-
 	}
 
-	public abstract void implementationDefinition();
+	public abstract void packageDefinition();
 
-	protected final SamServiceImplementationGrammarContract provideContract(
-			Class<? extends SamServiceDefinition> serviceContract) {
-		return reader.provideContract(serviceContract);
-	}
+    protected final void registerImplementation(
+            AbstractSamServiceImplementationDefinition<? extends SamServiceDefinition> serviceImplementationContract){
+        reader.registerImplementation(serviceImplementationContract);
+    }
 
 }

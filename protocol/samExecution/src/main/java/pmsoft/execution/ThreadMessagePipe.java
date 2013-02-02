@@ -81,11 +81,7 @@ public final class ThreadMessagePipe {
         connection.write(initConnectionMessage);
     }
 
-    private volatile boolean closed = false;
-
     public void closeTransactionConnection() {
-        Preconditions.checkState(!closed);
-        this.closed = true;
         ThreadMessage closeTransactionMessage = new ThreadMessage();
         closeTransactionMessage.setSignature(signature);
         closeTransactionMessage.setMessageType(ThreadMessage.ThreadProtocolMessageType.CLOSE_TRANSACTION);

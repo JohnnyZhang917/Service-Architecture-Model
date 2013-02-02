@@ -21,6 +21,10 @@ public class OperationContext {
         }
     }
 
+    public OperationRuntimeException getRuntimeError(){
+        return errors.toRuntimeException();
+    }
+
     public ErrorsReport getErrors() {
         return errors;
     }

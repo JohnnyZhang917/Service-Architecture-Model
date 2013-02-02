@@ -8,13 +8,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import com.google.common.collect.*;
+import com.google.inject.*;
 import com.google.inject.name.Named;
 import pmsoft.exceptions.OperationContext;
 import pmsoft.exceptions.OperationReportingFactory;
+import pmsoft.exceptions.OperationRuntimeException;
 import pmsoft.sam.architecture.model.SamService;
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.protocol.CanonicalProtocolExecutionContext;
 import pmsoft.sam.protocol.CanonicalProtocolInfrastructure;
+import pmsoft.sam.protocol.freebinding.FreeVariableBindingBuilder;
 import pmsoft.sam.see.SEEServer;
 import pmsoft.sam.see.api.SamArchitectureRegistry;
 import pmsoft.sam.see.api.SamExecutionNodeInternalApi;
@@ -23,21 +27,11 @@ import pmsoft.sam.see.api.model.*;
 import pmsoft.sam.see.api.transaction.BindPointSIID;
 import pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
 import pmsoft.sam.see.api.transaction.SamInjectionModelVisitorAdapter;
-import pmsoft.sam.see.injectionUtils.ServiceInjectionUtils;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.HashBasedTable;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.Table;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Key;
+import pmsoft.sam.see.injectionUtils.ServiceKeyOrder;
 
 public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamExecutionNodeInternalApi {
 
@@ -51,7 +45,7 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 	@Inject
 	public SamExecutionNodeJVM(SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry,
                                CanonicalProtocolInfrastructure canonicalProtocol, @Named(SEEServer.SERVER_ADDRESS_BIND) InetSocketAddress serverAddress, OperationReportingFactory operationReportingFactory) {
-		super(architectureRegistry, serviceDiscoveryRegistry);
+		super(architectureRegistry, serviceDiscoveryRegistry, operationReportingFactory);
 		this.canonicalProtocol = canonicalProtocol;
         this.serverAddress = serverAddress;
         this.operationReportingFactory = operationReportingFactory;
@@ -134,7 +128,7 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
             }
         });
 		if (!errors.isEmpty()) {
-			// TODO a business logic exceptions
+			// FIXME exceptions
 			throw new RuntimeException(Joiner.on("\n").join(errors.iterator()));
 		}
 	}
@@ -161,22 +155,79 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 
 	@Override
 	public SamServiceInstance createServiceInstance(SamServiceImplementationKey key, ServiceMetadata metadata) {
-		Preconditions.checkArgument(key != null);
-		SamServiceImplementation serviceImplementation = getImplementation(key);
-		Preconditions.checkNotNull(serviceImplementation, "Service Implementation not found for key [%s]", key);
+        OperationContext operationContext = operationReportingFactory.openNestedContext();
+        SamServiceInstanceObject instance = null;
+        try {
+            Preconditions.checkArgument(key != null);
 
-		SIID id = new SIID();
-		Injector injector = ServiceInjectionUtils.createServiceInstanceInjector(serviceImplementation, architectureRegistry);
-		SamService contractService = architectureRegistry.getService(serviceImplementation.getSpecificationKey());
-		ServiceMetadata finalMetadata = metadata == null ? new ServiceMetadata() : metadata;
-		SamServiceInstanceObject instance = new SamServiceInstanceObject(key, id, injector, finalMetadata, contractService.getServiceContractAPI(),
-				contractService.getServiceKey());
-		runningInstances.put(id, instance);
-		typeOfRunningInstance.put(key, id);
-		return instance;
+            SamServiceImplementation serviceImplementation = getImplementation(key);
+            Preconditions.checkNotNull(serviceImplementation, "Service Implementation not found for key [%s]", key);
+
+            SIID id = new SIID();
+            Injector injector = createServiceInstanceInjector(serviceImplementation);
+            SamService contractService = architectureRegistry.getService(serviceImplementation.getSpecificationKey());
+            ServiceMetadata finalMetadata = metadata == null ? new ServiceMetadata() : metadata;
+            instance = new SamServiceInstanceObject(key, id, injector, finalMetadata, contractService.getServiceContractAPI(),
+                    contractService.getServiceKey());
+            runningInstances.put(id, instance);
+            typeOfRunningInstance.put(key, id);
+
+        } catch (OperationRuntimeException operationError) {
+            operationContext.getErrors().addError(operationError);
+        } finally {
+            operationReportingFactory.closeContext(operationContext);
+            if( operationContext.getErrors().hasErrors()){
+                throw operationContext.getRuntimeError();
+            }
+        }
+        return instance;
 	}
 
-	private static class SamServiceInstanceObject implements SamServiceInstance {
+    private Injector createServiceInstanceInjector(SamServiceImplementation serviceImplementation) {
+        OperationContext operationContext = operationReportingFactory.openExistingContext();
+        Class<? extends Module> implModule = serviceImplementation.getModule();
+        Module implModuleInstance;
+        try {
+            implModuleInstance = implModule.newInstance();
+        } catch (InstantiationException e) {
+            operationContext.getErrors().addError(e);
+            throw operationContext.getRuntimeError();
+        } catch (IllegalAccessException e) {
+            operationContext.getErrors().addError(e);
+            throw operationContext.getRuntimeError();
+        }
+
+        List<ServiceKey> injectServices = serviceImplementation.getBindedServices();
+        ImmutableList<ServiceKey> orderedInjectServices = ServiceKeyOrder.orderAndRequiereUnique(injectServices);
+        List<List<Key<?>>> injectedFreeVariableBinding= Lists.newLinkedList();
+        for (ServiceKey externalServiceKey : orderedInjectServices) {
+            List<Key<?>> serviceKeys = Lists.newArrayList();
+            SamService externalServiceSpec = architectureRegistry.getService(externalServiceKey);
+            Set<Key<?>> keys = externalServiceSpec.getServiceContractAPI();
+            for (Key<?> serviceApi : keys) {
+                serviceKeys.add(serviceApi);
+            }
+            injectedFreeVariableBinding.add(serviceKeys);
+        }
+        Module freeVariableModule = FreeVariableBindingBuilder.createFreeBindingModule(injectedFreeVariableBinding);
+        Injector implInjector = Guice.createInjector(implModuleInstance, freeVariableModule);
+        validateInjectorWithServiceContract(implInjector, serviceImplementation);
+        return implInjector;
+
+    }
+
+    private void validateInjectorWithServiceContract(Injector implInjector, SamServiceImplementation serviceImplementation) {
+        OperationContext operationContext = operationReportingFactory.openExistingContext();
+        SamService externalServiceSpec = architectureRegistry.getService(serviceImplementation.getSpecificationKey());
+        Set<Key<?>> contract = externalServiceSpec.getServiceContractAPI();
+        for (Key<?> key : contract) {
+            if( implInjector.getExistingBinding(key) == null ) {
+                operationContext.getErrors().addError("missing implementation fo key %s on service implementation %s declared to implement contract %s", key,serviceImplementation,serviceImplementation.getSpecificationKey());
+            }
+        }
+    }
+
+    private static class SamServiceInstanceObject implements SamServiceInstance {
 
 		private final SIID id;
 		private final Injector injector;

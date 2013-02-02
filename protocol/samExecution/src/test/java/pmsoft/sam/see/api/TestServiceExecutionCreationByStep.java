@@ -16,6 +16,7 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
+import pmsoft.exceptions.OperationCheckedException;
 import pmsoft.exceptions.OperationReportingModule;
 import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
 import pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
@@ -105,7 +106,8 @@ public class TestServiceExecutionCreationByStep {
 	}
 
 	@Test(dataProvider = "registeredImplementations", groups = "architectureLoadCheck", dependsOnGroups="architectureDefinition")
-	public void testServiceInstanceCreation(SamServiceImplementationKey key) {
+	public void testServiceInstanceCreation(SamServiceImplementationKey key) throws OperationCheckedException {
+
 		SamServiceInstance serviceInstance = executionNode.createServiceInstance(key,null);
 		assertNotNull(serviceInstance);
 		assertNotNull(serviceInstance.getInjector());

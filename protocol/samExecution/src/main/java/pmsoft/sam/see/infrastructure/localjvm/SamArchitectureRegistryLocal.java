@@ -5,6 +5,7 @@ import java.util.Set;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Sets;
 
+import pmsoft.exceptions.OperationRuntimeException;
 import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.architecture.model.SamService;
 import pmsoft.sam.architecture.model.ServiceKey;
@@ -23,13 +24,14 @@ public class SamArchitectureRegistryLocal implements SamArchitectureManagement {
 	
 	@Override
 	public SamService getService(ServiceKey serviceKey) {
+        // TODO merge architectures definitions
 		for (SamArchitecture arch : architectures) {
 			SamService service = arch.getService(serviceKey);
 			if( service != null) {
 				return service;
 			}
 		}
-		return null;
+		throw new OperationRuntimeException("service not found on architecture" + serviceKey);
 	}
 
 	@Override

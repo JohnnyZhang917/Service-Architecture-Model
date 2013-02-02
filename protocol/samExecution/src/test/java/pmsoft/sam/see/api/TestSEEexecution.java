@@ -44,7 +44,7 @@ import com.google.inject.Key;
 public class TestSEEexecution {
 
     @DataProvider(name = "executionStrategies")
-    public Object[][] listOfArchitectures() throws IncorrectArchitectureDefinition {
+    public Object[][] listOfArchitectures() {
         return new Object[][] { { ExecutionStrategy.PROCEDURAL },{ ExecutionStrategy.SIMPLE_LAZY } };
     }
 
@@ -58,7 +58,7 @@ public class TestSEEexecution {
 
         SEEServiceSetupAction storeSetupAction=new SEEServiceSetupAction() {
             @Override
-            public void setup() {
+            public void setup()  {
                 SIID storeInstanceId = createServiceInstance(TestStoreServiceModule.class);
                 setupServiceTransaction(SamTransactionConfigurationUtil.createTransactionOn(StoreService.class).providedByServiceInstance(storeInstanceId), strategy);
             }
