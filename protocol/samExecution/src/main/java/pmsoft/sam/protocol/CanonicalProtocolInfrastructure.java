@@ -1,8 +1,8 @@
 package pmsoft.sam.protocol;
 
-import java.util.UUID;
-
 import pmsoft.sam.see.api.model.SamInstanceTransaction;
+
+import java.util.UUID;
 
 public interface CanonicalProtocolInfrastructure {
 

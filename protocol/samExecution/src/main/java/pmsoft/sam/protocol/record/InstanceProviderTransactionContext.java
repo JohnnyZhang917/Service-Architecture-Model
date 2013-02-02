@@ -1,15 +1,14 @@
 package pmsoft.sam.protocol.record;
 
-import java.util.List;
-
-import pmsoft.sam.protocol.freebinding.ExternalInstanceProvider;
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.assistedinject.Assisted;
+import pmsoft.sam.protocol.freebinding.ExternalInstanceProvider;
+
+import java.util.List;
 
 class InstanceProviderTransactionContext implements ExternalInstanceProvider {
 

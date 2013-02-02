@@ -1,12 +1,11 @@
 package pmsoft.sam.see.execution.localjvm;
 
+import com.google.inject.PrivateModule;
+import com.google.inject.Provides;
 import pmsoft.sam.protocol.record.CanonicalProtocolModule;
 import pmsoft.sam.see.api.SamExecutionNode;
 import pmsoft.sam.see.api.SamExecutionNodeInternalApi;
 import pmsoft.sam.see.api.SamServiceRegistry;
-
-import com.google.inject.PrivateModule;
-import com.google.inject.Provides;
 
 public class LocalSeeExecutionModule extends PrivateModule {
 

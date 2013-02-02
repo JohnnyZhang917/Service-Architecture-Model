@@ -1,12 +1,12 @@
 package pmsoft.sam.see.api.data.impl.store;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
-
 import pmsoft.sam.see.api.data.architecture.contract.courier.CourierAddressSetupInfo;
 import pmsoft.sam.see.api.data.architecture.contract.store.StoreOrder;
 import pmsoft.sam.see.api.data.architecture.contract.store.StoreServiceContract;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 public class TestStoreServiceContract implements StoreServiceContract {
 

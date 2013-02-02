@@ -1,10 +1,9 @@
 package pmsoft.sam.protocol;
 
-import java.util.UUID;
-
+import com.google.inject.Injector;
 import pmsoft.execution.ExecutionContextInternalLogic;
 
-import com.google.inject.Injector;
+import java.util.UUID;
 
 public interface CanonicalProtocolExecutionContext extends ExecutionContextInternalLogic {
 

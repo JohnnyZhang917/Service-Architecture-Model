@@ -1,23 +1,16 @@
 package pmsoft.sam.protocol.record;
 
-import static com.google.common.base.Preconditions.checkPositionIndex;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+import com.google.inject.Key;
+import org.slf4j.Logger;
+import pmsoft.injectionUtils.logger.InjectLogger;
+import pmsoft.sam.protocol.transport.data.*;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.slf4j.Logger;
-import pmsoft.injectionUtils.logger.InjectLogger;
-import pmsoft.sam.protocol.transport.data.AbstractInstanceReference;
-import pmsoft.sam.protocol.transport.data.BindingKeyInstanceReference;
-import pmsoft.sam.protocol.transport.data.ExternalSlotInstanceReference;
-import pmsoft.sam.protocol.transport.data.FilledDataInstanceReference;
-import pmsoft.sam.protocol.transport.data.InstanceMergeVisitor;
-import pmsoft.sam.protocol.transport.data.PendingDataInstanceReference;
-import pmsoft.sam.protocol.transport.data.ServerPendingDataInstanceReference;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
-import com.google.inject.Key;
+import static com.google.common.base.Preconditions.checkPositionIndex;
 
 abstract class AbstractInstanceRegistry implements InstanceRegistry,InstanceMergeVisitor {
 

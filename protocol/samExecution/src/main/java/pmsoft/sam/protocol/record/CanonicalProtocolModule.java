@@ -1,12 +1,11 @@
 package pmsoft.sam.protocol.record;
 
+import com.google.inject.PrivateModule;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import pmsoft.injectionUtils.logger.LoggerInjectorModule;
 import pmsoft.sam.protocol.CanonicalProtocolExecutionContext;
 import pmsoft.sam.protocol.CanonicalProtocolInfrastructure;
 import pmsoft.sam.protocol.TransactionController;
-import pmsoft.injectionUtils.logger.LoggerInjectorModule;
-
-import com.google.inject.PrivateModule;
-import com.google.inject.assistedinject.FactoryModuleBuilder;
 
 public class CanonicalProtocolModule extends PrivateModule {
 

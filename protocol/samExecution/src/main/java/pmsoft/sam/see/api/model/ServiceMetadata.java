@@ -1,8 +1,8 @@
 package pmsoft.sam.see.api.model;
 
-import java.util.Map;
-
 import com.google.common.collect.ImmutableMap;
+
+import java.util.Map;
 
 public class ServiceMetadata {
 

@@ -1,12 +1,10 @@
 package pmsoft.sam.architecture.loader;
 
-import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
+import com.google.inject.Key;
 import pmsoft.sam.architecture.definition.SamArchitectureDefinition;
 import pmsoft.sam.architecture.definition.SamArchitectureLoader;
 import pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
@@ -17,11 +15,8 @@ import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.definition.service.SamServiceDefinition;
 import pmsoft.sam.definition.service.SamServiceLoader;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
-import com.google.inject.Key;
+import java.lang.annotation.Annotation;
+import java.util.*;
 
 public class ArchitectureModelLoader implements SamArchitectureLoader {
 

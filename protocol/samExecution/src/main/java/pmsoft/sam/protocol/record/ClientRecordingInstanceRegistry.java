@@ -1,26 +1,16 @@
 package pmsoft.sam.protocol.record;
 
-import static com.google.common.base.Preconditions.checkPositionIndex;
-import static com.google.common.base.Preconditions.checkState;
-
-import java.util.List;
-
-import pmsoft.sam.protocol.transport.data.AbstractInstanceReference;
-import pmsoft.sam.protocol.transport.data.BindingKeyInstanceReference;
-import pmsoft.sam.protocol.transport.data.ClientDataObjectInstanceReference;
-import pmsoft.sam.protocol.transport.data.ExternalSlotInstanceReference;
-import pmsoft.sam.protocol.transport.data.FilledDataInstanceReference;
-import pmsoft.sam.protocol.transport.data.PendingDataInstanceReference;
-import pmsoft.sam.protocol.transport.data.ServerBindingKeyInstanceReference;
-import pmsoft.sam.protocol.transport.data.ServerDataObjectInstanceReference;
-import pmsoft.sam.protocol.transport.data.ServerPendingDataInstanceReference;
-import pmsoft.sam.see.api.model.SIURL;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.assistedinject.Assisted;
+import pmsoft.sam.protocol.transport.data.*;
+
+import java.util.List;
+
+import static com.google.common.base.Preconditions.checkPositionIndex;
+import static com.google.common.base.Preconditions.checkState;
 
 class ClientRecordingInstanceRegistry extends AbstractInstanceRegistry implements InstanceProvider, InstanceRegistry {
 

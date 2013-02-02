@@ -1,11 +1,10 @@
 package pmsoft.sam.protocol.record;
 
-import java.util.List;
-
+import com.google.inject.Key;
 import pmsoft.sam.protocol.transport.data.AbstractInstanceReference;
 import pmsoft.sam.protocol.transport.data.InstanceMergeVisitor;
 
-import com.google.inject.Key;
+import java.util.List;
 
 public interface InstanceRegistry {
 

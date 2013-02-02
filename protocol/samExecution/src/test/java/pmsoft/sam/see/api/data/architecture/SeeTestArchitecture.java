@@ -2,12 +2,7 @@ package pmsoft.sam.see.api.data.architecture;
 
 import pmsoft.sam.architecture.definition.AbstractSamArchitectureDefinition;
 import pmsoft.sam.architecture.definition.SamArchitectureLoader.SamCategoryLoader;
-import pmsoft.sam.see.api.data.architecture.service.ShoppingService;
-import pmsoft.sam.see.api.data.architecture.service.CourierService;
-import pmsoft.sam.see.api.data.architecture.service.StoreService;
-import pmsoft.sam.see.api.data.architecture.service.TestServiceOne;
-import pmsoft.sam.see.api.data.architecture.service.TestServiceTwo;
-import pmsoft.sam.see.api.data.architecture.service.TestServiceZero;
+import pmsoft.sam.see.api.data.architecture.service.*;
 
 public class SeeTestArchitecture extends AbstractSamArchitectureDefinition {
 

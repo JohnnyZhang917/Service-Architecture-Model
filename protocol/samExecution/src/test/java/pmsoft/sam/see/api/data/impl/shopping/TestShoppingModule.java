@@ -1,8 +1,7 @@
 package pmsoft.sam.see.api.data.impl.shopping;
 
-import pmsoft.sam.see.api.data.architecture.contract.shopping.ShoppingStoreWithCourierInteraction;
-
 import com.google.inject.AbstractModule;
+import pmsoft.sam.see.api.data.architecture.contract.shopping.ShoppingStoreWithCourierInteraction;
 
 public class TestShoppingModule extends AbstractModule {
 

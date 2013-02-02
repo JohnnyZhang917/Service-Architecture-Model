@@ -1,9 +1,7 @@
 package pmsoft.sam.see.api.data.impl;
 
-import com.google.inject.name.Names;
-import pmsoft.sam.see.api.data.architecture.contract.TestInterfaceOne;
-
 import com.google.inject.AbstractModule;
+import pmsoft.sam.see.api.data.architecture.contract.TestInterfaceOne;
 import pmsoft.sam.see.api.data.architecture.service.TestServiceOne;
 
 public class TestServiceOneModule extends AbstractModule {

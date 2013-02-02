@@ -1,13 +1,12 @@
 package pmsoft.sam.see.api.data.impl.shopping;
 
+import com.google.inject.Inject;
 import pmsoft.sam.see.api.data.architecture.contract.courier.CourierAddressSetupInfo;
 import pmsoft.sam.see.api.data.architecture.contract.courier.CourierServiceContract;
 import pmsoft.sam.see.api.data.architecture.contract.courier.CourierServiceOrder;
 import pmsoft.sam.see.api.data.architecture.contract.shopping.ShoppingStoreWithCourierInteraction;
 import pmsoft.sam.see.api.data.architecture.contract.store.StoreOrder;
 import pmsoft.sam.see.api.data.architecture.contract.store.StoreServiceContract;
-
-import com.google.inject.Inject;
 
 public class TestShoppingStoreWithCourierInteraction implements ShoppingStoreWithCourierInteraction {
 

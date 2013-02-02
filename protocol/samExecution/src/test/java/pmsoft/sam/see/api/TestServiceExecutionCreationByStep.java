@@ -1,25 +1,15 @@
 package pmsoft.sam.see.api;
 
-import static org.testng.AssertJUnit.assertEquals;
-import static org.testng.AssertJUnit.assertNotNull;
-import static org.testng.AssertJUnit.assertNull;
-import static org.testng.AssertJUnit.assertTrue;
-
-import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
-import java.util.Set;
-
 import com.google.inject.*;
 import com.google.inject.name.Names;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
-
 import pmsoft.exceptions.OperationCheckedException;
 import pmsoft.exceptions.OperationReportingModule;
-import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
 import pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
+import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
 import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
@@ -41,6 +31,12 @@ import pmsoft.sam.see.api.model.*;
 import pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
 import pmsoft.sam.see.execution.localjvm.LocalSeeExecutionModule;
 import pmsoft.sam.see.infrastructure.localjvm.LocalSeeInfrastructureModule;
+
+import java.net.InetSocketAddress;
+import java.net.MalformedURLException;
+import java.util.Set;
+
+import static org.testng.AssertJUnit.*;
 
 @Guice(modules = {OperationReportingModule.class,LocalSeeExecutionModule.class,LocalSeeInfrastructureModule.class,TestServiceExecutionCreationByStep.PortBindModule.class})
 public class TestServiceExecutionCreationByStep {

@@ -1,24 +1,23 @@
 package pmsoft.sam.architecture.test;
 
-import static org.testng.AssertJUnit.assertNotNull;
-import static org.testng.AssertJUnit.assertTrue;
-
-import java.util.Collection;
-import java.util.List;
-
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
-
 import pmsoft.sam.architecture.definition.AbstractSamArchitectureDefinition;
 import pmsoft.sam.architecture.definition.SamArchitectureDefinition;
 import pmsoft.sam.architecture.definition.SamArchitectureLoader.SamCategoryLoader;
-import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
 import pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
+import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
 import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.architecture.model.SamCategory;
 import pmsoft.sam.architecture.model.SamService;
 import pmsoft.sam.definition.service.AbstractSamServiceDefinition;
+
+import java.util.Collection;
+import java.util.List;
+
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class ArchitectureLoadingPositiveTest {
 

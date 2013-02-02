@@ -1,32 +1,27 @@
 package pmsoft.sam.see.execution.localjvm;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
-import com.google.inject.Injector;
+import com.google.common.collect.Sets.SetView;
+import com.google.inject.Module;
 import pmsoft.exceptions.OperationContext;
 import pmsoft.exceptions.OperationReportingFactory;
 import pmsoft.exceptions.OperationRuntimeException;
-import pmsoft.sam.architecture.model.SamService;
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.definition.implementation.AbstractSamServiceImplementationDefinition;
 import pmsoft.sam.definition.implementation.SamServiceImplementationLoader;
-import pmsoft.sam.definition.implementation.SamServicePackageLoader;
 import pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
+import pmsoft.sam.definition.implementation.SamServicePackageLoader;
 import pmsoft.sam.definition.service.SamServiceDefinition;
 import pmsoft.sam.see.api.SamArchitectureRegistry;
 import pmsoft.sam.see.api.SamServiceDiscovery;
 import pmsoft.sam.see.api.SamServiceRegistry;
-import pmsoft.sam.see.api.model.SIID;
 import pmsoft.sam.see.api.model.SamServiceImplementation;
 import pmsoft.sam.see.api.model.SamServiceImplementationKey;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.Sets.SetView;
-import com.google.inject.Module;
-import pmsoft.sam.see.api.model.ServiceMetadata;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public abstract class SamServiceRegistryLocal implements SamServiceRegistry {
 

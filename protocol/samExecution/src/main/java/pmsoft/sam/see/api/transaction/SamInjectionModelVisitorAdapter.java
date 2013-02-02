@@ -1,7 +1,6 @@
 package pmsoft.sam.see.api.transaction;
 
 import com.google.common.collect.ImmutableList;
-
 import pmsoft.sam.see.api.model.SamInstanceTransaction;
 
 public class SamInjectionModelVisitorAdapter<T> implements SamInjectionModelVisitor<T> {

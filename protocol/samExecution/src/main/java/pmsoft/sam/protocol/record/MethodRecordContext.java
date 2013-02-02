@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import pmsoft.sam.protocol.freebinding.ExternalBindingSwitch;
 import pmsoft.sam.protocol.transport.data.AbstractInstanceReference;
 import pmsoft.sam.protocol.transport.data.ClientDataObjectInstanceReference;
-import pmsoft.sam.protocol.transport.data.FilledDataInstanceReference;
 import pmsoft.sam.protocol.transport.data.MethodCall;
 
 import java.io.Serializable;

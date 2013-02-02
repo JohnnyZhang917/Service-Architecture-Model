@@ -17,7 +17,6 @@ import pmsoft.sam.see.api.model.ExecutionStrategy;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Deque;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 

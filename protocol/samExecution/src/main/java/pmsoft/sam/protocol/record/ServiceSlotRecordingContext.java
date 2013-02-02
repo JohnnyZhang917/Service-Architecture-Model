@@ -1,9 +1,8 @@
 package pmsoft.sam.protocol.record;
 
-import java.lang.reflect.Method;
-
-
 import com.google.inject.Key;
+
+import java.lang.reflect.Method;
 
 interface ServiceSlotRecordingContext {
 

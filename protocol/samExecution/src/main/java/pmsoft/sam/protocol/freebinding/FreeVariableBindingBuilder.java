@@ -1,15 +1,9 @@
 package pmsoft.sam.protocol.freebinding;
 
-import java.util.List;
-
-
 import com.google.common.collect.ImmutableList;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.Module;
-import com.google.inject.PrivateModule;
-import com.google.inject.Provider;
+import com.google.inject.*;
+
+import java.util.List;
 
 public class FreeVariableBindingBuilder {
 

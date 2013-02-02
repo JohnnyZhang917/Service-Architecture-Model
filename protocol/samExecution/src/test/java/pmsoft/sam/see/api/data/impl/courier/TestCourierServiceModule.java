@@ -1,8 +1,7 @@
 package pmsoft.sam.see.api.data.impl.courier;
 
-import pmsoft.sam.see.api.data.architecture.contract.courier.CourierServiceContract;
-
 import com.google.inject.AbstractModule;
+import pmsoft.sam.see.api.data.architecture.contract.courier.CourierServiceContract;
 
 public class TestCourierServiceModule extends AbstractModule {
 

@@ -2,12 +2,11 @@ package pmsoft.sam.architecture.test;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
 import pmsoft.sam.architecture.definition.AbstractSamArchitectureDefinition;
 import pmsoft.sam.architecture.definition.SamArchitectureDefinition;
 import pmsoft.sam.architecture.definition.SamArchitectureLoader.SamCategoryLoader;
-import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
 import pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
+import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
 import pmsoft.sam.definition.service.AbstractSamServiceDefinition;
 
 public class ArchitectureLoadingNegativeTest {

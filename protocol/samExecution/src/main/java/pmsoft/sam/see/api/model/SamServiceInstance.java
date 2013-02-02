@@ -1,12 +1,10 @@
 package pmsoft.sam.see.api.model;
 
-import java.util.Set;
-
-import pmsoft.sam.architecture.model.ServiceKey;
-
-
 import com.google.inject.Injector;
 import com.google.inject.Key;
+import pmsoft.sam.architecture.model.ServiceKey;
+
+import java.util.Set;
 
 public interface SamServiceInstance {
 

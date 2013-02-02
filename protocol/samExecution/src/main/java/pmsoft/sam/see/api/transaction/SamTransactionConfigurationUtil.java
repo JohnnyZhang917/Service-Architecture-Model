@@ -1,17 +1,15 @@
 package pmsoft.sam.see.api.transaction;
 
-import java.util.Set;
-
-
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Ordering;
+import com.google.common.collect.Sets;
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.definition.service.SamServiceDefinition;
 import pmsoft.sam.see.api.model.SIID;
 import pmsoft.sam.see.api.model.SIURL;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Ordering;
-import com.google.common.collect.Sets;
+import java.util.Set;
 
 public class SamTransactionConfigurationUtil {
 

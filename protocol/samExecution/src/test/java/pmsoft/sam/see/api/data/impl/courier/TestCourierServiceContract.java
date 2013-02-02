@@ -1,10 +1,9 @@
 package pmsoft.sam.see.api.data.impl.courier;
 
+import com.google.common.base.Preconditions;
 import pmsoft.sam.see.api.data.architecture.contract.courier.CourierAddressSetupInfo;
 import pmsoft.sam.see.api.data.architecture.contract.courier.CourierServiceContract;
 import pmsoft.sam.see.api.data.architecture.contract.courier.CourierServiceOrder;
-
-import com.google.common.base.Preconditions;
 
 public class TestCourierServiceContract implements CourierServiceContract {
 

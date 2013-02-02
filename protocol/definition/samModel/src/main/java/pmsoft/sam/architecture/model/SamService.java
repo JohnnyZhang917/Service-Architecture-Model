@@ -1,8 +1,8 @@
 package pmsoft.sam.architecture.model;
 
-import java.util.Set;
-
 import com.google.inject.Key;
+
+import java.util.Set;
 
 
 public interface SamService {

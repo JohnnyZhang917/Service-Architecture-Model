@@ -2,13 +2,7 @@ package pmsoft.sam.see.api.data.impl;
 
 import pmsoft.sam.definition.implementation.AbstractSamImplementationPackage;
 import pmsoft.sam.definition.implementation.AbstractSamServiceImplementationDefinition;
-import pmsoft.sam.definition.service.SamServiceDefinition;
-import pmsoft.sam.see.api.data.architecture.service.CourierService;
-import pmsoft.sam.see.api.data.architecture.service.ShoppingService;
-import pmsoft.sam.see.api.data.architecture.service.StoreService;
-import pmsoft.sam.see.api.data.architecture.service.TestServiceOne;
-import pmsoft.sam.see.api.data.architecture.service.TestServiceTwo;
-import pmsoft.sam.see.api.data.architecture.service.TestServiceZero;
+import pmsoft.sam.see.api.data.architecture.service.*;
 import pmsoft.sam.see.api.data.impl.courier.TestCourierServiceModule;
 import pmsoft.sam.see.api.data.impl.shopping.TestShoppingModule;
 import pmsoft.sam.see.api.data.impl.store.TestStoreServiceModule;

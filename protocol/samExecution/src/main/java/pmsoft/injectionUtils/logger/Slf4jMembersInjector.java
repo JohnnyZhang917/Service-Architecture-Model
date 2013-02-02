@@ -1,11 +1,10 @@
 package pmsoft.injectionUtils.logger;
 
-import java.lang.reflect.Field;
-
+import com.google.inject.MembersInjector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.inject.MembersInjector;
+import java.lang.reflect.Field;
 
 class Slf4jMembersInjector<T> implements MembersInjector<T> {
 	private final Field field;

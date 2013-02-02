@@ -1,14 +1,5 @@
 package pmsoft.sam.see.infrastructure.localjvm;
 
-import java.util.List;
-import java.util.Map;
-
-
-import pmsoft.sam.architecture.model.ServiceKey;
-import pmsoft.sam.see.api.SamServiceDiscovery;
-import pmsoft.sam.see.api.model.SIURL;
-import pmsoft.sam.see.api.plugin.SamServiceDiscoveryListener;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSet.Builder;
@@ -17,6 +8,13 @@ import com.google.inject.Binding;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.TypeLiteral;
+import pmsoft.sam.architecture.model.ServiceKey;
+import pmsoft.sam.see.api.SamServiceDiscovery;
+import pmsoft.sam.see.api.model.SIURL;
+import pmsoft.sam.see.api.plugin.SamServiceDiscoveryListener;
+
+import java.util.List;
+import java.util.Map;
 
 public class SamServiceDiscoveryLocal implements SamServiceDiscovery {
 

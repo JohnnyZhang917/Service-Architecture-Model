@@ -1,19 +1,10 @@
 package pmsoft.sam.see.api;
 
-import static org.testng.AssertJUnit.assertNotNull;
-import static org.testng.AssertJUnit.assertTrue;
-
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-
+import com.google.inject.Key;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
-
 import pmsoft.exceptions.OperationCheckedException;
 import pmsoft.execution.ServiceAction;
-import pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.see.SEEServer;
 import pmsoft.sam.see.SEEServiceSetupAction;
@@ -21,12 +12,7 @@ import pmsoft.sam.see.api.data.TestServiceExecutionEnvironmentConfiguration;
 import pmsoft.sam.see.api.data.TestTransactionDefinition;
 import pmsoft.sam.see.api.data.architecture.contract.TestInterfaceTwo0;
 import pmsoft.sam.see.api.data.architecture.contract.shopping.ShoppingStoreWithCourierInteraction;
-import pmsoft.sam.see.api.data.architecture.service.CourierService;
-import pmsoft.sam.see.api.data.architecture.service.ShoppingService;
-import pmsoft.sam.see.api.data.architecture.service.StoreService;
-import pmsoft.sam.see.api.data.architecture.service.TestServiceOne;
-import pmsoft.sam.see.api.data.architecture.service.TestServiceTwo;
-import pmsoft.sam.see.api.data.architecture.service.TestServiceZero;
+import pmsoft.sam.see.api.data.architecture.service.*;
 import pmsoft.sam.see.api.data.impl.TestServiceOneModule;
 import pmsoft.sam.see.api.data.impl.TestServiceTwoModule;
 import pmsoft.sam.see.api.data.impl.TestServiceZeroModule;
@@ -39,7 +25,13 @@ import pmsoft.sam.see.api.model.SIURL;
 import pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
 import pmsoft.sam.see.api.transaction.SamTransactionConfigurationUtil;
 
-import com.google.inject.Key;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class TestSEEexecution {
 

@@ -1,12 +1,12 @@
 package pmsoft.sam.protocol.freebinding;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
-
 import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.Provider;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 
 /**
  * Provide switching capabilities of injected references.

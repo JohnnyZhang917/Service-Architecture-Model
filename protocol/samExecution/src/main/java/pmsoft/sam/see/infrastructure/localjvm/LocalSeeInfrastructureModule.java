@@ -1,11 +1,10 @@
 package pmsoft.sam.see.infrastructure.localjvm;
 
+import com.google.inject.PrivateModule;
+import com.google.inject.Provides;
 import pmsoft.sam.see.api.SamArchitectureManagement;
 import pmsoft.sam.see.api.SamArchitectureRegistry;
 import pmsoft.sam.see.api.SamServiceDiscovery;
-
-import com.google.inject.PrivateModule;
-import com.google.inject.Provides;
 
 public class LocalSeeInfrastructureModule extends PrivateModule {
 

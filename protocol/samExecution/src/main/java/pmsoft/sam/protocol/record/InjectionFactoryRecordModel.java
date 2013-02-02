@@ -1,18 +1,17 @@
 package pmsoft.sam.protocol.record;
 
-import java.util.List;
-import java.util.UUID;
-import java.net.URL;
-
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import pmsoft.sam.protocol.TransactionController;
 import pmsoft.sam.protocol.freebinding.ExternalBindingController;
 import pmsoft.sam.protocol.freebinding.ExternalInstanceProvider;
-
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import pmsoft.sam.see.api.model.ExecutionStrategy;
 import pmsoft.sam.see.api.model.SamServiceInstance;
+
+import java.net.URL;
+import java.util.List;
+import java.util.UUID;
 
 interface InjectionFactoryRecordModel {
 

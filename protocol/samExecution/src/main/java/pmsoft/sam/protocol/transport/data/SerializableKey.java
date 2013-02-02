@@ -1,10 +1,10 @@
 package pmsoft.sam.protocol.transport.data;
 
+import com.google.inject.Key;
+
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-
-import com.google.inject.Key;
 
 public class SerializableKey<T> implements Serializable {
 

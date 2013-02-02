@@ -1,9 +1,10 @@
 package pmsoft.sam.protocol.record;
 
-import java.net.URL;
-import java.util.Set;
-import java.util.UUID;
-
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.ImmutableMap;
+import com.google.inject.*;
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.protocol.CanonicalProtocolExecutionContext;
 import pmsoft.sam.protocol.CanonicalProtocolInfrastructure;
@@ -12,22 +13,11 @@ import pmsoft.sam.protocol.freebinding.ExternalBindingController;
 import pmsoft.sam.protocol.freebinding.ExternalInstanceProvider;
 import pmsoft.sam.see.api.SamExecutionNodeInternalApi;
 import pmsoft.sam.see.api.model.*;
-import pmsoft.sam.see.api.transaction.BindPointNestedTransaction;
-import pmsoft.sam.see.api.transaction.BindPointSIID;
-import pmsoft.sam.see.api.transaction.BindPointSIURL;
-import pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
-import pmsoft.sam.see.api.transaction.SamInjectionModelVisitorAdapter;
+import pmsoft.sam.see.api.transaction.*;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
-import com.google.common.collect.ImmutableMap;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Key;
-import com.google.inject.Module;
+import java.net.URL;
+import java.util.Set;
+import java.util.UUID;
 
 class CanonicalProtocolModel implements CanonicalProtocolInfrastructure {
 

@@ -1,19 +1,17 @@
 package pmsoft.sam.protocol.record;
 
 import com.google.common.collect.ImmutableList;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
 import com.google.inject.Key;
-
-import java.net.URL;
-import java.util.List;
-import java.util.UUID;
-
+import com.google.inject.assistedinject.Assisted;
 import pmsoft.execution.ThreadMessagePipe;
 import pmsoft.sam.protocol.CanonicalProtocolExecutionContext;
 import pmsoft.sam.protocol.TransactionController;
 
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.assistedinject.Assisted;
+import java.net.URL;
+import java.util.List;
+import java.util.UUID;
 
 class CanonicalProtocolExecutionContextObject implements CanonicalProtocolExecutionContext {
 

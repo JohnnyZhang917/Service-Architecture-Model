@@ -1,9 +1,8 @@
 package pmsoft.sam.see.api.transaction;
 
+import com.google.common.collect.ImmutableList;
 import pmsoft.sam.architecture.model.ServiceKey;
 import pmsoft.sam.see.api.model.SIID;
-
-import com.google.common.collect.ImmutableList;
 
 class SamInjectionConfigurationObject implements SamInjectionConfiguration {
 

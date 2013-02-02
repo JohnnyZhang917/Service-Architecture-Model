@@ -1,12 +1,11 @@
 package pmsoft.sam.see.api.data.impl;
 
+import com.google.inject.AbstractModule;
+import com.google.inject.Inject;
 import pmsoft.sam.see.api.data.architecture.contract.TestInterfaceOne;
 import pmsoft.sam.see.api.data.architecture.contract.TestInterfaceTwo0;
 import pmsoft.sam.see.api.data.architecture.contract.TestInterfaceTwo1;
 import pmsoft.sam.see.api.data.architecture.contract.TestInterfaceZero;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Inject;
 
 public class TestServiceTwoModule extends AbstractModule {
 

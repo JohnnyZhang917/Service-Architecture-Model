@@ -1,12 +1,11 @@
 package pmsoft.sam.see.injectionUtils;
 
-import java.util.Comparator;
-import java.util.List;
-
-import pmsoft.sam.architecture.model.ServiceKey;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Ordering;
+import pmsoft.sam.architecture.model.ServiceKey;
+
+import java.util.Comparator;
+import java.util.List;
 
 public class ServiceKeyOrder {
 	

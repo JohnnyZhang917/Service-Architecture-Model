@@ -1,8 +1,7 @@
 package pmsoft.sam.see.api.data.impl.store;
 
-import pmsoft.sam.see.api.data.architecture.contract.store.StoreServiceContract;
-
 import com.google.inject.AbstractModule;
+import pmsoft.sam.see.api.data.architecture.contract.store.StoreServiceContract;
 
 public class TestStoreServiceModule extends AbstractModule {
 

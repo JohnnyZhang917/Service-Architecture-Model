@@ -2,8 +2,6 @@ package pmsoft.sam.see;
 
 import com.google.common.base.Preconditions;
 import com.google.inject.Module;
-
-import pmsoft.exceptions.OperationCheckedException;
 import pmsoft.sam.see.api.SamExecutionNode;
 import pmsoft.sam.see.api.model.*;
 import pmsoft.sam.see.api.transaction.SamInjectionConfiguration;

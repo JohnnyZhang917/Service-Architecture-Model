@@ -1,10 +1,9 @@
 package pmsoft.sam.see.api.model;
 
-import java.util.List;
-
+import com.google.inject.Module;
 import pmsoft.sam.architecture.model.ServiceKey;
 
-import com.google.inject.Module;
+import java.util.List;
 
 /**
  * Definition of a Service Implementation

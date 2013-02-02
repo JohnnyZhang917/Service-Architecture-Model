@@ -1,12 +1,13 @@
 package pmsoft.sam.see.api.data;
 
-import static pmsoft.sam.see.api.transaction.SamTransactionConfigurationUtil.createTransactionOn;
 import pmsoft.sam.see.api.data.architecture.service.TestServiceOne;
 import pmsoft.sam.see.api.data.architecture.service.TestServiceTwo;
 import pmsoft.sam.see.api.data.architecture.service.TestServiceZero;
 import pmsoft.sam.see.api.model.SIID;
 import pmsoft.sam.see.api.model.SIURL;
 import pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
+
+import static pmsoft.sam.see.api.transaction.SamTransactionConfigurationUtil.createTransactionOn;
 
 /**
  * Transaction definition based on definition of the service implementations.

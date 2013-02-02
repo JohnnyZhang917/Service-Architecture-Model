@@ -1,12 +1,11 @@
 package pmsoft.sam.protocol.record;
 
-import java.util.Set;
-
-
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Injector;
 import com.google.inject.Key;
+
+import java.util.Set;
 
 /**
  * Provide instances using directly a service injector.

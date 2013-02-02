@@ -1,20 +1,19 @@
 package pmsoft.sam.definition.instance;
 
-import static org.mockito.Mockito.*;
-
+import com.google.inject.AbstractModule;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.mockito.stubbing.Stubber;
 import org.testng.annotations.Test;
-
 import pmsoft.sam.definition.implementation.AbstractSamImplementationPackage;
 import pmsoft.sam.definition.implementation.AbstractSamServiceImplementationDefinition;
-import pmsoft.sam.definition.implementation.SamServicePackageLoader;
 import pmsoft.sam.definition.implementation.SamServiceImplementationLoader;
+import pmsoft.sam.definition.implementation.SamServicePackageLoader;
 import pmsoft.sam.definition.service.AbstractSamServiceDefinition;
 
-import com.google.inject.AbstractModule;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.verify;
 
 /**
  * Tests to check the loading calls mapping and to feel the client API

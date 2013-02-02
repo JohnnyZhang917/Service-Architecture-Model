@@ -4,7 +4,7 @@ import com.google.inject.name.Names;
 import org.mockito.Mockito;
 import org.testng.annotations.Test;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
 public class SamServiceDefinitionTest {
 

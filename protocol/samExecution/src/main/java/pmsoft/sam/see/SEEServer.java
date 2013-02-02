@@ -1,17 +1,17 @@
 package pmsoft.sam.see;
 
-import java.net.InetSocketAddress;
-import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-
+import com.google.common.collect.Lists;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.google.inject.Module;
 import com.google.inject.name.Names;
+import com.google.inject.util.Modules;
 import pmsoft.exceptions.*;
 import pmsoft.execution.*;
 import pmsoft.sam.architecture.definition.SamArchitectureDefinition;
-import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
 import pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
+import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
 import pmsoft.sam.architecture.model.SamArchitecture;
 import pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
 import pmsoft.sam.see.api.SamArchitectureManagement;
@@ -20,14 +20,13 @@ import pmsoft.sam.see.api.SamServiceDiscovery;
 import pmsoft.sam.see.api.SamServiceRegistry;
 import pmsoft.sam.see.configuration.SEEConfiguration;
 import pmsoft.sam.see.execution.localjvm.LocalSeeExecutionModule;
-
-import com.google.common.collect.Lists;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.util.Modules;
 import pmsoft.sam.see.infrastructure.localjvm.LocalSeeInfrastructureModule;
+
+import java.net.InetSocketAddress;
+import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 
 public class SEEServer {

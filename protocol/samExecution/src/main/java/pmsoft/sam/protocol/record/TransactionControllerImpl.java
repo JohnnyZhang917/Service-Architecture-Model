@@ -1,18 +1,16 @@
 package pmsoft.sam.protocol.record;
 
-import java.util.Map.Entry;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import org.slf4j.Logger;
-
-import pmsoft.sam.protocol.TransactionController;
-import pmsoft.sam.protocol.freebinding.ExternalBindingController;
-import pmsoft.sam.protocol.freebinding.ExternalInstanceProvider;
-import pmsoft.injectionUtils.logger.InjectLogger;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import org.slf4j.Logger;
+import pmsoft.injectionUtils.logger.InjectLogger;
+import pmsoft.sam.protocol.TransactionController;
+import pmsoft.sam.protocol.freebinding.ExternalBindingController;
+import pmsoft.sam.protocol.freebinding.ExternalInstanceProvider;
+
+import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Realize the switching of ExternalInstanceProvider for all controllers ExternalBindingController on a given transaction.
