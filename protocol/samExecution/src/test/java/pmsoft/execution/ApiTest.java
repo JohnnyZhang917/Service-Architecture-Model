@@ -61,12 +61,12 @@ public class ApiTest {
             serviceOne = new URL("http://localhost:5001/one");
             serviceTwo = new URL("http://localhost:5002/two");
         } catch (MalformedURLException e) {
-           // ignore
+            // ignore
         }
     }
 
-    static List<URL> oneSendToTwoConfiguration(URL service){
-        if( service == serviceOne) {
+    static List<URL> oneSendToTwoConfiguration(URL service) {
+        if (service == serviceOne) {
             return ImmutableList.of(serviceTwo);
         }
         return ImmutableList.of();
@@ -80,7 +80,7 @@ public class ApiTest {
         ThreadExecutionServer two = infrastructure.createServer(new InetSocketAddress(5002));
         one.startServer();
         two.startServer();
-        Future<String> testFuture = one.executeServiceAction(new ServiceAction<String,SimpleCallService>(serviceOne, Key.get(SimpleCallService.class)) {
+        Future<String> testFuture = one.executeServiceAction(new ServiceAction<String, SimpleCallService>(serviceOne, Key.get(SimpleCallService.class)) {
             @Override
             public String executeInteraction(SimpleCallService service) {
                 return service.makeSimpleCall();
@@ -107,7 +107,7 @@ public class ApiTest {
         }
     }
 
-    static class SimpleExecutionlogic implements ExecutionContextInternalLogic,CallExternal {
+    static class SimpleExecutionlogic implements ExecutionContextInternalLogic, CallExternal {
 
         private final URL target;
         private final Injector injector;
@@ -145,7 +145,7 @@ public class ApiTest {
         @Override
         public void enterExecution(ThreadMessagePipe headCommandPipe, List<ThreadMessagePipe> endpoints) {
             this.headCommandPipe = headCommandPipe;
-            if(endpoints.size() > 0 ){
+            if (endpoints.size() > 0) {
                 this.endpoint = endpoints.get(0);
             }
         }
@@ -164,8 +164,8 @@ public class ApiTest {
         @Override
         public void executeCanonicalProtocol() {
             ThreadMessage msg = this.headCommandPipe.pollMessage();
-            if( msg == null) {
-                throw  new RuntimeException("message pool can not be empty for protocol execution");
+            if (msg == null) {
+                throw new RuntimeException("message pool can not be empty for protocol execution");
             }
             SimpleCallService localService = injector.getInstance(SimpleCallService.class);
             msg.setPayload(localService.getAddress().toString());
@@ -196,11 +196,11 @@ public class ApiTest {
             this.external = external;
         }
 
-        URL getAddress(){
+        URL getAddress() {
             return serviceURL;
         }
 
-        String makeSimpleCall(){
+        String makeSimpleCall() {
             return external.call();
         }
     }

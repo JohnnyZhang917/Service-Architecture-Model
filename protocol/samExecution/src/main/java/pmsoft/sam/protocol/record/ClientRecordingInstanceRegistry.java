@@ -15,101 +15,101 @@ import static com.google.common.base.Preconditions.checkState;
 class ClientRecordingInstanceRegistry extends AbstractInstanceRegistry implements InstanceProvider, InstanceRegistry {
 
     @Inject
-	public ClientRecordingInstanceRegistry(@Assisted int serviceSlotNr) {
-		super(serviceSlotNr);
+    public ClientRecordingInstanceRegistry(@Assisted int serviceSlotNr) {
+        super(serviceSlotNr);
     }
 
-	public <T> T getInstance(Key<T> key) {
-		return createKeyBinding(key).getInstance();
-	}
-	
-	public int createDataBinding(Object arg) {
-		int serviceInstanceNr = getNextInstanceNumber();
-		ClientDataObjectInstanceReference dataInstance = new ClientDataObjectInstanceReference(serviceInstanceNr, arg);
-		instanceReferenceList.add(dataInstance);
-		instanceObjectList.add(arg);
-		return serviceInstanceNr;
-	}
+    public <T> T getInstance(Key<T> key) {
+        return createKeyBinding(key).getInstance();
+    }
 
-	public List<AbstractInstanceReference> getInstanceReferenceToTransfer() {
-		Builder<AbstractInstanceReference> builder = ImmutableList.builder();
-		for (int i = transferedInstanceReferenceMark; i < instanceReferenceList.size(); i++) {
-			AbstractInstanceReference instanceRef = instanceReferenceList.get(i);
+    public int createDataBinding(Object arg) {
+        int serviceInstanceNr = getNextInstanceNumber();
+        ClientDataObjectInstanceReference dataInstance = new ClientDataObjectInstanceReference(serviceInstanceNr, arg);
+        instanceReferenceList.add(dataInstance);
+        instanceObjectList.add(arg);
+        return serviceInstanceNr;
+    }
+
+    public List<AbstractInstanceReference> getInstanceReferenceToTransfer() {
+        Builder<AbstractInstanceReference> builder = ImmutableList.builder();
+        for (int i = transferedInstanceReferenceMark; i < instanceReferenceList.size(); i++) {
+            AbstractInstanceReference instanceRef = instanceReferenceList.get(i);
             if (instanceRef instanceof ServerPendingDataInstanceReference) {
                 continue;
             }
             if (instanceRef instanceof ServerDataObjectInstanceReference) {
                 continue;
             }
-			if (instanceRef instanceof ServerBindingKeyInstanceReference<?>) {
-				continue;
-			}
-			builder.add(instanceRef);
-		}
-		transferedInstanceReferenceMark = instanceReferenceList.size();
-		return builder.build();
-	}
+            if (instanceRef instanceof ServerBindingKeyInstanceReference<?>) {
+                continue;
+            }
+            builder.add(instanceRef);
+        }
+        transferedInstanceReferenceMark = instanceReferenceList.size();
+        return builder.build();
+    }
 
-	@Override
-	protected int getNextInstanceNumber() {
-		return internalInstanceCounter.getAndIncrement();
-	}
+    @Override
+    protected int getNextInstanceNumber() {
+        return internalInstanceCounter.getAndIncrement();
+    }
 
-	public <T> void visitBindingKey(BindingKeyInstanceReference<T> bindingKeyInstanceReference) {
-		throw new RuntimeException("not allowed type");
-	}
+    public <T> void visitBindingKey(BindingKeyInstanceReference<T> bindingKeyInstanceReference) {
+        throw new RuntimeException("not allowed type");
+    }
 
-	public <T> void visitExternalSlotInstance(ExternalSlotInstanceReference<T> externalSlotInstanceReference) {
-		throw new RuntimeException("not allowed type");
-	}
-	
-	public <T> void visitServerBindingKeyInstanceReference(ServerBindingKeyInstanceReference<T> serverBindingKeyInstanceReference) {
-		int currentInstanceNumber = getNextInstanceNumber();
-		checkState(serverBindingKeyInstanceReference.getInstanceNr() == currentInstanceNumber);
-		ServerBindingKeyInstanceReference<T> serverReference = new ServerBindingKeyInstanceReference<T>(currentInstanceNumber, serverBindingKeyInstanceReference.getKey());
-		instanceReferenceList.add(serverReference);
-		instanceObjectList.add(null);
-	}
-	
-	public void visitServerPendingDataInstance(ServerPendingDataInstanceReference serverPendingDataInstanceReference) {
-		int currentInstanceNumber = getNextInstanceNumber();
-		checkState(serverPendingDataInstanceReference.getInstanceNr() == currentInstanceNumber);
-		PendingDataInstanceReference dataRef = new ServerPendingDataInstanceReference(currentInstanceNumber,
-				serverPendingDataInstanceReference.getDataType());
-		instanceReferenceList.add(dataRef);
-		instanceObjectList.add(null);
-	}
+    public <T> void visitExternalSlotInstance(ExternalSlotInstanceReference<T> externalSlotInstanceReference) {
+        throw new RuntimeException("not allowed type");
+    }
 
-	public void visitFilledDataInstance(FilledDataInstanceReference filledDataInstanceReference) {
-		int position = filledDataInstanceReference.getInstanceNr();
-		checkPositionIndex(position, instanceReferenceList.size());
-		AbstractInstanceReference instance = instanceReferenceList.get(position);
-		checkState(instance instanceof PendingDataInstanceReference,
-				"A pending data position should be found, critical protocol exceptions");
-		Object objectReference = filledDataInstanceReference.getObjectReference();
-        FilledDataInstanceReference dataRef = new FilledDataInstanceReference(position, objectReference );
-		instanceReferenceList.set(position, dataRef);
-		instanceObjectList.set(position,objectReference);
-		
-	}
+    public <T> void visitServerBindingKeyInstanceReference(ServerBindingKeyInstanceReference<T> serverBindingKeyInstanceReference) {
+        int currentInstanceNumber = getNextInstanceNumber();
+        checkState(serverBindingKeyInstanceReference.getInstanceNr() == currentInstanceNumber);
+        ServerBindingKeyInstanceReference<T> serverReference = new ServerBindingKeyInstanceReference<T>(currentInstanceNumber, serverBindingKeyInstanceReference.getKey());
+        instanceReferenceList.add(serverReference);
+        instanceObjectList.add(null);
+    }
 
-	public void visitPendingDataInstance(PendingDataInstanceReference pendingDataInstanceReference) {
-		throw new RuntimeException("not allowed type");	
-	}
+    public void visitServerPendingDataInstance(ServerPendingDataInstanceReference serverPendingDataInstanceReference) {
+        int currentInstanceNumber = getNextInstanceNumber();
+        checkState(serverPendingDataInstanceReference.getInstanceNr() == currentInstanceNumber);
+        PendingDataInstanceReference dataRef = new ServerPendingDataInstanceReference(currentInstanceNumber,
+                serverPendingDataInstanceReference.getDataType());
+        instanceReferenceList.add(dataRef);
+        instanceObjectList.add(null);
+    }
 
-	@Override
-	public void visitClientDataObjectInstance(ClientDataObjectInstanceReference dataObjectInstanceReference) {
-		throw new RuntimeException("not allowed type");			
-	}
-	
-	@Override
-	public void visitServerDataObjectInstance(ServerDataObjectInstanceReference dataObjectInstanceReference) {
-		int currentInstanceNumber = getNextInstanceNumber();
-		checkState(dataObjectInstanceReference.getInstanceNr() == currentInstanceNumber, "exceptions on merge of %s. currentInstanceNumber = %s", dataObjectInstanceReference,currentInstanceNumber);
-		Object objectReference = dataObjectInstanceReference.getObjectReference();
-		ServerDataObjectInstanceReference dataRef = new ServerDataObjectInstanceReference(currentInstanceNumber, objectReference);
-		instanceReferenceList.add(dataRef);
-		instanceObjectList.add(objectReference);
-	}
+    public void visitFilledDataInstance(FilledDataInstanceReference filledDataInstanceReference) {
+        int position = filledDataInstanceReference.getInstanceNr();
+        checkPositionIndex(position, instanceReferenceList.size());
+        AbstractInstanceReference instance = instanceReferenceList.get(position);
+        checkState(instance instanceof PendingDataInstanceReference,
+                "A pending data position should be found, critical protocol exceptions");
+        Object objectReference = filledDataInstanceReference.getObjectReference();
+        FilledDataInstanceReference dataRef = new FilledDataInstanceReference(position, objectReference);
+        instanceReferenceList.set(position, dataRef);
+        instanceObjectList.set(position, objectReference);
+
+    }
+
+    public void visitPendingDataInstance(PendingDataInstanceReference pendingDataInstanceReference) {
+        throw new RuntimeException("not allowed type");
+    }
+
+    @Override
+    public void visitClientDataObjectInstance(ClientDataObjectInstanceReference dataObjectInstanceReference) {
+        throw new RuntimeException("not allowed type");
+    }
+
+    @Override
+    public void visitServerDataObjectInstance(ServerDataObjectInstanceReference dataObjectInstanceReference) {
+        int currentInstanceNumber = getNextInstanceNumber();
+        checkState(dataObjectInstanceReference.getInstanceNr() == currentInstanceNumber, "exceptions on merge of %s. currentInstanceNumber = %s", dataObjectInstanceReference, currentInstanceNumber);
+        Object objectReference = dataObjectInstanceReference.getObjectReference();
+        ServerDataObjectInstanceReference dataRef = new ServerDataObjectInstanceReference(currentInstanceNumber, objectReference);
+        instanceReferenceList.add(dataRef);
+        instanceObjectList.add(objectReference);
+    }
 
 }

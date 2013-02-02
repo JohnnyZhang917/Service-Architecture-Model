@@ -9,25 +9,25 @@ import java.util.Set;
 
 /**
  * Provide instances using directly a service injector.
- * 
+ * <p/>
  * Service contract is verified on keys level.
- * @author pawel
  *
- */ 
+ * @author pawel
+ */
 class DirectInstanceProvider implements InstanceProvider {
 
-	private final Injector directServiceInjector;
-	private final ImmutableSet<Key<?>> serviceApiKeys;
-	
-	DirectInstanceProvider(Injector directServiceInjector, Set<Key<?>> serviceApiKeys) {
-		this.directServiceInjector = directServiceInjector;
-		this.serviceApiKeys = ImmutableSet.copyOf(serviceApiKeys);
-	}
+    private final Injector directServiceInjector;
+    private final ImmutableSet<Key<?>> serviceApiKeys;
 
-	@Override
-	public <T> T getInstance(Key<T> key) {
-		Preconditions.checkState(serviceApiKeys.contains(key),"This service don't provide a implementation of this key. Routing exceptions.");
-		return directServiceInjector.getInstance(key);
-	}
+    DirectInstanceProvider(Injector directServiceInjector, Set<Key<?>> serviceApiKeys) {
+        this.directServiceInjector = directServiceInjector;
+        this.serviceApiKeys = ImmutableSet.copyOf(serviceApiKeys);
+    }
+
+    @Override
+    public <T> T getInstance(Key<T> key) {
+        Preconditions.checkState(serviceApiKeys.contains(key), "This service don't provide a implementation of this key. Routing exceptions.");
+        return directServiceInjector.getInstance(key);
+    }
 
 }

@@ -5,9 +5,9 @@ import pmsoft.sam.see.api.data.architecture.contract.courier.CourierServiceContr
 
 public class TestCourierServiceModule extends AbstractModule {
 
-	@Override
-	protected void configure() {
-		bind(CourierServiceContract.class).to(TestCourierServiceContract.class).asEagerSingleton();
-	}
+    @Override
+    protected void configure() {
+        bind(CourierServiceContract.class).to(TestCourierServiceContract.class).asEagerSingleton();
+    }
 
 }

@@ -24,11 +24,11 @@ public class MethodRecordContext {
     private final Logger logger;
 
     @Inject
-    MethodRecordContext(@Assisted ImmutableList<InstanceRegistry> instanceRegistries, @Assisted AbstractExecutionStackManager executionManager ) {
+    MethodRecordContext(@Assisted ImmutableList<InstanceRegistry> instanceRegistries, @Assisted AbstractExecutionStackManager executionManager) {
         this.instanceRegistries = instanceRegistries;
         this.executionManager = executionManager;
         for (Iterator<InstanceRegistry> iterator = instanceRegistries.iterator(); iterator.hasNext(); ) {
-            InstanceRegistry registry =  iterator.next();
+            InstanceRegistry registry = iterator.next();
             registry.setMethodRecordContext(this);
         }
         this.logger = LoggerFactory.getLogger(MethodRecordContext.class);
@@ -46,7 +46,7 @@ public class MethodRecordContext {
         logger.debug("find return object for {}", call);
         InstanceRegistry instanceRegistry = getInstanceRegistry(call.getServiceSlotNr());
         AbstractInstanceReference reference = instanceRegistry.getInstanceReference(call.getReturnInstanceId());
-        if( reference instanceof ClientDataObjectInstanceReference) {
+        if (reference instanceof ClientDataObjectInstanceReference) {
             ClientDataObjectInstanceReference referenceInstance = (ClientDataObjectInstanceReference) reference;
             logger.trace("execution complete for call {}. reference is {}", call, reference);
             return referenceInstance.getObjectReference();

@@ -7,18 +7,18 @@ import java.util.List;
 
 public class CanonicalProtocolRequestData implements Serializable {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 393248247046868614L;
-	private final List<AbstractInstanceReference> instanceReferences;
-	private final List<MethodCall> methodCalls;
+    /**
+     *
+     */
+    private static final long serialVersionUID = 393248247046868614L;
+    private final List<AbstractInstanceReference> instanceReferences;
+    private final List<MethodCall> methodCalls;
     private final boolean closeThread;
 
     public CanonicalProtocolRequestData(List<AbstractInstanceReference> instanceReferences, List<MethodCall> methodCalls, boolean closeThread) {
-		super();
-		this.instanceReferences = instanceReferences;
-		this.methodCalls = methodCalls;
+        super();
+        this.instanceReferences = instanceReferences;
+        this.methodCalls = methodCalls;
         this.closeThread = closeThread;
     }
 
@@ -27,12 +27,12 @@ public class CanonicalProtocolRequestData implements Serializable {
     }
 
     public List<AbstractInstanceReference> getInstanceReferences() {
-		return instanceReferences;
-	}
+        return instanceReferences;
+    }
 
     public List<MethodCall> getMethodCalls() {
-		return methodCalls;
-	}
+        return methodCalls;
+    }
 
 //    @Override
 //	public String toString() {

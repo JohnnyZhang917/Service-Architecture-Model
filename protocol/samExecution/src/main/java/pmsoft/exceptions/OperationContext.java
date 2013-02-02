@@ -16,12 +16,12 @@ public class OperationContext {
     }
 
     public void throwOnErrors() throws OperationCheckedException {
-        if( errors.hasErrors()){
+        if (errors.hasErrors()) {
             throw errors.toException();
         }
     }
 
-    public OperationRuntimeException getRuntimeError(){
+    public OperationRuntimeException getRuntimeError() {
         return errors.toRuntimeException();
     }
 

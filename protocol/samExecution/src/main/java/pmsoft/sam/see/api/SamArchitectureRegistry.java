@@ -5,6 +5,6 @@ import pmsoft.sam.architecture.model.ServiceKey;
 
 public interface SamArchitectureRegistry {
 
-	SamService getService(ServiceKey serviceKey);
+    SamService getService(ServiceKey serviceKey);
 
 }

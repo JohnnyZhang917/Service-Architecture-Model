@@ -15,40 +15,40 @@ import java.util.UUID;
 
 class CanonicalProtocolExecutionContextObject implements CanonicalProtocolExecutionContext {
 
-	private final MethodRecordContext recordStack;
-	private final MethodRecordContext executionStack;
-	private final UUID canonicalTransactionIdentificator;
-	private final TransactionController controller;
+    private final MethodRecordContext recordStack;
+    private final MethodRecordContext executionStack;
+    private final UUID canonicalTransactionIdentificator;
+    private final TransactionController controller;
     private final ImmutableList<URL> endpointAddresses;
     private final Injector headTransactionInjector;
 
-	@Inject
-	public CanonicalProtocolExecutionContextObject(@Assisted("record") MethodRecordContext recordStack, @Assisted("execute") MethodRecordContext executionStack,
+    @Inject
+    public CanonicalProtocolExecutionContextObject(@Assisted("record") MethodRecordContext recordStack, @Assisted("execute") MethodRecordContext executionStack,
                                                    @Assisted UUID canonicalTransactionIdentificator, @Assisted TransactionController controller, @Assisted ImmutableList<URL> endpointAddresses,
                                                    @Assisted InjectorReference glueInjector) {
-		this.recordStack = recordStack;
-		this.executionStack = executionStack;
-		this.canonicalTransactionIdentificator = canonicalTransactionIdentificator;
-		this.controller = controller;
+        this.recordStack = recordStack;
+        this.executionStack = executionStack;
+        this.canonicalTransactionIdentificator = canonicalTransactionIdentificator;
+        this.controller = controller;
         this.endpointAddresses = endpointAddresses;
         this.headTransactionInjector = glueInjector.getInjector();
     }
 
-	@Override
-	public UUID getContextUniqueID() {
-		return canonicalTransactionIdentificator;
-	}
+    @Override
+    public UUID getContextUniqueID() {
+        return canonicalTransactionIdentificator;
+    }
 
-	@Override
-	public TransactionController getTransactionController() {
-		return controller;
-	}
+    @Override
+    public TransactionController getTransactionController() {
+        return controller;
+    }
 
-	@Override
-	public Injector getInjector() {
-		return headTransactionInjector;
-	}
-	
+    @Override
+    public Injector getInjector() {
+        return headTransactionInjector;
+    }
+
     @Override
     public <T> T getInstance(Key<T> key) {
         return headTransactionInjector.getInstance(key);
@@ -57,7 +57,7 @@ class CanonicalProtocolExecutionContextObject implements CanonicalProtocolExecut
     @Override
     public void enterExecution(ThreadMessagePipe headCommandPipe, List<ThreadMessagePipe> endpoints) {
         controller.enterTransactionContext();
-        if( headCommandPipe != null) {
+        if (headCommandPipe != null) {
             this.executionStack.getExecutionManager().bindExecutionPipes(ImmutableList.of(headCommandPipe));
         }
         this.recordStack.getExecutionManager().bindExecutionPipes(ImmutableList.copyOf(endpoints));

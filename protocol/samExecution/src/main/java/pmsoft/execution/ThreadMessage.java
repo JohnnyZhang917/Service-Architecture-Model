@@ -17,7 +17,7 @@ public class ThreadMessage implements Serializable {
     private static final long serialVersionUID = 8462213620673547714L;
     private UUID uuid;
     private URL targetUrl;
-	private Object payload;
+    private Object payload;
     private String signature;
     private ThreadProtocolMessageType messageType;
 
@@ -33,20 +33,20 @@ public class ThreadMessage implements Serializable {
     }
 
     public UUID getUuid() {
-		return uuid;
-	}
+        return uuid;
+    }
 
-	public void setUuid(UUID uuid) {
-		this.uuid = uuid;
-	}
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
 
-	public Object getPayload() {
-		return payload;
-	}
+    public Object getPayload() {
+        return payload;
+    }
 
-	public void setPayload(Object payload) {
-		this.payload = payload;
-	}
+    public void setPayload(Object payload) {
+        this.payload = payload;
+    }
 
     public URL getTargetUrl() {
         return targetUrl;

@@ -7,59 +7,60 @@ import pmsoft.sam.see.api.data.architecture.contract.courier.CourierServiceOrder
 
 public class TestCourierServiceContract implements CourierServiceContract {
 
-	@Override
-	public CourierServiceOrder openOrder(String contractId) {
-		return new MyCourierServiceOrder();
-	}
+    @Override
+    public CourierServiceOrder openOrder(String contractId) {
+        return new MyCourierServiceOrder();
+    }
 
-	class MyCourierServiceOrder implements CourierServiceOrder {
-		String contractId;
-		Integer price = 10000;
-		MyCourierAddressSetupInfo info;
-		
-		@Override
-		public CourierAddressSetupInfo setupAddress() {
-			info =  new MyCourierAddressSetupInfo();
-			return info;
-		}
+    class MyCourierServiceOrder implements CourierServiceOrder {
+        String contractId;
+        Integer price = 10000;
+        MyCourierAddressSetupInfo info;
 
-		@Override
-		public Integer getServicePrice() {
-			Preconditions.checkState(info.setupDone);
-			return price;
-		}
+        @Override
+        public CourierAddressSetupInfo setupAddress() {
+            info = new MyCourierAddressSetupInfo();
+            return info;
+        }
 
-		class MyCourierAddressSetupInfo implements CourierAddressSetupInfo {
+        @Override
+        public Integer getServicePrice() {
+            Preconditions.checkState(info.setupDone);
+            return price;
+        }
 
-			boolean setupDone = false;
+        class MyCourierAddressSetupInfo implements CourierAddressSetupInfo {
+
+            boolean setupDone = false;
             int countcall = 0;
-			@Override
-			public void setCity(String cityName) {
-				price = price - 100;
-                countcall++;
-			}
 
-			@Override
-			public void setStreet(String streetName) {
-				price = price - 100;
+            @Override
+            public void setCity(String cityName) {
+                price = price - 100;
                 countcall++;
-			}
+            }
 
-			@Override
-			public void setPackageSize(Integer kgSize) {
-				price = price - 1000;
+            @Override
+            public void setStreet(String streetName) {
+                price = price - 100;
                 countcall++;
-			}
+            }
 
-			@Override
-			public boolean setupDone() {
-                if( countcall > 2) {
+            @Override
+            public void setPackageSize(Integer kgSize) {
+                price = price - 1000;
+                countcall++;
+            }
+
+            @Override
+            public boolean setupDone() {
+                if (countcall > 2) {
                     setupDone = true;
                 }
-				return setupDone;
-			}
-			
-		}
-	}
-	
+                return setupDone;
+            }
+
+        }
+    }
+
 }

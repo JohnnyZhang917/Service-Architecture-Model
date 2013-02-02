@@ -16,23 +16,23 @@ import java.net.InetSocketAddress;
 
 public class TestServiceExecutionEnvironmentConfiguration {
 
-	public static SEEConfiguration createSEEConfiguration(int port) {
-		return createArchitectureConfiguration().bindToAddress(new InetSocketAddress(port));
-	}
-	
-	private static SEEConfigurationGrammar createArchitectureConfiguration() {
-		return SEEConfigurationBuilder.configuration().withPlugin(new AbstractModule() {
-			@Override
-			protected void configure() {
-				bind(SamServiceDiscoveryListener.class).annotatedWith(UniqueAnnotations.create()).toInstance(new SamServiceDiscoveryListener() {
-					@Override
-					public void serviceInstanceCreated(SIURL url, ServiceKey contract) {
-						System.out.println("serviceCreated: url[" + url + "], contract [" + contract + "]");
-					}
-				});
-			}
-		}).architecture(new SeeTestArchitecture()).implementationPackage(new TestImplementationDeclaration());
-	}
+    public static SEEConfiguration createSEEConfiguration(int port) {
+        return createArchitectureConfiguration().bindToAddress(new InetSocketAddress(port));
+    }
+
+    private static SEEConfigurationGrammar createArchitectureConfiguration() {
+        return SEEConfigurationBuilder.configuration().withPlugin(new AbstractModule() {
+            @Override
+            protected void configure() {
+                bind(SamServiceDiscoveryListener.class).annotatedWith(UniqueAnnotations.create()).toInstance(new SamServiceDiscoveryListener() {
+                    @Override
+                    public void serviceInstanceCreated(SIURL url, ServiceKey contract) {
+                        System.out.println("serviceCreated: url[" + url + "], contract [" + contract + "]");
+                    }
+                });
+            }
+        }).architecture(new SeeTestArchitecture()).implementationPackage(new TestImplementationDeclaration());
+    }
 
     public static SEEConfiguration createSEEConfiguration(int port, SEEServiceSetupAction setupAction) {
         return createArchitectureConfiguration().setupAction(setupAction).bindToAddress(new InetSocketAddress(port));

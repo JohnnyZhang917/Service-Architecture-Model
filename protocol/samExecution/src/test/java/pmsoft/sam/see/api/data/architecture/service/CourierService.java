@@ -5,10 +5,10 @@ import pmsoft.sam.see.api.data.architecture.contract.courier.CourierServiceContr
 
 public class CourierService extends AbstractSamServiceDefinition {
 
-	@Override
-	public void loadServiceDefinition() {
-		// Only exposed interfaces are defined in the service contract
-		addInterface(CourierServiceContract.class);
-	}
+    @Override
+    public void loadServiceDefinition() {
+        // Only exposed interfaces are defined in the service contract
+        addInterface(CourierServiceContract.class);
+    }
 
 }

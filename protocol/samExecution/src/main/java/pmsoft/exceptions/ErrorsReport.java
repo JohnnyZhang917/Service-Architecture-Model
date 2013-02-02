@@ -10,11 +10,11 @@ public class ErrorsReport {
     List<ErrorMessage> errors = Lists.newArrayList();
 
     public void addError(Throwable e, String format, Object... objects) {
-        errors.add(new ErrorMessage(e,format,objects));
+        errors.add(new ErrorMessage(e, format, objects));
     }
 
-    public void addError( String format, Object... objects) {
-        errors.add(new ErrorMessage(format,objects));
+    public void addError(String format, Object... objects) {
+        errors.add(new ErrorMessage(format, objects));
     }
 
     public void addError(Throwable exception) {
@@ -29,7 +29,7 @@ public class ErrorsReport {
         return new OperationCheckedException(this);
     }
 
-    public OperationRuntimeException toRuntimeException(){
+    public OperationRuntimeException toRuntimeException() {
         return new OperationRuntimeException(this);
     }
 

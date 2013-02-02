@@ -3,24 +3,24 @@ package pmsoft.sam.definition.implementation;
 import pmsoft.sam.definition.service.SamServiceDefinition;
 
 public abstract class AbstractSamImplementationPackage implements
-		SamServiceImplementationPackageContract {
+        SamServiceImplementationPackageContract {
 
-	private SamServicePackageLoader reader;
+    private SamServicePackageLoader reader;
 
-	@Override
-	public void loadContractPackage(SamServicePackageLoader reader) {
-		try {
-			this.reader = reader;
-			packageDefinition();
-		} finally {
-			this.reader = null;
-		}
-	}
+    @Override
+    public void loadContractPackage(SamServicePackageLoader reader) {
+        try {
+            this.reader = reader;
+            packageDefinition();
+        } finally {
+            this.reader = null;
+        }
+    }
 
-	public abstract void packageDefinition();
+    public abstract void packageDefinition();
 
     protected final void registerImplementation(
-            AbstractSamServiceImplementationDefinition<? extends SamServiceDefinition> serviceImplementationContract){
+            AbstractSamServiceImplementationDefinition<? extends SamServiceDefinition> serviceImplementationContract) {
         reader.registerImplementation(serviceImplementationContract);
     }
 

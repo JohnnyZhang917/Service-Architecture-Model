@@ -8,16 +8,16 @@ import java.util.Set;
 
 public interface SamServiceInstance {
 
-	public Injector getInjector();
+    public Injector getInjector();
 
-	public SIID getKey();
-	
-	public ServiceMetadata getMetadata();
+    public SIID getKey();
 
-	public Set<Key<?>> getServiceContract();
-	
-	public ServiceKey getServiceKeyContract();
-	
-	public SamServiceImplementationKey getImplementationKey();
-	
+    public ServiceMetadata getMetadata();
+
+    public Set<Key<?>> getServiceContract();
+
+    public ServiceKey getServiceKeyContract();
+
+    public SamServiceImplementationKey getImplementationKey();
+
 }

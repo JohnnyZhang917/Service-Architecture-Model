@@ -5,14 +5,14 @@ import pmsoft.sam.definition.service.SamServiceDefinition;
 
 public interface SamArchitectureLoader {
 
-	SamCategoryLoader createCategory(String categoryName);
+    SamCategoryLoader createCategory(String categoryName);
 
-	static public interface SamCategoryLoader {
+    static public interface SamCategoryLoader {
 
-		public SamCategoryLoader accessToCategory(SamCategoryLoader accesibleCategory);
-		
-		public SamCategoryLoader withService(SamServiceDefinition serviceDefinition);
+        public SamCategoryLoader accessToCategory(SamCategoryLoader accesibleCategory);
 
-	}
+        public SamCategoryLoader withService(SamServiceDefinition serviceDefinition);
+
+    }
 
 }

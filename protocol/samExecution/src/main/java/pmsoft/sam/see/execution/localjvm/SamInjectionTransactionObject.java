@@ -9,14 +9,14 @@ import pmsoft.sam.see.api.transaction.SamInjectionModelVisitor;
 
 public class SamInjectionTransactionObject implements SamInstanceTransaction {
 
-	private final SamInjectionConfiguration configuration;
-	private final SIURL transactionURL;
+    private final SamInjectionConfiguration configuration;
+    private final SIURL transactionURL;
     private final ExecutionStrategy executionStrategy;
 
 
-	public SamInjectionTransactionObject(SamInjectionConfiguration configuration, SIURL transactionURL, ExecutionStrategy executionStrategy) {
-		this.configuration = configuration;
-		this.transactionURL = transactionURL;
+    public SamInjectionTransactionObject(SamInjectionConfiguration configuration, SIURL transactionURL, ExecutionStrategy executionStrategy) {
+        this.configuration = configuration;
+        this.transactionURL = transactionURL;
         this.executionStrategy = executionStrategy;
     }
 
@@ -26,17 +26,17 @@ public class SamInjectionTransactionObject implements SamInstanceTransaction {
     }
 
     @Override
-	public SIURL getTransactionURL() {
-		return transactionURL;
-	}
-	
-	@Override
-	public SamInjectionConfiguration getInjectionConfiguration() {
-		return configuration;
-	}
+    public SIURL getTransactionURL() {
+        return transactionURL;
+    }
 
-	public <T> T accept(SamInjectionModelVisitor<T> visitor) {
-		return visitor.visitTransaction(this);
-	}
+    @Override
+    public SamInjectionConfiguration getInjectionConfiguration() {
+        return configuration;
+    }
+
+    public <T> T accept(SamInjectionModelVisitor<T> visitor) {
+        return visitor.visitTransaction(this);
+    }
 
 }

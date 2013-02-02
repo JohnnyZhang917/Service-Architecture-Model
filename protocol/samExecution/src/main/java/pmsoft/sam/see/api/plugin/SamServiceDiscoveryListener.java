@@ -5,6 +5,6 @@ import pmsoft.sam.see.api.model.SIURL;
 
 public interface SamServiceDiscoveryListener {
 
-	public void serviceInstanceCreated(SIURL url, ServiceKey contract);
-	
+    public void serviceInstanceCreated(SIURL url, ServiceKey contract);
+
 }

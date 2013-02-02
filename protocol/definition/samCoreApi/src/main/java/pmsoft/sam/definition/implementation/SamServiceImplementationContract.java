@@ -9,7 +9,9 @@ public interface SamServiceImplementationContract<T extends SamServiceDefinition
     // Key for ServiceImplementation is Module.
 
     public SamServiceImplementationContract<T> provideContract(Class<T> serviceContract);
+
     public SamServiceImplementationContract<T> withBindingsTo(Class<? extends SamServiceDefinition> bindedService);
+
     public void implementedInModule(Class<? extends Module> serviceImplementationModule);
 
 }

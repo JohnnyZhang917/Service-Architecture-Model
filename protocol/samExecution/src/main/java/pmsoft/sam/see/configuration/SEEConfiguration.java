@@ -18,9 +18,9 @@ public class SEEConfiguration {
     SEEConfiguration(ImmutableList<Module> pluginModules, ImmutableList<SamArchitectureDefinition> architectures,
                      ImmutableList<SamServiceImplementationPackageContract> implementationPackages, ImmutableList<SEEServiceSetupAction> setupActions, InetSocketAddress address) {
         this.pluginModules = pluginModules;
-		this.architectures = architectures;
-		this.implementationPackages = implementationPackages;
-		this.setupActions = setupActions;
+        this.architectures = architectures;
+        this.implementationPackages = implementationPackages;
+        this.setupActions = setupActions;
         this.address = address;
     }
 

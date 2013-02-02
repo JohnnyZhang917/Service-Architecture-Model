@@ -1,11 +1,10 @@
 package pmsoft.sam.protocol;
 
 
-
 public interface TransactionController {
 
-	public boolean enterTransactionContext();
+    public boolean enterTransactionContext();
 
-	public void exitTransactionContext();
-	
+    public void exitTransactionContext();
+
 }

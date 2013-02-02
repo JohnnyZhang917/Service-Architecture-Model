@@ -46,11 +46,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 interface ModelFactory {
 
     ThreadExecutionContext threadExecutionContext(ExecutionContextInternalLogic internalLogic, ThreadMessagePipe headCommandPipe,
-                                                  List<ThreadMessagePipe> endpoints,UUID transactionID);
+                                                  List<ThreadMessagePipe> endpoints, UUID transactionID);
 
     ThreadClientConnection openConnection(URL serverAddress);
 
-    ThreadMessagePipe createPipe(Channel connection,String signature, UUID transactionID, URL address);
+    ThreadMessagePipe createPipe(Channel connection, String signature, UUID transactionID, URL address);
 
     ThreadExecutionServer server(InetSocketAddress serverAddress);
 }
@@ -106,7 +106,7 @@ class ProviderConnectionHandler extends ChannelInboundMessageHandlerAdapter<Thre
     private final ExecutionContextManager contextManager;
     private final ThreadExecutionManager executionManager;
     // TODO make something more efficient to multiplex the connection
-    private Map<String,ThreadExecutionContext> transactionBinding = Maps.newHashMap();
+    private Map<String, ThreadExecutionContext> transactionBinding = Maps.newHashMap();
 
     @Inject
     ProviderConnectionHandler(ExecutionContextManager contextManager, ThreadExecutionManager executionManager) {
@@ -120,7 +120,7 @@ class ProviderConnectionHandler extends ChannelInboundMessageHandlerAdapter<Thre
             ThreadMessage.ThreadProtocolMessageType messageType = msg.getMessageType();
             switch (messageType) {
                 case INITIALIZE_TRANSACTION:
-                    initializeTransaction(ctx,msg);
+                    initializeTransaction(ctx, msg);
                     break;
                 case CLOSE_TRANSACTION:
                     closeTransaction(ctx, msg);
@@ -170,7 +170,7 @@ class ProviderConnectionHandler extends ChannelInboundMessageHandlerAdapter<Thre
 }
 
 
-class ThreadConnectionManager{
+class ThreadConnectionManager {
 
     private final ConcurrentMap<String, ThreadClientConnection> clientConnections;
     private final ModelFactory model;
@@ -192,28 +192,29 @@ class ThreadConnectionManager{
         return clientConnections.get(key);
     }
 
-     List<ThreadMessagePipe> openPipes(UUID transactionID, List<URL> endpointAdressList) {
+    List<ThreadMessagePipe> openPipes(UUID transactionID, List<URL> endpointAdressList) {
         Builder<ThreadMessagePipe> builder = ImmutableList.builder();
         for (URL address : endpointAdressList) {
             ThreadClientConnection connection = openConnection(address);
             String signature = newUniquePipeTransactionSignature(transactionID, address);
-            ThreadMessagePipe threadMessagePipe = connection.bindPipe(signature, transactionID,address);
+            ThreadMessagePipe threadMessagePipe = connection.bindPipe(signature, transactionID, address);
             builder.add(threadMessagePipe);
         }
         return builder.build();
     }
 
-     ThreadMessagePipe createHeadPipe(String signature, Channel channel) {
-         ThreadMessagePipe headPipe = model.createPipe(channel, signature,null,null);
-         pipeRoutingMap.put(headPipe.getSignature(), headPipe);
-         return headPipe;
-     }
+    ThreadMessagePipe createHeadPipe(String signature, Channel channel) {
+        ThreadMessagePipe headPipe = model.createPipe(channel, signature, null, null);
+        pipeRoutingMap.put(headPipe.getSignature(), headPipe);
+        return headPipe;
+    }
 
     AtomicInteger signatureCounter = new AtomicInteger();
-    private String newUniquePipeTransactionSignature(UUID transactionID, URL endpointAddress){
+
+    private String newUniquePipeTransactionSignature(UUID transactionID, URL endpointAddress) {
         // TODO make a more effective unique signature pipe
         int counter = signatureCounter.getAndAdd(1);
-        return counter + ":"+ transactionID.toString() + "-->"+ endpointAddress.toString();
+        return counter + ":" + transactionID.toString() + "-->" + endpointAddress.toString();
     }
 
 }
@@ -289,8 +290,8 @@ class ThreadClientConnection {
     ThreadMessagePipe bindPipe(String signature, UUID transactionID, URL address) {
         Preconditions.checkNotNull(signature);
         Preconditions.checkNotNull(transactionID);
-        ThreadMessagePipe pipe = model.createPipe(channel,signature,transactionID,address);
-        clientConnectionHandler.bindPipe(signature,pipe);
+        ThreadMessagePipe pipe = model.createPipe(channel, signature, transactionID, address);
+        clientConnectionHandler.bindPipe(signature, pipe);
         return pipe;
     }
 
@@ -317,11 +318,11 @@ class ExecutionContextManager {
         return openExecutionContextForServiceInteraction(UUID.randomUUID(), transactionURL).getTransactionID();
     }
 
-    ThreadExecutionContext openExecutionContextForServiceInteraction(UUID transactionID, URL transactionURL){
+    ThreadExecutionContext openExecutionContextForServiceInteraction(UUID transactionID, URL transactionURL) {
         Preconditions.checkNotNull(transactionID);
         Preconditions.checkNotNull(transactionURL);
         if (!localExecutionMap.containsKey(transactionID)) {
-            ThreadExecutionContext context = createExecutionContext(null,transactionID, transactionURL, null);
+            ThreadExecutionContext context = createExecutionContext(null, transactionID, transactionURL, null);
             localExecutionMap.putIfAbsent(transactionID, context);
         }
         return localExecutionMap.get(transactionID);
@@ -332,26 +333,27 @@ class ExecutionContextManager {
         Preconditions.checkNotNull(channel);
         Preconditions.checkNotNull(transactionID);
         Preconditions.checkNotNull(transactionURL);
-        return internalOpenExecutionContext(headPipeSignature,transactionID,transactionURL,channel);
+        return internalOpenExecutionContext(headPipeSignature, transactionID, transactionURL, channel);
 
     }
+
     private ThreadExecutionContext internalOpenExecutionContext(String headPipeSignature, UUID transactionID, URL transactionURL, Channel channel) {
         if (!externalExecutionMap.containsKey(headPipeSignature)) {
-            ThreadExecutionContext context = createExecutionContext(headPipeSignature,transactionID, transactionURL, channel);
+            ThreadExecutionContext context = createExecutionContext(headPipeSignature, transactionID, transactionURL, channel);
             externalExecutionMap.putIfAbsent(headPipeSignature, context);
         }
         return externalExecutionMap.get(headPipeSignature);
     }
 
 
-    private ThreadExecutionContext createExecutionContext(String headPipeSignature,UUID transactionID, URL transactionURL, Channel channel) {
+    private ThreadExecutionContext createExecutionContext(String headPipeSignature, UUID transactionID, URL transactionURL, Channel channel) {
         ExecutionContextInternalLogic internalLogic = internalLogicFactory.open(transactionURL);
         ThreadMessagePipe headPipe = null;
-        if(channel != null ) {
-             headPipe = connectionManager.createHeadPipe(headPipeSignature,channel);
+        if (channel != null) {
+            headPipe = connectionManager.createHeadPipe(headPipeSignature, channel);
         }
         List<ThreadMessagePipe> endpoints = connectionManager.openPipes(transactionID, internalLogic.getEndpointAdressList());
-        ThreadExecutionContext context = factory.threadExecutionContext(internalLogic, headPipe, endpoints,transactionID);
+        ThreadExecutionContext context = factory.threadExecutionContext(internalLogic, headPipe, endpoints, transactionID);
         return context;
     }
 
@@ -426,20 +428,20 @@ class ThreadExecutionManager {
         @Override
         public Void call() throws Exception {
             logger.trace("execution thread running for canonical protocol execution");
-                try {
-                    if (executionContext.enterExecutionContext()) {
-                        logger.trace("execution is open");
-                        logger.trace("start canonical protocol execution");
-                        executionContext.executeCanonicalProtocol();
-                        return null;
-                    }
-                } catch (Exception e) {
-                    logger.error("execution exceptions", e);   // FIXME exception policy.
-                    // TODO expand exceptions to global transaction context
-                } finally {
-                    executionContext.exitTransactionContext();
-                    logger.trace("execution closed");
+            try {
+                if (executionContext.enterExecutionContext()) {
+                    logger.trace("execution is open");
+                    logger.trace("start canonical protocol execution");
+                    executionContext.executeCanonicalProtocol();
+                    return null;
                 }
+            } catch (Exception e) {
+                logger.error("execution exceptions", e);   // FIXME exception policy.
+                // TODO expand exceptions to global transaction context
+            } finally {
+                executionContext.exitTransactionContext();
+                logger.trace("execution closed");
+            }
             logger.info("execution already open, ignoring duplicate execution start");
             // FIXME exception policy.
             return null;

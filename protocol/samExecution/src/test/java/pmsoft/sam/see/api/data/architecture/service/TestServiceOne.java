@@ -8,11 +8,12 @@ import java.lang.annotation.Annotation;
 
 public class TestServiceOne extends AbstractSamServiceDefinition {
 
-    public static final Annotation TEST_NAME =  Names.named("test1");
-	@Override
-	public void loadServiceDefinition() {
-		addInterface(TestInterfaceOne.class);
+    public static final Annotation TEST_NAME = Names.named("test1");
+
+    @Override
+    public void loadServiceDefinition() {
+        addInterface(TestInterfaceOne.class);
         addInterface(TestInterfaceOne.class, TEST_NAME);
-	}
+    }
 
 }

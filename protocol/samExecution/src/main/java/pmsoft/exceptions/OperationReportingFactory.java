@@ -6,9 +6,9 @@ public class OperationReportingFactory {
 
     ThreadLocal<OperationContext> contextPerThread = new ThreadLocal<OperationContext>();
 
-    public OperationContext ensureEmptyContext(){
+    public OperationContext ensureEmptyContext() {
         OperationContext current = contextPerThread.get();
-        Preconditions.checkState(current == null,"context is not empty, unexpected state on SamOperationContextFactory");
+        Preconditions.checkState(current == null, "context is not empty, unexpected state on SamOperationContextFactory");
         OperationContext context = new OperationContext(null);
         contextPerThread.set(context);
         return context;
@@ -16,7 +16,7 @@ public class OperationReportingFactory {
 
     public OperationContext openExistingContext() {
         OperationContext current = contextPerThread.get();
-        Preconditions.checkNotNull(current,"operation context is empty, unexpected state on SamOperationContextFactory");
+        Preconditions.checkNotNull(current, "operation context is empty, unexpected state on SamOperationContextFactory");
         return current;
     }
 

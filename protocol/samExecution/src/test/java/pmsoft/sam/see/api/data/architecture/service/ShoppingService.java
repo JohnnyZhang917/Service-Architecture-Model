@@ -5,9 +5,9 @@ import pmsoft.sam.see.api.data.architecture.contract.shopping.ShoppingStoreWithC
 
 public class ShoppingService extends AbstractSamServiceDefinition {
 
-	@Override
-	public void loadServiceDefinition() {
-		addInterface(ShoppingStoreWithCourierInteraction.class);
-	}
+    @Override
+    public void loadServiceDefinition() {
+        addInterface(ShoppingStoreWithCourierInteraction.class);
+    }
 
 }

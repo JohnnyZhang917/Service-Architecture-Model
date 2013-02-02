@@ -13,8 +13,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public final class ThreadMessagePipe {
 
-	private final ConcurrentLinkedQueue<ThreadMessage> messageInputQueue = new ConcurrentLinkedQueue<ThreadMessage>();
-	private final Channel connection;
+    private final ConcurrentLinkedQueue<ThreadMessage> messageInputQueue = new ConcurrentLinkedQueue<ThreadMessage>();
+    private final Channel connection;
     // TODO create multiple wait strategies
     private final Object waitMonitor = new Object();
     private final String signature;
@@ -24,9 +24,9 @@ public final class ThreadMessagePipe {
     private Logger logger;
 
     @Inject
-	ThreadMessagePipe(@Assisted Channel connection, @Assisted String signature,@Nullable @Assisted UUID transactionID,@Nullable @Assisted URL address) {
-		super();
-		this.connection = connection;
+    ThreadMessagePipe(@Assisted Channel connection, @Assisted String signature, @Nullable @Assisted UUID transactionID, @Nullable @Assisted URL address) {
+        super();
+        this.connection = connection;
         this.signature = signature;
         this.transactionID = transactionID;
         this.address = address;
@@ -34,28 +34,28 @@ public final class ThreadMessagePipe {
 
     public void receiveMessage(ThreadMessage message) {
         logger.trace("receive message: {}", signature);
-		messageInputQueue.add(message);
+        messageInputQueue.add(message);
         synchronized (waitMonitor) {
             logger.debug("notify on : {}", signature);
             waitMonitor.notify();
         }
-	}
-	
-	public ThreadMessage pollMessage(){
-		return messageInputQueue.poll();
-	}
-	
-	public void sendMessage(ThreadMessage message){
+    }
+
+    public ThreadMessage pollMessage() {
+        return messageInputQueue.poll();
+    }
+
+    public void sendMessage(ThreadMessage message) {
         logger.trace("sending message: {}\n{}", signature, message);
         message.setSignature(signature);
         message.setMessageType(ThreadMessage.ThreadProtocolMessageType.CANONICAL_PROTOCOL_EXECUTION);
-		connection.write(message);
-	}
+        connection.write(message);
+    }
 
-	public ThreadMessage waitResponse() {
+    public ThreadMessage waitResponse() {
         logger.debug("start wait for response: {}", signature);
         synchronized (waitMonitor) {
-            while(messageInputQueue.isEmpty()) {
+            while (messageInputQueue.isEmpty()) {
                 try {
                     waitMonitor.wait();
                 } catch (InterruptedException e) {
@@ -63,14 +63,14 @@ public final class ThreadMessagePipe {
                 }
             }
         }
-		return messageInputQueue.poll();
-	}
+        return messageInputQueue.poll();
+    }
 
     public String getSignature() {
         return signature;
     }
 
-    public void initializeTransactionConnection(){
+    public void initializeTransactionConnection() {
         ThreadMessage initConnectionMessage = new ThreadMessage();
         initConnectionMessage.setUuid(transactionID);
         initConnectionMessage.setSignature(signature);

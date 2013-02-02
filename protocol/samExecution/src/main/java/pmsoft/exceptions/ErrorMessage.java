@@ -16,20 +16,20 @@ public class ErrorMessage {
     }
 
     public ErrorMessage(String format, Object[] objects) {
-        this(null,format,objects);
+        this(null, format, objects);
     }
 
     public ErrorMessage(Throwable exception) {
-        this(exception,null,null);
+        this(exception, null, null);
     }
 
     @Override
     public String toString() {
         // FIXME report string
-        if( format!= null ){
-            return format(format,objects);
+        if (format != null) {
+            return format(format, objects);
         }
-        if( exception != null) {
+        if (exception != null) {
             return exception.getMessage();
         }
         return Objects.toStringHelper(this).omitNullValues()

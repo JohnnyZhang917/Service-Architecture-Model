@@ -35,12 +35,12 @@ abstract class AbstractExecutionStackManager {
         this.logger = logger;
     }
 
-    void bindTransaction(){
+    void bindTransaction() {
         assert stack.threadExecutionStack.empty();
         stack.bindStack(-1);
     }
 
-    void unbindTransaction(){
+    void unbindTransaction() {
         assert stack.threadExecutionStack.size() == 1;
         stack.unbindStack();
     }
@@ -48,7 +48,7 @@ abstract class AbstractExecutionStackManager {
     public void bindExecutionPipes(ImmutableList<ThreadMessagePipe> pipes) {
         Preconditions.checkNotNull(pipes);
         Preconditions.checkState(instanceRegistries.size() == pipes.size());
-        this.pipes =  pipes;
+        this.pipes = pipes;
     }
 
     public void unbindPipe() {
@@ -62,15 +62,15 @@ abstract class AbstractExecutionStackManager {
         private final Stack<MethodExecutionStack> threadExecutionStack;
 
         private StackOfStack() {
-            this.threadExecutionStack =  new Stack<MethodExecutionStack>();
+            this.threadExecutionStack = new Stack<MethodExecutionStack>();
         }
 
-        void bindStack(int mainTargetSlot){
+        void bindStack(int mainTargetSlot) {
             logger.trace("Stack Execution PUSH for slot {}", mainTargetSlot);
             threadExecutionStack.push(new MethodExecutionStack(mainTargetSlot));
         }
 
-        void unbindStack(){
+        void unbindStack() {
             logger.trace("Stack Execution POP");
             MethodExecutionStack executionStack = threadExecutionStack.pop();
             assert executionStack != null;
@@ -97,7 +97,7 @@ abstract class AbstractExecutionStackManager {
                 flushExecution();
                 break;
             case SIMPLE_LAZY:
-                if(slotChange) {
+                if (slotChange) {
                     logger.debug("slotChange");
                     pushProtocolExecution(false, currentStack);
                 }
@@ -105,7 +105,7 @@ abstract class AbstractExecutionStackManager {
         }
     }
 
-    void forceResolveCall(MethodCall call){
+    void forceResolveCall(MethodCall call) {
         pushMethodCall(call);
         flushExecution();
     }
@@ -113,8 +113,8 @@ abstract class AbstractExecutionStackManager {
     protected void flushExecution() {
         MethodExecutionStack executionStackCall = stack.getCurrentStack();
         int expectedExecutionMark = executionStackCall.recordMark;
-        while( executionStackCall.executionMark < expectedExecutionMark) {
-            logger.trace("force execution. CurrentMark/Expected [{},{}]",executionStackCall.executionMark , expectedExecutionMark);
+        while (executionStackCall.executionMark < expectedExecutionMark) {
+            logger.trace("force execution. CurrentMark/Expected [{},{}]", executionStackCall.executionMark, expectedExecutionMark);
             pushProtocolExecution(true, executionStackCall);
         }
         logger.trace("flush execution done");
@@ -122,24 +122,24 @@ abstract class AbstractExecutionStackManager {
 
 
     protected void pushProtocolExecution(boolean forceWait, MethodExecutionStack currentStack) {
-        if(currentStack.waitingStatus){
+        if (currentStack.waitingStatus) {
             ThreadMessagePipe threadMessagePipe = getPipe(currentStack.waitingSlotNr);
             ThreadMessage message;
-            if( forceWait ) {
+            if (forceWait) {
                 logger.trace("forcing wait response on execution");
                 message = threadMessagePipe.waitResponse();
             } else {
                 logger.trace("trying poll");
                 message = threadMessagePipe.pollMessage();
             }
-            if( message != null) {
+            if (message != null) {
                 logger.trace("handling message back");
                 CanonicalProtocolRequestData payload = (CanonicalProtocolRequestData) message.getPayload();
-                if( payload == null) {
+                if (payload == null) {
                     logger.trace("returning thread execution");
                     currentStack.markDone();
                 } else {
-                    if( payload.isCloseThread()) {
+                    if (payload.isCloseThread()) {
                         logger.trace("handle returning message call - merge only for clossing execution thread");
                         InstanceRegistry executionRegistry = instanceRegistries.get(currentStack.waitingSlotNr);
                         mergeInstances(executionRegistry, payload.getInstanceReferences());
@@ -150,13 +150,13 @@ abstract class AbstractExecutionStackManager {
                         InstanceRegistry executionRegistry = instanceRegistries.get(currentStack.waitingSlotNr);
                         mergeInstances(executionRegistry, payload.getInstanceReferences());
                         // thread line binds to the global thread stack line
-                        if(payload.getMethodCalls() != null) {
+                        if (payload.getMethodCalls() != null) {
                             stack.bindStack(currentStack.waitingSlotNr);
                             executeCalls(payload.getMethodCalls(), executionRegistry);
                             stack.unbindStack();
                         }
                         // thread line returns to external slot
-                        CanonicalProtocolRequestData returnMessage = new CanonicalProtocolRequestData(executionRegistry.getInstanceReferenceToTransfer(),null,true);
+                        CanonicalProtocolRequestData returnMessage = new CanonicalProtocolRequestData(executionRegistry.getInstanceReferenceToTransfer(), null, true);
                         ThreadMessage closeMsg = new ThreadMessage();
                         closeMsg.setPayload(returnMessage);
                         threadMessagePipe.sendMessage(closeMsg);
@@ -178,7 +178,7 @@ abstract class AbstractExecutionStackManager {
         }
     }
 
-    private ThreadMessagePipe getPipe(int targetSlotNr){
+    private ThreadMessagePipe getPipe(int targetSlotNr) {
         return pipes.get(targetSlotNr);
     }
 
@@ -260,9 +260,9 @@ abstract class AbstractExecutionStackManager {
         }
 
         void markDone() {
-            logger.trace("stack status change. Send/Execution=[{},{}]",sendMark,executionMark);
+            logger.trace("stack status change. Send/Execution=[{},{}]", sendMark, executionMark);
             executionMark = sendMark;
-            logger.trace("stack status change. Send/Execution=[{},{}]",sendMark,executionMark);
+            logger.trace("stack status change. Send/Execution=[{},{}]", sendMark, executionMark);
             waitingStatus = false;
         }
 
@@ -284,7 +284,7 @@ abstract class AbstractExecutionStackManager {
 
         private CanonicalProtocolRequestData prepareMergeInstanceRequest() {
             List<AbstractInstanceReference> instanceReference = instanceRegistries.get(waitingSlotNr).getInstanceReferenceToTransfer();
-            if( instanceReference == null || instanceReference.size() == 0) {
+            if (instanceReference == null || instanceReference.size() == 0) {
                 return null;
             }
             CanonicalProtocolRequestData data = new CanonicalProtocolRequestData(instanceReference, null, false);
@@ -316,7 +316,7 @@ abstract class AbstractExecutionStackManager {
         @Override
         public String toString() {
             return Objects.toStringHelper(this).omitNullValues()
-                    .add("serviceCallStack", Joiner.on("==").join(serviceCallStack) )
+                    .add("serviceCallStack", Joiner.on("==").join(serviceCallStack))
                     .add("slotReference", slotReference)
                     .add("waitingStatus", waitingStatus)
                     .add("waitingSlotNr", waitingSlotNr)

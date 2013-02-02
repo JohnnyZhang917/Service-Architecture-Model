@@ -32,17 +32,18 @@ import java.util.concurrent.Future;
 public class SEEServer {
     public final static String SERVER_ADDRESS_BIND = "SERVER_ADDRESS_BIND";
 
-	private final Injector serverInjector;
+    private final Injector serverInjector;
     private final ThreadExecutionServer server;
     private final InetSocketAddress address;
     private final OperationReportingFactory operationReportingFactory;
 
     /**
-	 * Visible for testing
+     * Visible for testing
+     *
      * @param serverAddressBind
      */
-	public static Module createServerModule(final InetSocketAddress serverAddressBind){
-		List<Module> serverModules = Lists.newArrayList();
+    public static Module createServerModule(final InetSocketAddress serverAddressBind) {
+        List<Module> serverModules = Lists.newArrayList();
         serverModules.add(new ThreadExecutionModule());
         // TODO extract as configuration
         serverModules.add(new AbstractModule() {
@@ -52,7 +53,7 @@ public class SEEServer {
                 bind(InternalLogicContextFactory.class).to(SEELogicContextFactory.class).asEagerSingleton();
             }
         });
-		serverModules.add(new LocalSeeExecutionModule());
+        serverModules.add(new LocalSeeExecutionModule());
         serverModules.add(new OperationReportingModule());
         serverModules.add(new LocalSeeInfrastructureModule());
         //TODO setup this some where else, without inner class
@@ -62,14 +63,14 @@ public class SEEServer {
                 bind(InetSocketAddress.class).annotatedWith(Names.named(SEEServer.SERVER_ADDRESS_BIND)).toInstance(serverAddressBind);
             }
         });
-		return Modules.combine(serverModules);
-	}
+        return Modules.combine(serverModules);
+    }
 
-	public SEEServer(final SEEConfiguration configuration) throws OperationCheckedException {
+    public SEEServer(final SEEConfiguration configuration) throws OperationCheckedException {
         ErrorsReport initializationContext = new ErrorsReport();
         this.address = configuration.address;
-		Module pluginsModule = Modules.combine(configuration.pluginModules);
-		serverInjector = Guice.createInjector(createServerModule(configuration.address),pluginsModule);
+        Module pluginsModule = Modules.combine(configuration.pluginModules);
+        serverInjector = Guice.createInjector(createServerModule(configuration.address), pluginsModule);
         ThreadExecutionInfrastructure infrastructure = serverInjector.getInstance(ThreadExecutionInfrastructure.class);
         this.server = infrastructure.createServer(address);
         this.operationReportingFactory = serverInjector.getInstance(OperationReportingFactory.class);
@@ -117,21 +118,21 @@ public class SEEServer {
             operationReportingFactory.closeContext(operationContext);
             operationContext.throwOnErrors();
         }
-	}
+    }
 
-	public SamServiceDiscovery getServiceDiscovery() {
-		return serverInjector.getInstance(SamServiceDiscovery.class);
-	}
+    public SamServiceDiscovery getServiceDiscovery() {
+        return serverInjector.getInstance(SamServiceDiscovery.class);
+    }
 
-	public void startUpServer() {
+    public void startUpServer() {
         server.startServer();
-	}
+    }
 
-	public void shutdownServer() {
+    public void shutdownServer() {
         server.shutdownServer();
-	}
+    }
 
-    public <R,T> Future<R> executeServiceAction(ServiceAction<R,T> interaction) {
+    public <R, T> Future<R> executeServiceAction(ServiceAction<R, T> interaction) {
         return server.executeServiceAction(interaction);
     }
 }

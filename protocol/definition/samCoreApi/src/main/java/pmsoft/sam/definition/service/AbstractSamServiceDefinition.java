@@ -4,31 +4,31 @@ import java.lang.annotation.Annotation;
 
 /**
  * Definition of ONE service contract ( a set of interfaces )
- * @author pawel
  *
+ * @author pawel
  */
 public abstract class AbstractSamServiceDefinition implements
-		SamServiceDefinition {
+        SamServiceDefinition {
 
-	private SamServiceLoader loaderRef;
+    private SamServiceLoader loaderRef;
 
-	public void loadServiceDefinition(SamServiceLoader loader) {
-		try {
-			loader.setupLoadContext(this.getClass());
-			this.loaderRef = loader;
-			loadServiceDefinition();
-		} finally {
-			this.loaderRef = null;
-		}
-	}
+    public void loadServiceDefinition(SamServiceLoader loader) {
+        try {
+            loader.setupLoadContext(this.getClass());
+            this.loaderRef = loader;
+            loadServiceDefinition();
+        } finally {
+            this.loaderRef = null;
+        }
+    }
 
-	abstract public void loadServiceDefinition();
+    abstract public void loadServiceDefinition();
 
-	protected void addInterface(Class<?> interfaceReference) {
-		loaderRef.addInterface(interfaceReference);
-	}
+    protected void addInterface(Class<?> interfaceReference) {
+        loaderRef.addInterface(interfaceReference);
+    }
 
-    protected void addInterface(Class<?> interfaceReference, Annotation annotation){
+    protected void addInterface(Class<?> interfaceReference, Annotation annotation) {
         loaderRef.addInterface(interfaceReference, annotation);
     }
 }

@@ -18,32 +18,32 @@ import java.util.Map;
 
 public class SamServiceDiscoveryLocal implements SamServiceDiscovery {
 
-	private final ImmutableSet<SamServiceDiscoveryListener> listeners;
-	private final Map<SIURL, ServiceKey> running = Maps.newHashMap();
+    private final ImmutableSet<SamServiceDiscoveryListener> listeners;
+    private final Map<SIURL, ServiceKey> running = Maps.newHashMap();
 
-	@Inject
-	public SamServiceDiscoveryLocal(Injector infrastructureInjector) {
-		super();
-		List<Binding<SamServiceDiscoveryListener>> plugInListeners = infrastructureInjector.findBindingsByType(TypeLiteral
-				.get(SamServiceDiscoveryListener.class));
-		Builder<SamServiceDiscoveryListener> builder = ImmutableSet.builder();
-		for (Binding<SamServiceDiscoveryListener> plugin : plugInListeners) {
-			builder.add(plugin.getProvider().get());
-		}
-		listeners = builder.build();
-	}
+    @Inject
+    public SamServiceDiscoveryLocal(Injector infrastructureInjector) {
+        super();
+        List<Binding<SamServiceDiscoveryListener>> plugInListeners = infrastructureInjector.findBindingsByType(TypeLiteral
+                .get(SamServiceDiscoveryListener.class));
+        Builder<SamServiceDiscoveryListener> builder = ImmutableSet.builder();
+        for (Binding<SamServiceDiscoveryListener> plugin : plugInListeners) {
+            builder.add(plugin.getProvider().get());
+        }
+        listeners = builder.build();
+    }
 
-	@Override
-	public void serviceTransactionCreated(SIURL url, ServiceKey contract) {
-		running.put(url, contract);
-		for (SamServiceDiscoveryListener listener : listeners) {
-			listener.serviceInstanceCreated(url, contract);
-		}
-	}
-	
-	@Override
-	public Map<SIURL, ServiceKey> getServiceRunningStatus() {
-		return ImmutableMap.copyOf(running);
-	}
+    @Override
+    public void serviceTransactionCreated(SIURL url, ServiceKey contract) {
+        running.put(url, contract);
+        for (SamServiceDiscoveryListener listener : listeners) {
+            listener.serviceInstanceCreated(url, contract);
+        }
+    }
+
+    @Override
+    public Map<SIURL, ServiceKey> getServiceRunningStatus() {
+        return ImmutableMap.copyOf(running);
+    }
 
 }

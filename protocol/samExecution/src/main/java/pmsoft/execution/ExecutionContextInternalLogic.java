@@ -6,13 +6,13 @@ import java.net.URL;
 import java.util.List;
 
 public interface ExecutionContextInternalLogic {
-	public <T> T getInstance(Key<T> key);
+    public <T> T getInstance(Key<T> key);
 
-	public void enterExecution(ThreadMessagePipe headCommandPipe, List<ThreadMessagePipe> endpoints);
+    public void enterExecution(ThreadMessagePipe headCommandPipe, List<ThreadMessagePipe> endpoints);
 
-	public void exitExecution();
+    public void exitExecution();
 
-	public List<URL> getEndpointAdressList();
+    public List<URL> getEndpointAdressList();
 
     void executeCanonicalProtocol();
 

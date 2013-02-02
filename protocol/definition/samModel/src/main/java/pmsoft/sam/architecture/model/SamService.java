@@ -7,8 +7,8 @@ import java.util.Set;
 
 public interface SamService {
 
-	public ServiceKey getServiceKey();
-	
-	public Set<Key<?>> getServiceContractAPI();
-	
+    public ServiceKey getServiceKey();
+
+    public Set<Key<?>> getServiceContractAPI();
+
 }

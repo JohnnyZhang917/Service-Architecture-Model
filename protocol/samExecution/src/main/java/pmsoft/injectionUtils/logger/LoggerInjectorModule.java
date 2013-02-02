@@ -5,9 +5,9 @@ import com.google.inject.matcher.Matchers;
 
 public class LoggerInjectorModule extends AbstractModule {
 
-	@Override
-	protected void configure() {
-		bindListener(Matchers.any(), new Slf4jTypeListener());		
-	}
+    @Override
+    protected void configure() {
+        bindListener(Matchers.any(), new Slf4jTypeListener());
+    }
 
 }

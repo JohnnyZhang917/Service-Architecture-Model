@@ -5,9 +5,9 @@ import pmsoft.sam.see.api.data.architecture.contract.shopping.ShoppingStoreWithC
 
 public class TestShoppingModule extends AbstractModule {
 
-	@Override
-	protected void configure() {
-		bind(ShoppingStoreWithCourierInteraction.class).to(TestShoppingStoreWithCourierInteraction.class);
-	}
+    @Override
+    protected void configure() {
+        bind(ShoppingStoreWithCourierInteraction.class).to(TestShoppingStoreWithCourierInteraction.class);
+    }
 
 }

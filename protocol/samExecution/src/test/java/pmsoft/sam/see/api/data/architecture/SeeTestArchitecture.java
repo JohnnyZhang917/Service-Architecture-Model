@@ -6,18 +6,18 @@ import pmsoft.sam.see.api.data.architecture.service.*;
 
 public class SeeTestArchitecture extends AbstractSamArchitectureDefinition {
 
-	@Override
-	protected void loadArchitectureDefinition() {
-		SamCategoryLoader test = createCategory("Test");
-		test.withService(new TestServiceOne());
-		test.withService(new TestServiceTwo());
-		test.withService(new TestServiceZero());
+    @Override
+    protected void loadArchitectureDefinition() {
+        SamCategoryLoader test = createCategory("Test");
+        test.withService(new TestServiceOne());
+        test.withService(new TestServiceTwo());
+        test.withService(new TestServiceZero());
 
-		SamCategoryLoader shopping = createCategory("Shopping");
-		shopping.withService(new ShoppingService());
-		shopping.withService(new CourierService());
-		shopping.withService(new StoreService());
+        SamCategoryLoader shopping = createCategory("Shopping");
+        shopping.withService(new ShoppingService());
+        shopping.withService(new CourierService());
+        shopping.withService(new StoreService());
 
-	}
+    }
 
 }

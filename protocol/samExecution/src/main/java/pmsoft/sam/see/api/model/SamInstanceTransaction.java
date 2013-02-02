@@ -7,10 +7,10 @@ public interface SamInstanceTransaction {
 
     public ExecutionStrategy getExecutionStrategy();
 
-	public SIURL getTransactionURL();
+    public SIURL getTransactionURL();
 
-	public SamInjectionConfiguration getInjectionConfiguration();
-	
-	public <T> T accept(SamInjectionModelVisitor<T> visitor);
+    public SamInjectionConfiguration getInjectionConfiguration();
+
+    public <T> T accept(SamInjectionModelVisitor<T> visitor);
 
 }

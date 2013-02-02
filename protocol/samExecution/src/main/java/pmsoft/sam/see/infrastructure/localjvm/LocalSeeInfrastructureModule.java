@@ -8,19 +8,19 @@ import pmsoft.sam.see.api.SamServiceDiscovery;
 
 public class LocalSeeInfrastructureModule extends PrivateModule {
 
-	@Override
-	protected void configure() {
-		binder().requireExplicitBindings();
-		bind(SamArchitectureManagement.class).to(SamArchitectureRegistryLocal.class).asEagerSingleton();
-		expose(SamArchitectureRegistry.class);
-		expose(SamArchitectureManagement.class);
-		bind(SamServiceDiscovery.class).to(SamServiceDiscoveryLocal.class).asEagerSingleton();
-		expose(SamServiceDiscovery.class);
-	}
+    @Override
+    protected void configure() {
+        binder().requireExplicitBindings();
+        bind(SamArchitectureManagement.class).to(SamArchitectureRegistryLocal.class).asEagerSingleton();
+        expose(SamArchitectureRegistry.class);
+        expose(SamArchitectureManagement.class);
+        bind(SamServiceDiscovery.class).to(SamServiceDiscoveryLocal.class).asEagerSingleton();
+        expose(SamServiceDiscovery.class);
+    }
 
-	@Provides
-	public SamArchitectureRegistry provideArchitectureManager(SamArchitectureManagement manager) {
-		return manager;
-	}
+    @Provides
+    public SamArchitectureRegistry provideArchitectureManager(SamArchitectureManagement manager) {
+        return manager;
+    }
 
 }

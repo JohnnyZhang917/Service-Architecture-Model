@@ -7,8 +7,8 @@ import java.util.Map;
 
 public interface SamServiceDiscovery {
 
-	public void serviceTransactionCreated(SIURL url, ServiceKey contract);
-	
-	public Map<SIURL, ServiceKey> getServiceRunningStatus();
-	
+    public void serviceTransactionCreated(SIURL url, ServiceKey contract);
+
+    public Map<SIURL, ServiceKey> getServiceRunningStatus();
+
 }

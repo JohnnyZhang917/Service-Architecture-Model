@@ -7,10 +7,10 @@ import java.util.UUID;
 
 public interface CanonicalProtocolExecutionContext extends ExecutionContextInternalLogic {
 
-	public UUID getContextUniqueID();
+    public UUID getContextUniqueID();
 
-	public TransactionController getTransactionController();
+    public TransactionController getTransactionController();
 
-	public Injector getInjector();
+    public Injector getInjector();
 
 }

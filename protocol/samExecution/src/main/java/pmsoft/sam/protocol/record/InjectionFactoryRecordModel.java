@@ -15,14 +15,14 @@ import java.util.UUID;
 
 interface InjectionFactoryRecordModel {
 
-	CanonicalProtocolExecutionContextObject canonicalProtocolExecutionContextObject(@Assisted("record") MethodRecordContext record, @Assisted("execute")MethodRecordContext execution,
-			UUID transactionUniqueId, TransactionController buildController, ImmutableList<URL> endpointAddresses, InjectorReference reference);
+    CanonicalProtocolExecutionContextObject canonicalProtocolExecutionContextObject(@Assisted("record") MethodRecordContext record, @Assisted("execute") MethodRecordContext execution,
+                                                                                    UUID transactionUniqueId, TransactionController buildController, ImmutableList<URL> endpointAddresses, InjectorReference reference);
 
-	TransactionController transactionController(ImmutableMap<ExternalBindingController, ExternalInstanceProvider> controlToInstanceProviderMap);
+    TransactionController transactionController(ImmutableMap<ExternalBindingController, ExternalInstanceProvider> controlToInstanceProviderMap);
 
-	InstanceProviderTransactionContext instanceProviderTransactionContext(List<InstanceProvider> transactionLevelProviders);
+    InstanceProviderTransactionContext instanceProviderTransactionContext(List<InstanceProvider> transactionLevelProviders);
 
-	ClientRecordingInstanceRegistry clientRecordingInstanceRegistry(int slotNr);
+    ClientRecordingInstanceRegistry clientRecordingInstanceRegistry(int slotNr);
 
     ServerExecutionInstanceRegistry serverExecutionInstanceRegistry(SamServiceInstance serviceInstance);
 

@@ -35,8 +35,8 @@ class ProviderExecutionStackManager extends AbstractExecutionStackManager {
         flushExecution();
         List<AbstractInstanceReference> instanceReferenceToTransfer = executionRegistry.getInstanceReferenceToTransfer();
         ThreadMessage message = new ThreadMessage();
-        if( !instanceReferenceToTransfer.isEmpty()) {
-            CanonicalProtocolRequestData closingData = new CanonicalProtocolRequestData(instanceReferenceToTransfer,null, true);
+        if (!instanceReferenceToTransfer.isEmpty()) {
+            CanonicalProtocolRequestData closingData = new CanonicalProtocolRequestData(instanceReferenceToTransfer, null, true);
             message.setPayload(closingData);
         }
         headPipe.sendMessage(message);

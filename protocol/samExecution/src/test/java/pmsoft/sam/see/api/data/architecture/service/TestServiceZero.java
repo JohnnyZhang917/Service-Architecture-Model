@@ -5,9 +5,9 @@ import pmsoft.sam.see.api.data.architecture.contract.TestInterfaceZero;
 
 public class TestServiceZero extends AbstractSamServiceDefinition {
 
-	@Override
-	public void loadServiceDefinition() {
-		addInterface(TestInterfaceZero.class);
-	}
+    @Override
+    public void loadServiceDefinition() {
+        addInterface(TestInterfaceZero.class);
+    }
 
 }
