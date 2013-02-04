@@ -1,0 +1,22 @@
+package eu.pmsoft.sam.architecture.definition;
+
+import eu.pmsoft.sam.definition.service.SamServiceDefinition;
+
+
+public interface SamArchitectureLoader {
+
+    public void architectureSignature(String architectureSignature);
+
+    SamCategoryLoader createCategory(String categoryName);
+
+    static public interface SamCategoryLoader {
+
+        public String getCategoryId();
+
+        public SamCategoryLoader accessToCategory(SamCategoryLoader accesibleCategory);
+
+        public SamCategoryLoader withService(SamServiceDefinition serviceDefinition);
+
+    }
+
+}

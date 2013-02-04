@@ -1,0 +1,86 @@
+package InjectionBusModel;
+
+option optimize_for = SPEED;
+option java_package = "eu.pmsoft.sam.model";
+option java_outer_classname = "InjectionBusMessage";
+
+enum SamEnvironmentCommandType {
+    PING = 0;
+    ARCHITECTURE_INFO = 1;
+    SERVICE_LIST = 2;
+}
+
+message SamEnvironmentAction {
+    required SamEnvironmentCommandType command = 1;
+    // optional --- architectureInfo -- not used  = 2;
+    // optional --- serviceList -- not used = 3;
+}
+
+message SamEnvironmentResult {
+    required SamEnvironmentCommandType command = 1;
+    optional string architectureInfoSignature = 2;
+    repeated SamExposedServiceReference serviceList = 3;
+}
+
+message SamExposedServiceReference {
+    required string url = 1;
+    required string contract = 2;
+}
+
+message LongLongIDProto {
+    required int64 mask = 1;
+    required int64 linear = 2;
+}
+
+
+
+
+message CanonicalProtocolMethodCallProto {
+    required int32 instanceNr = 1;
+    required int32 methodSignature = 2;
+    optional int32 returnInstanceId = 3;
+    repeated int32 argumentsReference = 4;
+    enum CallType {
+        VOID_CALL = 1;
+        INTERFACE_CALL = 2;
+        RETURN_CALL = 3;
+      }
+    required CallType callType = 5;
+
+}
+
+message BindingKey {
+    optional string type = 1;
+    optional string annotationType = 2;
+    optional bytes annotationInstance = 3;
+}
+
+
+
+message CanonicalProtocolInstanceProto {
+    required int32 instanceNr = 1;
+    enum InstanceType {
+        CLIENT_BINDING_KEY = 1;
+        CLIENT_RETURN_BINDING_KEY = 2;
+        CLIENT_EXTERNAL_INSTANCE_BINDING = 3;
+        CLIENT_PENDING_DATA_INSTANCE = 4;
+        CLIENT_FILLED_DATA_INSTANCE = 5;
+        CLIENT_DATA_INSTANCE = 6;
+        SERVER_BINDING_KEY = 7;
+        SERVER_RETURN_BINDING_KEY = 8;
+        SERVER_EXTERNAL_INSTANCE_BINDING = 9;
+        SERVER_PENDING_DATA_INSTANCE = 10;
+        SERVER_FILLED_DATA_INSTANCE = 11;
+        SERVER_DATA_INSTANCE = 12;
+      }
+    required InstanceType instanceType = 2;
+    required BindingKey key = 3;
+    optional bytes dataObjectSerialization = 5;
+}
+
+message CanonicalRequestProto {
+    required LongLongIDProto transactionID = 1;
+    repeated CanonicalProtocolMethodCallProto calls = 2;
+    repeated CanonicalProtocolInstanceProto instances = 3;
+    required bool closeThread = 4;
+}

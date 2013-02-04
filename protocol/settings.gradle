@@ -1,3 +1,0 @@
-include 'definition:samCoreApi'
-include 'definition:samModel'
-include 'samExecution'
