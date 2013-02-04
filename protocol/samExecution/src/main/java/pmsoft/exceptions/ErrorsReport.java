@@ -6,19 +6,20 @@ import com.google.common.collect.Lists;
 import java.util.List;
 
 public class ErrorsReport {
-
     List<ErrorMessage> errors = Lists.newArrayList();
 
-    public void addError(Throwable e, String format, Object... objects) {
-        errors.add(new ErrorMessage(e, format, objects));
+    public void addError(Throwable cause, String format, Object... objects) {
+        String message = ErrorsReport.format(format, objects);
+        errors.add(new ErrorMessage(message,cause));
     }
 
     public void addError(String format, Object... objects) {
-        errors.add(new ErrorMessage(format, objects));
+        String message = ErrorsReport.format(format, objects);
+        errors.add(new ErrorMessage(message, null));
     }
 
-    public void addError(Throwable exception) {
-        errors.add(new ErrorMessage(exception));
+    public void addError(Throwable cause) {
+        errors.add(new ErrorMessage(null,cause));
     }
 
     public boolean hasErrors() {
@@ -31,6 +32,11 @@ public class ErrorsReport {
 
     public OperationRuntimeException toRuntimeException() {
         return new OperationRuntimeException(this);
+    }
+
+
+    private static String format(String messageFormat, Object[] arguments) {
+        return String.format(messageFormat, arguments);
     }
 
     @Override

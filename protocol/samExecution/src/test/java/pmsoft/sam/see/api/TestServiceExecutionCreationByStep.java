@@ -36,7 +36,8 @@ import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.util.Set;
 
-import static org.testng.AssertJUnit.*;
+import static org.testng.Assert.*;
+
 
 @Guice(modules = {OperationReportingModule.class, LocalSeeExecutionModule.class, LocalSeeInfrastructureModule.class, TestServiceExecutionCreationByStep.PortBindModule.class})
 public class TestServiceExecutionCreationByStep {
@@ -115,7 +116,7 @@ public class TestServiceExecutionCreationByStep {
 
         Set<SamServiceInstance> setInstance = executionNode.searchInstance(serviceKey, null);
 
-        assertEquals("1 instance of Service expected", 1, setInstance.size());
+        assertEquals(1, setInstance.size(),"1 instance of Service expected");
         SamServiceInstance instance = setInstance.iterator().next();
         return instance.getKey();
     }
