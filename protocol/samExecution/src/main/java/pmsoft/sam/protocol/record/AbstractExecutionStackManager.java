@@ -221,7 +221,7 @@ abstract class AbstractExecutionStackManager {
 
             Object returnObject;
             try {
-                logger.trace("execution method call {}", methodCall);
+                logger.debug("execution method call {}", methodCall);
                 if (argumentsObjects == null || argumentsObjects.length == 0) {
                     returnObject = targetMethod.invoke(headObject);
                 } else {

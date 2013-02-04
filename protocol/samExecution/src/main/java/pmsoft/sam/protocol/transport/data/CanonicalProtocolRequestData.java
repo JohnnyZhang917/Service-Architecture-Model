@@ -1,5 +1,6 @@
 package pmsoft.sam.protocol.transport.data;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 
 import java.io.Serializable;
@@ -34,19 +35,21 @@ public class CanonicalProtocolRequestData implements Serializable {
         return methodCalls;
     }
 
-//    @Override
-//	public String toString() {
-//		return "CanonicalProtocolRequestData [\ninstanceReferences=[\n" + Joiner.on("\n").join(instanceReferences) + "]\nmethodCalls=[\n"
-//				+ Joiner.on("\n").join(methodCalls) + "]\n";
-//	}
-
-
     @Override
-    public String toString() {
-        return Objects.toStringHelper(this).omitNullValues()
-                .add("instanceReferences", instanceReferences)
-                .add("methodCalls", methodCalls)
-                .add("closeThread", closeThread)
-                .toString();
-    }
+	public String toString() {
+        StringBuilder buf = new StringBuilder();
+        buf.append("CanonicalProtocolRequestData [\n");
+        if( instanceReferences != null){
+            buf.append("instanceReferences=[\n");
+            Joiner.on("\n").appendTo(buf,instanceReferences);
+            buf.append("\n]");
+
+        }
+        if( methodCalls != null){
+            buf.append("methodCalls=[\n");
+            Joiner.on("\n").appendTo(buf,methodCalls);
+            buf.append("\n]");
+        }
+        return buf.toString();
+	}
 }

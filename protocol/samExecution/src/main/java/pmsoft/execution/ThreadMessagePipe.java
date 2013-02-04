@@ -33,10 +33,10 @@ public final class ThreadMessagePipe {
     }
 
     public void receiveMessage(ThreadMessage message) {
-        logger.trace("receive message: {}", signature);
+        logger.debug("receive message: {}", signature);
         messageInputQueue.add(message);
         synchronized (waitMonitor) {
-            logger.debug("notify on : {}", signature);
+            logger.trace("notify on : {}", signature);
             waitMonitor.notify();
         }
     }
@@ -46,14 +46,14 @@ public final class ThreadMessagePipe {
     }
 
     public void sendMessage(ThreadMessage message) {
-        logger.trace("sending message: {}\n{}", signature, message);
+        logger.debug("sending message: {}\n{}", signature, message);
         message.setSignature(signature);
         message.setMessageType(ThreadMessage.ThreadProtocolMessageType.CANONICAL_PROTOCOL_EXECUTION);
         connection.write(message);
     }
 
     public ThreadMessage waitResponse() {
-        logger.debug("start wait for response: {}", signature);
+        logger.trace("start wait for response: {}", signature);
         synchronized (waitMonitor) {
             while (messageInputQueue.isEmpty()) {
                 try {

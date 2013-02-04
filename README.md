@@ -1,8 +1,19 @@
 ## Service Architecture Model
 
-A formal model for definition of software architectures. 
+A formal model for definition and execution of software architectures.
 
-Architecture specification is written in code (currently only java). It is possible to compile and analyze provided definitions. On future some soft formal specification paradigm are planned.
+Architecture specification is written in code (currently java). It is possible to compile and analyze provided definitions. On future some soft formal specification paradigm are planned.
+
+## Current limitations
+
+Lazy evaluation of external methods calls can change the execution semantic of the program. It is possible to preserve program semantic on base of the architecture definitions, but it is not implemented in the current versions.
+
+## TODO
+
+- Business logic exceptions transport
+- Architecture compilation
+- Custom binary format for method calls serialization
+- Execution model related to architecture semantic constrains
 
 ## Why SAM is different???
 
@@ -40,307 +51,229 @@ i_n="IntegerSerialization"
 r_0=Type<boolean>
 </pre>
 
-As You may note, this is the neccesary information to create a instance on a injector provider and execute all method calls.
+As You may note, this is the necessary information to create a instance on a injector provider and execute all method calls.
 
 ## It is more that just lazy execution of method calls.
 
-It is possible to pass external reference between different external services. This provide new interaction posibilities between service instance without any additional overhead on service implementations. To show this run the test `pmsoft.sam.module.definition.test.OAuthPrintingPhotoTest` (output given below), it shows the implementation of the OAuth guice example given on http://hueniverse.com/oauth/guide/workflow/
+It is possible to pass external reference between different external services. This provide new interaction possibilities between service instance without any additional overhead on service implementations.
 
-The big difference is that there is not explicit interaction between services faji and beppa. The resource reference passing is made directly at the canonical protocol level, without any additional code on client and external services. The information about service orchestration is given externally by a injection configuration, at the Service Execution Enviroment level. For the current prototype the injection configuration is provided on the test code:
+To see the pass of reference between services run the test `pmsoft.sam.see.api.TestSEEexecution.testCourierSetup`. The test presents interaction between a Client, a Store service and a Courier Service. Store and Courier service are no directly interconnected. The Client object have a injected reference to each of this services:
+
 ```java
-		TransactionConfigurator transaction = see.createTransactionConfiguration(janeGuiInterface);
-		InjectionConfiguration configuration = transaction.getInjectionConfiguration();
-		configuration.bindExternalInstance(fajiImplementationDefinition.getServiceSpecificationKey(), fajiURL);
-		configuration.bindExternalInstance(beppaImplementationDefinition.getServiceSpecificationKey(), beppaURL);
+public class TestShoppingStoreWithCourierInteraction implements ShoppingStoreWithCourierInteraction {
 
+    private final CourierServiceContract courier;
+    private final StoreServiceContract store;
+
+    @Inject
+    public TestShoppingStoreWithCourierInteraction(CourierServiceContract courier, StoreServiceContract store) {
+        super();
+        this.courier = courier;
+        this.store = store;
+    }
+
+    @Override
+    public Integer makeShoping() {
+        StoreOrder order = store.createNewOrder();
+        order.addProduct("a", 1);
+        order.addProduct("b", 1);
+
+        CourierServiceOrder contract = courier.openOrder("myContractId");
+        CourierAddressSetupInfo address = contract.setupAddress();
+        boolean addressSetupOk = order.receiveExternalCourierService(address);
+        if (!addressSetupOk) {
+            throw new RuntimeException("address setup interaction failed");
+        }
+        Integer price = contract.getServicePrice();
+        System.err.println("order price is " + price);
+        String orderDone = order.realizeOrder();
+        System.err.println("My order contains:" + orderDone);
+        return price;
+    }
+}
 ```
+In this test:
+1. The StoreOrder reference is extracted from the Store service.
+2. Some products are selected from the store
+3. A CourierServiceOrder is open in the Courier service.
+4. A CourierAddressSetupInfo reference is extracted from the Courier service and passed to the StoreOrder reference.
+5. The CourierServiceOrder object provide a calculated price according to the information setup during Courier--Store interaction.
+6. the Store order is realized.
 
-## Current limitations
+The Courier--Store service interaction is performed passing methods calls information across the Client service Instance.
 
-The current prototype implementation is a proof of concept running in a single thread in one JVM. A real distributed implementation is in progress.
+The execution logs showing the use of the Canonical Protocol is showed below:
+```
+2705 [main] DEBUG pmsoft.execution.ThreadExecutionInfrastructure - New server instance, adress 0.0.0.0/0.0.0.0:4989
+2712 [main] DEBUG pmsoft.execution.ThreadExecutionServer - starting local server on address 0.0.0.0/0.0.0.0:4989
+2924 [main] DEBUG pmsoft.execution.ThreadExecutionInfrastructure - New server instance, adress 0.0.0.0/0.0.0.0:4988
+2934 [main] DEBUG pmsoft.execution.ThreadExecutionServer - starting local server on address 0.0.0.0/0.0.0.0:4988
+3091 [main] DEBUG pmsoft.execution.ThreadExecutionInfrastructure - New server instance, adress 0.0.0.0/0.0.0.0:4987
+3093 [main] DEBUG pmsoft.execution.ThreadExecutionServer - starting local server on address 0.0.0.0/0.0.0.0:4987
+3254 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - recording call MethodCall[1][#0.createNewOrder()#1]
+3254 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - recording call MethodCall[1][#1.addProduct(#2#3)#-1]
+3254 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - recording call MethodCall[1][#1.addProduct(#4#5)#-1]
+3255 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - recording call MethodCall[0][#0.openOrder(#1)#2]
+3255 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - slotChange
+3256 [pool-5-thread-1] DEBUG pmsoft.execution.ThreadMessagePipe - sending message: 1:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4988/service0
+ThreadMessage{payload=CanonicalProtocolRequestData [
+instanceReferences=[
+#0->BindingKeyInstanceReference [key=SerializableKey [type=interface pmsoft.sam.see.api.data.architecture.contract.store.StoreServiceContract, annotationType=null, annotationInstance=null], instanceNr=0]
+#1->BindingKeyInstanceReference [key=SerializableKey [type=interface pmsoft.sam.see.api.data.architecture.contract.store.StoreOrder, annotationType=null, annotationInstance=null], instanceNr=1]
+#2->ClientDataObjectInstanceReference [ instanceNr=2]objectReference=a
+#3->ClientDataObjectInstanceReference [ instanceNr=3]objectReference=1
+#4->ClientDataObjectInstanceReference [ instanceNr=4]objectReference=b
+#5->ClientDataObjectInstanceReference [ instanceNr=5]objectReference=1
+]methodCalls=[
+MethodCall[1][#0.createNewOrder()#1]
+MethodCall[1][#1.addProduct(#2#3)#-1]
+MethodCall[1][#1.addProduct(#4#5)#-1]
+]}
+3258 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - recording call MethodCall[0][#2.setupAddress()#3]
+3258 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - recording call MethodCall[1][#1.receiveExternalCourierService(#6)#7]
+3258 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - slotChange
+3268 [nioEventLoopGroup-12-2] DEBUG pmsoft.execution.ThreadMessagePipe - receive message: 1:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4988/service0
+3269 [pool-6-thread-1] DEBUG pmsoft.sam.protocol.record.ProviderExecutionStackManager - execution method call MethodCall[1][#0.createNewOrder()#1]
+3269 [pool-6-thread-1] DEBUG pmsoft.sam.protocol.record.ProviderExecutionStackManager - execution method call MethodCall[1][#1.addProduct(#2#3)#-1]
+3269 [pool-6-thread-1] DEBUG pmsoft.sam.protocol.record.ProviderExecutionStackManager - execution method call MethodCall[1][#1.addProduct(#4#5)#-1]
+3270 [pool-6-thread-1] DEBUG pmsoft.execution.ThreadMessagePipe - sending message: 1:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4988/service0
+ThreadMessage{}
+3272 [nioEventLoopGroup-16-2] DEBUG pmsoft.execution.ThreadMessagePipe - receive message: 1:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4988/service0
+3273 [pool-5-thread-1] DEBUG pmsoft.execution.ThreadMessagePipe - sending message: 0:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4987/service0
+ThreadMessage{payload=CanonicalProtocolRequestData [
+instanceReferences=[
+#0->BindingKeyInstanceReference [key=SerializableKey [type=interface pmsoft.sam.see.api.data.architecture.contract.courier.CourierServiceContract, annotationType=null, annotationInstance=null], instanceNr=0]
+#1->ClientDataObjectInstanceReference [ instanceNr=1]objectReference=myContractId
+#2->BindingKeyInstanceReference [key=SerializableKey [type=interface pmsoft.sam.see.api.data.architecture.contract.courier.CourierServiceOrder, annotationType=null, annotationInstance=null], instanceNr=2]
+#3->BindingKeyInstanceReference [key=SerializableKey [type=interface pmsoft.sam.see.api.data.architecture.contract.courier.CourierAddressSetupInfo, annotationType=null, annotationInstance=null], instanceNr=3]
+]methodCalls=[
+MethodCall[0][#0.openOrder(#1)#2]
+MethodCall[0][#2.setupAddress()#3]
+]}
+3281 [nioEventLoopGroup-14-2] DEBUG pmsoft.execution.ThreadMessagePipe - receive message: 0:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4987/service0
+3282 [pool-7-thread-1] DEBUG pmsoft.sam.protocol.record.ProviderExecutionStackManager - execution method call MethodCall[0][#0.openOrder(#1)#2]
+3282 [pool-7-thread-1] DEBUG pmsoft.sam.protocol.record.ProviderExecutionStackManager - execution method call MethodCall[0][#2.setupAddress()#3]
+3283 [pool-7-thread-1] DEBUG pmsoft.execution.ThreadMessagePipe - sending message: 0:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4987/service0
+ThreadMessage{}
+3285 [nioEventLoopGroup-15-2] DEBUG pmsoft.execution.ThreadMessagePipe - receive message: 0:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4987/service0
+3286 [pool-5-thread-1] DEBUG pmsoft.execution.ThreadMessagePipe - sending message: 1:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4988/service0
+ThreadMessage{payload=CanonicalProtocolRequestData [
+instanceReferences=[
+#6->ExternalSlotInstanceReference [key=SerializableKey [type=interface pmsoft.sam.see.api.data.architecture.contract.courier.CourierAddressSetupInfo, annotationType=null, annotationInstance=null], instanceNr=6]
+#7->PendingDataInstanceReference [dataType=boolean, instanceNr=7]
+]methodCalls=[
+MethodCall[1][#1.receiveExternalCourierService(#6)#7]
+]}
+3296 [nioEventLoopGroup-12-2] DEBUG pmsoft.execution.ThreadMessagePipe - receive message: 1:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4988/service0
+3296 [pool-6-thread-1] DEBUG pmsoft.sam.protocol.record.ProviderExecutionStackManager - execution method call MethodCall[1][#1.receiveExternalCourierService(#6)#7]
+3296 [pool-6-thread-1] DEBUG pmsoft.sam.protocol.record.ProviderExecutionStackManager - recording call MethodCall[0][#6.setCity(#8)#-1]
+3296 [pool-6-thread-1] DEBUG pmsoft.sam.protocol.record.ProviderExecutionStackManager - recording call MethodCall[0][#6.setStreet(#9)#-1]
+3297 [pool-6-thread-1] DEBUG pmsoft.sam.protocol.record.ProviderExecutionStackManager - recording call MethodCall[0][#6.setPackageSize(#10)#-1]
+3297 [pool-6-thread-1] DEBUG pmsoft.sam.protocol.record.ProviderExecutionStackManager - recording call MethodCall[0][#6.setupDone()#11]
+3297 [pool-6-thread-1] DEBUG pmsoft.execution.ThreadMessagePipe - sending message: 1:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4988/service0
+ThreadMessage{payload=CanonicalProtocolRequestData [
+instanceReferences=[
+#8->ServerDataObjectInstanceReference [ instanceNr=8]objectReference=Warsaw
+#9->ServerDataObjectInstanceReference [ instanceNr=9]objectReference=Gorczewska
+#10->ServerDataObjectInstanceReference [ instanceNr=10]objectReference=3
+#11->ServerPendingDataInstanceReference [instanceNr=11]
+]methodCalls=[
+MethodCall[0][#6.setCity(#8)#-1]
+MethodCall[0][#6.setStreet(#9)#-1]
+MethodCall[0][#6.setPackageSize(#10)#-1]
+MethodCall[0][#6.setupDone()#11]
+]}
+3318 [nioEventLoopGroup-16-2] DEBUG pmsoft.execution.ThreadMessagePipe - receive message: 1:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4988/service0
+3319 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - execution method call MethodCall[0][#6.setCity(#8)#-1]
+3319 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - recording call MethodCall[0][#3.setCity(#4)#-1]
+3319 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - execution method call MethodCall[0][#6.setStreet(#9)#-1]
+3319 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - recording call MethodCall[0][#3.setStreet(#5)#-1]
+3319 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - execution method call MethodCall[0][#6.setPackageSize(#10)#-1]
+3320 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - recording call MethodCall[0][#3.setPackageSize(#6)#-1]
+3320 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - execution method call MethodCall[0][#6.setupDone()#11]
+3320 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - recording call MethodCall[0][#3.setupDone()#7]
+3320 [pool-5-thread-1] DEBUG pmsoft.execution.ThreadMessagePipe - sending message: 0:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4987/service0
+ThreadMessage{payload=CanonicalProtocolRequestData [
+instanceReferences=[
+#4->ClientDataObjectInstanceReference [ instanceNr=4]objectReference=Warsaw
+#5->ClientDataObjectInstanceReference [ instanceNr=5]objectReference=Gorczewska
+#6->ClientDataObjectInstanceReference [ instanceNr=6]objectReference=3
+#7->PendingDataInstanceReference [dataType=boolean, instanceNr=7]
+]methodCalls=[
+MethodCall[0][#3.setCity(#4)#-1]
+MethodCall[0][#3.setStreet(#5)#-1]
+MethodCall[0][#3.setPackageSize(#6)#-1]
+MethodCall[0][#3.setupDone()#7]
+]}
+3332 [nioEventLoopGroup-14-2] DEBUG pmsoft.execution.ThreadMessagePipe - receive message: 0:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4987/service0
+3333 [pool-7-thread-1] DEBUG pmsoft.sam.protocol.record.ProviderExecutionStackManager - execution method call MethodCall[0][#3.setCity(#4)#-1]
+3333 [pool-7-thread-1] DEBUG pmsoft.sam.protocol.record.ProviderExecutionStackManager - execution method call MethodCall[0][#3.setStreet(#5)#-1]
+3333 [pool-7-thread-1] DEBUG pmsoft.sam.protocol.record.ProviderExecutionStackManager - execution method call MethodCall[0][#3.setPackageSize(#6)#-1]
+3333 [pool-7-thread-1] DEBUG pmsoft.sam.protocol.record.ProviderExecutionStackManager - execution method call MethodCall[0][#3.setupDone()#7]
+3334 [pool-7-thread-1] DEBUG pmsoft.execution.ThreadMessagePipe - sending message: 0:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4987/service0
+ThreadMessage{payload=CanonicalProtocolRequestData [
+instanceReferences=[
+#7->FilledDataInstanceReference [instanceNr=7, getObjectReference()=true]
+]}
+3339 [nioEventLoopGroup-15-2] DEBUG pmsoft.execution.ThreadMessagePipe - receive message: 0:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4987/service0
+3340 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.MethodRecordContext - find return object for MethodCall[0][#3.setupDone()#7]
+3340 [pool-5-thread-1] DEBUG pmsoft.execution.ThreadMessagePipe - sending message: 1:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4988/service0
+ThreadMessage{payload=CanonicalProtocolRequestData [
+instanceReferences=[
+#11->FilledDataInstanceReference [instanceNr=11, getObjectReference()=true]
+]}
+3344 [nioEventLoopGroup-12-2] DEBUG pmsoft.execution.ThreadMessagePipe - receive message: 1:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4988/service0
+3345 [pool-6-thread-1] DEBUG pmsoft.sam.protocol.record.MethodRecordContext - find return object for MethodCall[0][#6.setupDone()#11]
+3345 [pool-6-thread-1] DEBUG pmsoft.execution.ThreadMessagePipe - sending message: 1:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4988/service0
+ThreadMessage{payload=CanonicalProtocolRequestData [
+instanceReferences=[
+#7->FilledDataInstanceReference [instanceNr=7, getObjectReference()=true]
+]}
+3350 [nioEventLoopGroup-16-2] DEBUG pmsoft.execution.ThreadMessagePipe - receive message: 1:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4988/service0
+3350 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.MethodRecordContext - find return object for MethodCall[1][#1.receiveExternalCourierService(#6)#7]
+3350 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - recording call MethodCall[0][#2.getServicePrice()#8]
+3351 [pool-5-thread-1] DEBUG pmsoft.execution.ThreadMessagePipe - sending message: 0:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4987/service0
+ThreadMessage{payload=CanonicalProtocolRequestData [
+instanceReferences=[
+#8->PendingDataInstanceReference [dataType=class java.lang.Integer, instanceNr=8]
+]methodCalls=[
+MethodCall[0][#2.getServicePrice()#8]
+]}
+3358 [nioEventLoopGroup-14-2] DEBUG pmsoft.execution.ThreadMessagePipe - receive message: 0:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4987/service0
+3360 [pool-7-thread-1] DEBUG pmsoft.sam.protocol.record.ProviderExecutionStackManager - execution method call MethodCall[0][#2.getServicePrice()#8]
+3361 [pool-7-thread-1] DEBUG pmsoft.execution.ThreadMessagePipe - sending message: 0:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4987/service0
+ThreadMessage{payload=CanonicalProtocolRequestData [
+instanceReferences=[
+#8->FilledDataInstanceReference [instanceNr=8, getObjectReference()=8800]
+]}
+3366 [nioEventLoopGroup-15-2] DEBUG pmsoft.execution.ThreadMessagePipe - receive message: 0:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4987/service0
+3367 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.MethodRecordContext - find return object for MethodCall[0][#2.getServicePrice()#8]
+order price is 8800
+3367 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.ClientExecutionStackManager - recording call MethodCall[1][#1.realizeOrder()#12]
+3367 [pool-5-thread-1] DEBUG pmsoft.execution.ThreadMessagePipe - sending message: 1:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4988/service0
+ThreadMessage{payload=CanonicalProtocolRequestData [
+instanceReferences=[
+#12->PendingDataInstanceReference [dataType=class java.lang.String, instanceNr=12]
+]methodCalls=[
+MethodCall[1][#1.realizeOrder()#12]
+]}
+3372 [nioEventLoopGroup-12-2] DEBUG pmsoft.execution.ThreadMessagePipe - receive message: 1:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4988/service0
+3372 [pool-6-thread-1] DEBUG pmsoft.sam.protocol.record.ProviderExecutionStackManager - execution method call MethodCall[1][#1.realizeOrder()#12]
+3373 [pool-6-thread-1] DEBUG pmsoft.execution.ThreadMessagePipe - sending message: 1:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4988/service0
+ThreadMessage{payload=CanonicalProtocolRequestData [
+instanceReferences=[
+#12->FilledDataInstanceReference [instanceNr=12, getObjectReference()=product:b-1
+product:a-1
+]
+]}
+3377 [nioEventLoopGroup-16-2] DEBUG pmsoft.execution.ThreadMessagePipe - receive message: 1:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4988/service0
+3377 [pool-5-thread-1] DEBUG pmsoft.sam.protocol.record.MethodRecordContext - find return object for MethodCall[1][#1.realizeOrder()#12]
+My order contains:product:b-1
+product:a-1
 
-## OAuth test output
-
-Output of the OAuth test. Note the external reference exchange between services on the call of method `getPhotoData`.
-
-<pre>
-SEE: Jane start the OAuth test
-SEE: Setup transactions to run the service interaction
-SEE: Execute Jane interaction
-JANE: I am back from her Scotland vacation, lets share photos
-JANE: registering in PhotoSharingService
-CP: Canonical Protocol Execution. Request
-CP: ServiceExecutionRequest [forwardCall=true, canonicalTransactionIdentificator=a2a508c5-5722-43eb-90e1-b86d90122e00, targetURL=http://localhost/transaction1, sourceURL=http://localhost/transaction2, data=CanonicalProtocolRequestData [
-instanceReferences=[
-#0->BindingKeyInstanceReference [key=Key[type=pmsoft.sam.module.definition.test.oauth.service.PhotoSharingAPI, annotation=[none]], instanceNr=0]
-#1->DataObjectInstanceReference [ instanceNr=1]objectReference=JANE
-#2->PendingDataInstanceReference [dataType=class java.lang.String, instanceNr=2]]
-methodCalls=[
-MethodCall[#0.register(#1)#2]]
-targetSlot=1]
-]
-CP: Canonical Protocol Execution. Response
-CP: CanonicalProtocolRequestData [
-instanceReferences=[
-#2->FilledDataInstanceReference [instanceNr=2, getObjectReference()=user0]]
-methodCalls=[
-]
-targetSlot=0]
-
-JANE: upload photos
-JANE: Lets send the photos to grandmother
-JANE: create print photo order
-CP: Canonical Protocol Execution. Request
-CP: ServiceExecutionRequest [forwardCall=true, canonicalTransactionIdentificator=a2a508c5-5722-43eb-90e1-b86d90122e00, targetURL=http://localhost/transaction1, sourceURL=http://localhost/transaction2, data=CanonicalProtocolRequestData [
-instanceReferences=[
-#3->DataObjectInstanceReference [ instanceNr=3]objectReference=user0
-#4->BindingKeyInstanceReference [key=Key[type=pmsoft.sam.module.definition.test.oauth.service.PhotoSharingAlbum, annotation=[none]], instanceNr=4]
-#5->DataObjectInstanceReference [ instanceNr=5]objectReference=landscape photo
-#6->DataObjectInstanceReference [ instanceNr=6]objectReference=[B@7f4d1d41
-#7->DataObjectInstanceReference [ instanceNr=7]objectReference=water photo
-#8->DataObjectInstanceReference [ instanceNr=8]objectReference=[B@1fbbd7b2
-#9->PendingDataInstanceReference [dataType=class [Lpmsoft.sam.module.definition.test.oauth.service.PhotoInfo;, instanceNr=9]]
-methodCalls=[
-MethodCall[#0.getAccessToAlbum(#3)#4]
-MethodCall[#4.uploadPhoto(#5#6)#-1]
-MethodCall[#4.uploadPhoto(#7#8)#-1]]
-targetSlot=1]
-]
-CP: Canonical Protocol Execution. Response
-CP: CanonicalProtocolRequestData [
-instanceReferences=[
-]
-methodCalls=[
-]
-targetSlot=0]
-
-CP: Canonical Protocol Execution. Request
-CP: ServiceExecutionRequest [forwardCall=true, canonicalTransactionIdentificator=a2a508c5-5722-43eb-90e1-b86d90122e00, targetURL=http://localhost/transaction0, sourceURL=http://localhost/transaction2, data=CanonicalProtocolRequestData [
-instanceReferences=[
-#0->BindingKeyInstanceReference [key=Key[type=pmsoft.sam.module.definition.test.oauth.service.PrintingPhotoAPI, annotation=[none]], instanceNr=0]
-#1->BindingKeyInstanceReference [key=Key[type=pmsoft.sam.module.definition.test.oauth.service.PrintingPhotoOrder, annotation=[none]], instanceNr=1]
-#2->DataObjectInstanceReference [ instanceNr=2]objectReference=grandmother direction]
-methodCalls=[
-MethodCall[#0.createPrintingOrder()#1]
-MethodCall[#1.addAdressInformation(#2)#-1]]
-targetSlot=0]
-]
-CP: Canonical Protocol Execution. Response
-CP: CanonicalProtocolRequestData [
-instanceReferences=[
-]
-methodCalls=[
-]
-targetSlot=0]
-
-CP: Canonical Protocol Execution. Request
-CP: ServiceExecutionRequest [forwardCall=true, canonicalTransactionIdentificator=a2a508c5-5722-43eb-90e1-b86d90122e00, targetURL=http://localhost/transaction1, sourceURL=http://localhost/transaction2, data=CanonicalProtocolRequestData [
-instanceReferences=[
-]
-methodCalls=[
-MethodCall[#4.getPhotoList()#9]]
-targetSlot=1]
-]
-CP: Canonical Protocol Execution. Response
-CP: CanonicalProtocolRequestData [
-instanceReferences=[
-#9->FilledDataInstanceReference [instanceNr=9, getObjectReference()=[Lpmsoft.sam.module.definition.test.oauth.service.PhotoInfo;@6655bb93]]
-methodCalls=[
-]
-targetSlot=0]
-
-JANE: send photo resource references
-JANE: send photo resource references
-JANE: now submit the printing order
-CP: Canonical Protocol Execution. Request
-CP: ServiceExecutionRequest [forwardCall=true, canonicalTransactionIdentificator=a2a508c5-5722-43eb-90e1-b86d90122e00, targetURL=http://localhost/transaction1, sourceURL=http://localhost/transaction2, data=CanonicalProtocolRequestData [
-instanceReferences=[
-#10->DataObjectInstanceReference [ instanceNr=10]objectReference=0
-#11->BindingKeyInstanceReference [key=Key[type=pmsoft.sam.module.definition.test.oauth.service.PhotoResource, annotation=[none]], instanceNr=11]
-#12->DataObjectInstanceReference [ instanceNr=12]objectReference=1
-#13->BindingKeyInstanceReference [key=Key[type=pmsoft.sam.module.definition.test.oauth.service.PhotoResource, annotation=[none]], instanceNr=13]]
-methodCalls=[
-MethodCall[#4.getPhotoSharingResource(#10)#11]
-MethodCall[#4.getPhotoSharingResource(#12)#13]]
-targetSlot=1]
-]
-CP: Canonical Protocol Execution. Response
-CP: CanonicalProtocolRequestData [
-instanceReferences=[
-]
-methodCalls=[
-]
-targetSlot=0]
-
-CP: Canonical Protocol Execution. Request
-CP: ServiceExecutionRequest [forwardCall=true, canonicalTransactionIdentificator=a2a508c5-5722-43eb-90e1-b86d90122e00, targetURL=http://localhost/transaction0, sourceURL=http://localhost/transaction2, data=CanonicalProtocolRequestData [
-instanceReferences=[
-#3->ExternalSlotInstanceReference [key=Key[type=pmsoft.sam.module.definition.test.oauth.service.PhotoResource, annotation=[none]], instanceNr=3]
-#4->ExternalSlotInstanceReference [key=Key[type=pmsoft.sam.module.definition.test.oauth.service.PhotoResource, annotation=[none]], instanceNr=4]
-#5->PendingDataInstanceReference [dataType=boolean, instanceNr=5]]
-methodCalls=[
-MethodCall[#1.addPhotoResourceReference(#3)#-1]
-MethodCall[#1.addPhotoResourceReference(#4)#-1]
-MethodCall[#1.submitOrder()#5]]
-targetSlot=0]
-]
-CP: Canonical Protocol Execution. Request
-CP: ServiceExecutionRequest [forwardCall=false, canonicalTransactionIdentificator=a2a508c5-5722-43eb-90e1-b86d90122e00, targetURL=http://localhost/transaction2, sourceURL=http://localhost/transaction0, data=CanonicalProtocolRequestData [
-instanceReferences=[
-#6->ServerBindingKeyInstanceReference [key=Key[type=pmsoft.sam.module.definition.test.oauth.service.PhotoResourceExtended, annotation=[none]], instanceNr=6]
-#7->ServerPendingDataInstanceReference [instanceNr=7]]
-methodCalls=[
-MethodCall[#3.getExtendedApi()#6]
-MethodCall[#6.checkNestedInterserviceInteraction()#7]]
-targetSlot=0]
-]
-CP: Canonical Protocol Execution. Request
-CP: ServiceExecutionRequest [forwardCall=true, canonicalTransactionIdentificator=a2a508c5-5722-43eb-90e1-b86d90122e00, targetURL=http://localhost/transaction1, sourceURL=http://localhost/transaction2, data=CanonicalProtocolRequestData [
-instanceReferences=[
-#14->BindingKeyInstanceReference [key=Key[type=pmsoft.sam.module.definition.test.oauth.service.PhotoResourceExtended, annotation=[none]], instanceNr=14]
-#15->PendingDataInstanceReference [dataType=boolean, instanceNr=15]]
-methodCalls=[
-MethodCall[#11.getExtendedApi()#14]
-MethodCall[#14.checkNestedInterserviceInteraction()#15]]
-targetSlot=1]
-]
-CP: Canonical Protocol Execution. Response
-CP: CanonicalProtocolRequestData [
-instanceReferences=[
-#15->FilledDataInstanceReference [instanceNr=15, getObjectReference()=true]]
-methodCalls=[
-]
-targetSlot=0]
-
-CP: Canonical Protocol Execution. Response
-CP: CanonicalProtocolRequestData [
-instanceReferences=[
-#7->FilledDataInstanceReference [instanceNr=7, getObjectReference()=true]]
-methodCalls=[
-]
-targetSlot=0]
-
-CP: Canonical Protocol Execution. Request
-CP: ServiceExecutionRequest [forwardCall=false, canonicalTransactionIdentificator=a2a508c5-5722-43eb-90e1-b86d90122e00, targetURL=http://localhost/transaction2, sourceURL=http://localhost/transaction0, data=CanonicalProtocolRequestData [
-instanceReferences=[
-#8->ServerPendingDataInstanceReference [instanceNr=8]]
-methodCalls=[
-MethodCall[#3.getPhotoData()#8]]
-targetSlot=0]
-]
-CP: Canonical Protocol Execution. Request
-CP: ServiceExecutionRequest [forwardCall=true, canonicalTransactionIdentificator=a2a508c5-5722-43eb-90e1-b86d90122e00, targetURL=http://localhost/transaction1, sourceURL=http://localhost/transaction2, data=CanonicalProtocolRequestData [
-instanceReferences=[
-#16->PendingDataInstanceReference [dataType=class [B, instanceNr=16]]
-methodCalls=[
-MethodCall[#11.getPhotoData()#16]]
-targetSlot=1]
-]
-CP: Canonical Protocol Execution. Response
-CP: CanonicalProtocolRequestData [
-instanceReferences=[
-#16->FilledDataInstanceReference [instanceNr=16, getObjectReference()=[B@7f4d1d41]]
-methodCalls=[
-]
-targetSlot=0]
-
-CP: Canonical Protocol Execution. Response
-CP: CanonicalProtocolRequestData [
-instanceReferences=[
-#8->FilledDataInstanceReference [instanceNr=8, getObjectReference()=[B@7f4d1d41]]
-methodCalls=[
-]
-targetSlot=0]
-
-Printing photo
-LANDSCAPE PHOTO
-CP: Canonical Protocol Execution. Request
-CP: ServiceExecutionRequest [forwardCall=false, canonicalTransactionIdentificator=a2a508c5-5722-43eb-90e1-b86d90122e00, targetURL=http://localhost/transaction2, sourceURL=http://localhost/transaction0, data=CanonicalProtocolRequestData [
-instanceReferences=[
-#9->ServerBindingKeyInstanceReference [key=Key[type=pmsoft.sam.module.definition.test.oauth.service.PhotoResourceExtended, annotation=[none]], instanceNr=9]
-#10->ServerPendingDataInstanceReference [instanceNr=10]]
-methodCalls=[
-MethodCall[#4.getExtendedApi()#9]
-MethodCall[#9.checkNestedInterserviceInteraction()#10]]
-targetSlot=0]
-]
-CP: Canonical Protocol Execution. Request
-CP: ServiceExecutionRequest [forwardCall=true, canonicalTransactionIdentificator=a2a508c5-5722-43eb-90e1-b86d90122e00, targetURL=http://localhost/transaction1, sourceURL=http://localhost/transaction2, data=CanonicalProtocolRequestData [
-instanceReferences=[
-#17->BindingKeyInstanceReference [key=Key[type=pmsoft.sam.module.definition.test.oauth.service.PhotoResourceExtended, annotation=[none]], instanceNr=17]
-#18->PendingDataInstanceReference [dataType=boolean, instanceNr=18]]
-methodCalls=[
-MethodCall[#13.getExtendedApi()#17]
-MethodCall[#17.checkNestedInterserviceInteraction()#18]]
-targetSlot=1]
-]
-CP: Canonical Protocol Execution. Response
-CP: CanonicalProtocolRequestData [
-instanceReferences=[
-#18->FilledDataInstanceReference [instanceNr=18, getObjectReference()=true]]
-methodCalls=[
-]
-targetSlot=0]
-
-CP: Canonical Protocol Execution. Response
-CP: CanonicalProtocolRequestData [
-instanceReferences=[
-#10->FilledDataInstanceReference [instanceNr=10, getObjectReference()=true]]
-methodCalls=[
-]
-targetSlot=0]
-
-CP: Canonical Protocol Execution. Request
-CP: ServiceExecutionRequest [forwardCall=false, canonicalTransactionIdentificator=a2a508c5-5722-43eb-90e1-b86d90122e00, targetURL=http://localhost/transaction2, sourceURL=http://localhost/transaction0, data=CanonicalProtocolRequestData [
-instanceReferences=[
-#11->ServerPendingDataInstanceReference [instanceNr=11]]
-methodCalls=[
-MethodCall[#4.getPhotoData()#11]]
-targetSlot=0]
-]
-CP: Canonical Protocol Execution. Request
-CP: ServiceExecutionRequest [forwardCall=true, canonicalTransactionIdentificator=a2a508c5-5722-43eb-90e1-b86d90122e00, targetURL=http://localhost/transaction1, sourceURL=http://localhost/transaction2, data=CanonicalProtocolRequestData [
-instanceReferences=[
-#19->PendingDataInstanceReference [dataType=class [B, instanceNr=19]]
-methodCalls=[
-MethodCall[#13.getPhotoData()#19]]
-targetSlot=1]
-]
-CP: Canonical Protocol Execution. Response
-CP: CanonicalProtocolRequestData [
-instanceReferences=[
-#19->FilledDataInstanceReference [instanceNr=19, getObjectReference()=[B@1fbbd7b2]]
-methodCalls=[
-]
-targetSlot=0]
-
-CP: Canonical Protocol Execution. Response
-CP: CanonicalProtocolRequestData [
-instanceReferences=[
-#11->FilledDataInstanceReference [instanceNr=11, getObjectReference()=[B@1fbbd7b2]]
-methodCalls=[
-]
-targetSlot=0]
-
-Printing photo
-WATER PHOTO
-Sending photos to:
-grandmother direction
-Print submition done.
-CP: Canonical Protocol Execution. Response
-CP: CanonicalProtocolRequestData [
-instanceReferences=[
-#5->FilledDataInstanceReference [instanceNr=5, getObjectReference()=true]]
-methodCalls=[
-]
-targetSlot=0]
-</pre>
-
-
-
-
-
-
-
-
-
+3378 [pool-5-thread-1] DEBUG pmsoft.execution.ThreadMessagePipe - notify for dead connection : 0:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4987/service0
+3378 [pool-5-thread-1] DEBUG pmsoft.execution.ThreadMessagePipe - notify for dead connection : 1:1b76e67b-34e2-4cd8-99d6-0f3d8cffa8f7-->http://0.0.0.0:4988/service0
+3378 [main] DEBUG pmsoft.execution.ThreadExecutionServer - shutdown local server on address 0.0.0.0/0.0.0.0:4989
+3388 [main] DEBUG pmsoft.execution.ThreadExecutionServer - shutdown local server on address 0.0.0.0/0.0.0.0:4988
+3394 [main] DEBUG pmsoft.execution.ThreadExecutionServer - shutdown local server on address 0.0.0.0/0.0.0.0:4987
+```
