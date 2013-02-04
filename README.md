@@ -93,6 +93,7 @@ public class TestShoppingStoreWithCourierInteraction implements ShoppingStoreWit
 }
 ```
 In this test:
+
 1. The StoreOrder reference is extracted from the Store service.
 2. Some products are selected from the store
 3. A CourierServiceOrder is open in the Courier service.
