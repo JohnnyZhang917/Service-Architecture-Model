@@ -12,6 +12,7 @@ configure(subprojects.findAll { it.name != 'definition' }) {
     }
 
     test {
+        jvmArgs '-XX:MaxDirectMemorySize=256m'
         useTestNG()
         options {
         }
