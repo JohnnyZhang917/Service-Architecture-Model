@@ -6,10 +6,9 @@ configure(subprojects.findAll { it.name != 'definition' }) {
 
     repositories {
         mavenCentral()
-        maven {
-            url "http://repository-netty.forge.cloudbees.com/snapshot/"
-        }
-
+	maven {
+		url "https://oss.sonatype.org/content/repositories/snapshots/"
+	}
     }
 
     test {

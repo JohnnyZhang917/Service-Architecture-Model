@@ -5,8 +5,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.*;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
-import io.netty.logging.InternalLoggerFactory;
-import io.netty.logging.Slf4JLoggerFactory;
+import io.netty.util.internal.logging.InternalLoggerFactory;
+import io.netty.util.internal.logging.Slf4JLoggerFactory;
 import org.testng.annotations.Test;
 
 import java.net.InetSocketAddress;
