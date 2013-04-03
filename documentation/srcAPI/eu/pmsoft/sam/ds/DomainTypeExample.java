@@ -2,9 +2,9 @@ package eu.pmsoft.sam.ds;
 
 public interface DomainTypeExample {
 
-	void setName(String name);
+    void setName(String name);
 
-	String getName();
-	
-	boolean isValid();
+    String getName();
+
+    boolean isValid();
 }

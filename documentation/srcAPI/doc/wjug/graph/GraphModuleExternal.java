@@ -1,85 +1,75 @@
 package doc.wjug.graph;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Inject;
-import com.google.inject.Injector;
-import com.google.inject.Provider;
 import com.google.inject.grapher.GrapherModule;
 import com.google.inject.grapher.InjectorGrapher;
 import com.google.inject.grapher.graphviz.GraphvizModule;
 import com.google.inject.grapher.graphviz.GraphvizRenderer;
 
+import java.io.*;
+
 public class GraphModuleExternal extends AbstractModule {
-	
-	public static void main(String[] args){
-		Injector injectorComplex = Guice.createInjector(new GraphModuleExternal());
-		Injector injectorSimple = Guice.createInjector(new GraphModuleSimple());
-		
-		graphGood("/tmp/canonical.dot", injectorComplex);
-		graphGood("/tmp/simple.dot", injectorSimple);
-	}
 
-	@Override
-	protected void configure() {
-		bind(ServiceInterface.class).to(ServiceImplementation.class);
-		bind(ExternalServiceInterface.class).toProvider(new Provider<ExternalServiceInterface>() {
-			@Inject
-			Provider<ExternalBindingSwitch> delaySwitchProvider;
+    public static void main(String[] args) {
+        Injector injectorComplex = Guice.createInjector(new GraphModuleExternal());
+        Injector injectorSimple = Guice.createInjector(new GraphModuleSimple());
 
-			public ExternalServiceInterface get() {
-				ExternalBindingSwitch intermedium = delaySwitchProvider.get();
-				return intermedium.getReferenceObject();
-			}
-		});
-		bind(ExternalBindingSwitch.class).to(ExternalBindingSwitchProxy.class);
-	}
+        graphGood("/tmp/canonical.dot", injectorComplex);
+        graphGood("/tmp/simple.dot", injectorSimple);
+    }
 
-	public final static Injector graphGood(String filename, Injector inj) {
-		try {
-			ByteArrayOutputStream baos = new ByteArrayOutputStream();
-			PrintWriter out = new PrintWriter(baos);
+    @Override
+    protected void configure() {
+        bind(ServiceInterface.class).to(ServiceImplementation.class);
+        bind(ExternalServiceInterface.class).toProvider(new Provider<ExternalServiceInterface>() {
+            @Inject
+            Provider<ExternalBindingSwitch> delaySwitchProvider;
 
-			Injector injector = Guice.createInjector(new GrapherModule(), new GraphvizModule());
-			GraphvizRenderer renderer = injector.getInstance(GraphvizRenderer.class);
-			renderer.setOut(out).setRankdir("TB");
+            public ExternalServiceInterface get() {
+                ExternalBindingSwitch intermedium = delaySwitchProvider.get();
+                return intermedium.getReferenceObject();
+            }
+        });
+        bind(ExternalBindingSwitch.class).to(ExternalBindingSwitchProxy.class);
+    }
 
-			injector.getInstance(InjectorGrapher.class).of(inj).graph();
+    public final static Injector graphGood(String filename, Injector inj) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            PrintWriter out = new PrintWriter(baos);
 
-			out = new PrintWriter(new File(filename), "UTF-8");
-			String s = baos.toString("UTF-8");
-			s = fixGrapherBug(s);
-			s = hideClassPaths(s);
-			out.write(s);
-			out.close();
+            Injector injector = Guice.createInjector(new GrapherModule(), new GraphvizModule());
+            GraphvizRenderer renderer = injector.getInstance(GraphvizRenderer.class);
+            renderer.setOut(out).setRankdir("TB");
 
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return inj;
-	}
+            injector.getInstance(InjectorGrapher.class).of(inj).graph();
 
-	public static String hideClassPaths(String s) {
-		s = s.replaceAll("\\w[a-z\\d_\\.]+\\.([A-Z][A-Za-z\\d_]*)", "");
-		s = s.replaceAll("value=[\\w-]+", "random");
-		return s;
-	}
+            out = new PrintWriter(new File(filename), "UTF-8");
+            String s = baos.toString("UTF-8");
+            s = fixGrapherBug(s);
+            s = hideClassPaths(s);
+            out.write(s);
+            out.close();
 
-	public static String fixGrapherBug(String s) {
-		s = s.replaceAll("style=invis", "style=solid");
-		return s;
-	}
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return inj;
+    }
 
-	
+    public static String hideClassPaths(String s) {
+        s = s.replaceAll("\\w[a-z\\d_\\.]+\\.([A-Z][A-Za-z\\d_]*)", "");
+        s = s.replaceAll("value=[\\w-]+", "random");
+        return s;
+    }
+
+    public static String fixGrapherBug(String s) {
+        s = s.replaceAll("style=invis", "style=solid");
+        return s;
+    }
+
+
 }

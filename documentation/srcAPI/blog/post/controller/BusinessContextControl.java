@@ -7,7 +7,7 @@ import blog.post.controller.model.Person;
 
 public interface BusinessContextControl {
 
-	void setupBusinessContext(BusinessData data, Person person, Manager manager, Context context);
-	
-	void clearBusinessContext();
+    void setupBusinessContext(BusinessData data, Person person, Manager manager, Context context);
+
+    void clearBusinessContext();
 }

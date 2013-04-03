@@ -2,8 +2,8 @@ package eu.pmsoft.sam.service.user;
 
 public interface UserDataSimpleAPI {
 
-	boolean simpleMethod();
+    boolean simpleMethod();
 
-	UserDataComplexAPI complexInteractionAPI(Integer basicType);
+    UserDataComplexAPI complexInteractionAPI(Integer basicType);
 
 }

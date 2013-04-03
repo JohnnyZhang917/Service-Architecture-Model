@@ -1,5 +1,5 @@
 package doc.wjug.graph;
 
-public class RealExternalInstanceProvider implements ExternalInstanceProvider{
+public class RealExternalInstanceProvider implements ExternalInstanceProvider {
 
 }
