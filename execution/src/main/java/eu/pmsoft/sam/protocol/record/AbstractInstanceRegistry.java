@@ -3,11 +3,14 @@ package eu.pmsoft.sam.protocol.record;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.inject.Key;
-import org.slf4j.Logger;
 import eu.pmsoft.injectionUtils.logger.InjectLogger;
-import eu.pmsoft.sam.protocol.transport.data.*;
+import eu.pmsoft.sam.protocol.transport.CanonicalInstanceReference;
+import eu.pmsoft.sam.protocol.transport.data.CanonicalProtocolSerialFactory;
+import eu.pmsoft.sam.protocol.transport.data.InstanceMergeVisitor;
+import org.slf4j.Logger;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.google.common.base.Preconditions.checkPositionIndex;
@@ -19,7 +22,7 @@ abstract class AbstractInstanceRegistry implements InstanceRegistry, InstanceMer
     protected final AtomicInteger internalInstanceCounter = new AtomicInteger(0);
     protected int transferedInstanceReferenceMark = 0;
 
-    protected final ArrayList<AbstractInstanceReference> instanceReferenceList = Lists.newArrayList();
+    protected final ArrayList<CanonicalInstanceReference> instanceReferenceList = Lists.newArrayList();
     protected final ArrayList<Object> instanceObjectList = Lists.newArrayList();
     @InjectLogger
     protected Logger logger;
@@ -41,27 +44,32 @@ abstract class AbstractInstanceRegistry implements InstanceRegistry, InstanceMer
 
     public int createPendingDataBinding(Class<?> returnType) {
         int serviceInstanceNr = getNextInstanceNumber();
-        PendingDataInstanceReference pendingInstance = new PendingDataInstanceReference(serviceInstanceNr, returnType);
-        instanceReferenceList.add(pendingInstance);
-        instanceObjectList.add(null);
+        CanonicalInstanceReference pendingInstance = CanonicalProtocolSerialFactory.createPendingDataInstanceReference(serviceInstanceNr, returnType);
+        addStackReferenceInstance(pendingInstance, null, serviceInstanceNr);
         return serviceInstanceNr;
     }
+
+    protected void addStackReferenceInstance(CanonicalInstanceReference pendingInstance, Object reference, int serviceInstanceNr) {
+        assert instanceReferenceList.size() == serviceInstanceNr;
+        instanceReferenceList.add(pendingInstance);
+        instanceObjectList.add(reference);
+        assert instanceReferenceList.size() == instanceObjectList.size();
+    }
+
 
     public <T> CanonicalInstanceRecorder<T> createKeyBinding(Key<T> key) {
         int serviceInstanceNr = getNextInstanceNumber();
         CanonicalInstanceRecorder<T> recorder = new CanonicalInstanceRecorder<T>(executionContext, key, serviceInstanceNr, serviceSlotNr);
         T instanceObject = recorder.getInstance();
-        BindingKeyInstanceReference<T> bindingReference = new BindingKeyInstanceReference<T>(serviceInstanceNr, key);
-        instanceReferenceList.add(bindingReference);
-        instanceObjectList.add(instanceObject);
+        CanonicalInstanceReference bindingReference = CanonicalProtocolSerialFactory.createBindingKeyReference(serviceInstanceNr, key);
+        addStackReferenceInstance(bindingReference, instanceObject, serviceInstanceNr);
         return recorder;
     }
 
     public <T> int createExternalInstanceBinding(Key<T> key, Object instanceProxy) {
         int serviceInstanceNr = getNextInstanceNumber();
-        ExternalSlotInstanceReference<T> externalInstance = new ExternalSlotInstanceReference<T>(serviceInstanceNr, key);
-        instanceReferenceList.add(externalInstance);
-        instanceObjectList.add(instanceProxy);
+        CanonicalInstanceReference externalInstance = CanonicalProtocolSerialFactory.createExternalInstanceReference(serviceInstanceNr, key);
+        addStackReferenceInstance(externalInstance, instanceProxy, serviceInstanceNr);
         return serviceInstanceNr;
     }
 
@@ -69,21 +77,23 @@ abstract class AbstractInstanceRegistry implements InstanceRegistry, InstanceMer
         return instanceObjectList.get(instanceNumber);
     }
 
-    public AbstractInstanceReference getInstanceReference(int instanceNr) {
+    public CanonicalInstanceReference getInstanceReference(int instanceNr) {
         checkPositionIndex(instanceNr, instanceReferenceList.size());
         return instanceReferenceList.get(instanceNr);
     }
 
     public void bindReturnObject(int returnInstance, Object returnObject) {
         checkPositionIndex(returnInstance, instanceReferenceList.size());
-        AbstractInstanceReference instance = instanceReferenceList.get(returnInstance);
-        if (instance instanceof PendingDataInstanceReference || instance instanceof ServerPendingDataInstanceReference) {
+        CanonicalInstanceReference instance = instanceReferenceList.get(returnInstance);
+        if (instance.getInstanceType() == CanonicalInstanceReference.InstanceType.PENDING_DATA_REF ||
+                instance.getInstanceType() == CanonicalInstanceReference.InstanceType.SERVER_PENDING_DATA_REF) {
             // TODO FIXME if client and server pending data are separated, then maybe filleddata must be also separated
-            instanceReferenceList.set(returnInstance, new FilledDataInstanceReference(returnInstance, returnObject));
+            CanonicalInstanceReference filledData = CanonicalProtocolSerialFactory.createFilledDataInstanceReference(returnInstance, returnObject);
+            instanceReferenceList.set(returnInstance, filledData);
             instanceObjectList.set(returnInstance, returnObject);
             return;
         }
-        if (instance instanceof BindingKeyInstanceReference) {
+        if (instance.getInstanceType() == CanonicalInstanceReference.InstanceType.BINDING_KEY) {
             instanceObjectList.set(returnInstance, returnObject);
             return;
         }
@@ -91,7 +101,16 @@ abstract class AbstractInstanceRegistry implements InstanceRegistry, InstanceMer
 
     }
 
-    public Object[] getArguments(int[] arguments) {
+    // TODO protostuff must give a int[]
+    public Object[] getArguments(List<Integer> arguments) {
+        int[] args = new int[arguments.size()];
+        for (int i = 0; i < arguments.size(); i++) {
+            args[i] = arguments.get(i);
+        }
+        return getArguments(args);
+    }
+
+    private Object[] getArguments(int[] arguments) {
         Object[] argObjets = new Object[arguments.length];
         for (int i = 0; i < arguments.length; i++) {
             int instanceNumber = arguments[i];
@@ -103,8 +122,8 @@ abstract class AbstractInstanceRegistry implements InstanceRegistry, InstanceMer
     }
 
     protected void fillInstanceKeyReference(int returnInstance, Object returnObject) {
-        AbstractInstanceReference reference = instanceReferenceList.get(returnInstance);
-        Preconditions.checkState(reference instanceof BindingKeyInstanceReference,
+        CanonicalInstanceReference reference = instanceReferenceList.get(returnInstance);
+        Preconditions.checkState(reference.getInstanceType() == CanonicalInstanceReference.InstanceType.BINDING_KEY,
                 "For this instance number there is not a BindingKeyInstanceReference reference, critical protocol exceptions.");
         instanceObjectList.set(returnInstance, returnObject);
     }

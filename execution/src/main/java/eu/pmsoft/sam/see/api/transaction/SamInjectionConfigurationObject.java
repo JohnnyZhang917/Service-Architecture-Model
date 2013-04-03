@@ -35,11 +35,6 @@ class SamInjectionConfigurationObject implements SamInjectionConfiguration {
     @Override
     public <T> void accept(SamInjectionModelVisitor<T> visitor) {
         visitor.visit(this);
-//		visitor.enterNested(this);
-//		for (BindPoint bindPoint : bindPoints) {
-//			bindPoint.accept(visitor);
-//		}
-//		visitor.exitNested(this);
     }
 
 }

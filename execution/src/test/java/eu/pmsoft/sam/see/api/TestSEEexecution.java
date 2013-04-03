@@ -1,8 +1,6 @@
 package eu.pmsoft.sam.see.api;
 
 import com.google.inject.Key;
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
 import eu.pmsoft.exceptions.OperationCheckedException;
 import eu.pmsoft.execution.ServiceAction;
 import eu.pmsoft.sam.architecture.model.ServiceKey;
@@ -24,6 +22,8 @@ import eu.pmsoft.sam.see.api.model.SIID;
 import eu.pmsoft.sam.see.api.model.SIURL;
 import eu.pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
 import eu.pmsoft.sam.see.api.transaction.SamTransactionConfigurationUtil;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
 
 import java.util.Map;
 import java.util.Map.Entry;

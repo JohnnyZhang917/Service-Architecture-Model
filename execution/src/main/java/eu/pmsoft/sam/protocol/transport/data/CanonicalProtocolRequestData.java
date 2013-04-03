@@ -1,52 +1,62 @@
 package eu.pmsoft.sam.protocol.transport.data;
 
+import com.dyuproject.protostuff.LinkedBuffer;
+import com.dyuproject.protostuff.ProtostuffIOUtil;
 import com.google.common.base.Joiner;
+import eu.pmsoft.sam.protocol.transport.CanonicalInstanceReference;
+import eu.pmsoft.sam.protocol.transport.CanonicalMethodCall;
+import eu.pmsoft.sam.protocol.transport.CanonicalRequest;
 
-import java.io.Serializable;
 import java.util.List;
 
-public class CanonicalProtocolRequestData implements Serializable {
+public class CanonicalProtocolRequestData {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = 393248247046868614L;
-    private final List<AbstractInstanceReference> instanceReferences;
-    private final List<MethodCall> methodCalls;
-    private final boolean closeThread;
+    private final CanonicalRequest data;
 
-    public CanonicalProtocolRequestData(List<AbstractInstanceReference> instanceReferences, List<MethodCall> methodCalls, boolean closeThread) {
-        super();
-        this.instanceReferences = instanceReferences;
-        this.methodCalls = methodCalls;
-        this.closeThread = closeThread;
+    public CanonicalProtocolRequestData(byte[] payload) {
+        CanonicalRequest d = new CanonicalRequest();
+        ProtostuffIOUtil.mergeFrom(payload, d, CanonicalRequest.getSchema());
+        this.data = d;
+    }
+
+    public CanonicalProtocolRequestData(CanonicalRequest data) {
+        this.data = data;
+    }
+
+    public byte[] getPayload() {
+        LinkedBuffer buffer = LinkedBuffer.allocate(512);
+        try {
+            return ProtostuffIOUtil.toByteArray(data, CanonicalRequest.getSchema(), buffer);
+        } finally {
+            buffer.clear();
+        }
     }
 
     public boolean isCloseThread() {
-        return closeThread;
+        return data.getCloseThread();
     }
 
-    public List<AbstractInstanceReference> getInstanceReferences() {
-        return instanceReferences;
+    public List<CanonicalInstanceReference> getInstanceReferences() {
+        return data.getInstancesList();
     }
 
-    public List<MethodCall> getMethodCalls() {
-        return methodCalls;
+    public List<CanonicalMethodCall> getMethodCalls() {
+        return data.getCallsList();
     }
 
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
         buf.append("CanonicalProtocolRequestData [\n");
-        if (instanceReferences != null) {
+        if (data.getInstancesList() != null) {
             buf.append("instanceReferences=[\n");
-            Joiner.on("\n").appendTo(buf, instanceReferences);
+            Joiner.on("\n").appendTo(buf, data.getInstancesList());
             buf.append("\n]");
 
         }
-        if (methodCalls != null) {
+        if (data.getCallsList() != null) {
             buf.append("methodCalls=[\n");
-            Joiner.on("\n").appendTo(buf, methodCalls);
+            Joiner.on("\n").appendTo(buf, data.getCallsList());
             buf.append("\n]");
         }
         return buf.toString();

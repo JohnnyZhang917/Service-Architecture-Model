@@ -3,11 +3,11 @@ package eu.pmsoft.sam.protocol.record;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import org.slf4j.Logger;
 import eu.pmsoft.injectionUtils.logger.InjectLogger;
 import eu.pmsoft.sam.protocol.TransactionController;
 import eu.pmsoft.sam.protocol.freebinding.ExternalBindingController;
 import eu.pmsoft.sam.protocol.freebinding.ExternalInstanceProvider;
+import org.slf4j.Logger;
 
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicBoolean;

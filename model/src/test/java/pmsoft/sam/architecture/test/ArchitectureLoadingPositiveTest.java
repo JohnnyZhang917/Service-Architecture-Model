@@ -1,8 +1,5 @@
 package eu.pmsoft.sam.architecture.test;
 
-import org.testng.annotations.DataProvider;
-import org.testng.annotations.Test;
-import org.testng.collections.Lists;
 import eu.pmsoft.sam.architecture.definition.AbstractSamArchitectureDefinition;
 import eu.pmsoft.sam.architecture.definition.SamArchitectureDefinition;
 import eu.pmsoft.sam.architecture.definition.SamArchitectureLoader.SamCategoryLoader;
@@ -12,6 +9,9 @@ import eu.pmsoft.sam.architecture.model.SamArchitecture;
 import eu.pmsoft.sam.architecture.model.SamCategory;
 import eu.pmsoft.sam.architecture.model.SamService;
 import eu.pmsoft.sam.definition.service.AbstractSamServiceDefinition;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.Test;
+import org.testng.collections.Lists;
 
 import java.util.Collection;
 import java.util.List;

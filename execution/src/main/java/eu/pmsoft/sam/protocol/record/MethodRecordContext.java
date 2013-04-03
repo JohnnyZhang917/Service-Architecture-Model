@@ -4,12 +4,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.assistedinject.Assisted;
+import eu.pmsoft.sam.protocol.freebinding.ExternalBindingSwitch;
+import eu.pmsoft.sam.protocol.transport.CanonicalInstanceReference;
+import eu.pmsoft.sam.protocol.transport.CanonicalMethodCall;
+import eu.pmsoft.sam.protocol.transport.data.CanonicalProtocolSerialFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import eu.pmsoft.sam.protocol.freebinding.ExternalBindingSwitch;
-import eu.pmsoft.sam.protocol.transport.data.AbstractInstanceReference;
-import eu.pmsoft.sam.protocol.transport.data.ClientDataObjectInstanceReference;
-import eu.pmsoft.sam.protocol.transport.data.MethodCall;
 
 import java.io.Serializable;
 import java.lang.reflect.InvocationHandler;
@@ -42,16 +42,17 @@ public class MethodRecordContext {
         return instanceRegistries.get(slotNumber);
     }
 
-    private Object getMethodCallReturnObject(MethodCall call) {
+    private Object getMethodCallReturnObject(CanonicalMethodCall call) {
         logger.debug("find return object for {}", call);
-        InstanceRegistry instanceRegistry = getInstanceRegistry(call.getServiceSlotNr());
-        AbstractInstanceReference reference = instanceRegistry.getInstanceReference(call.getReturnInstanceId());
-        if (reference instanceof ClientDataObjectInstanceReference) {
-            ClientDataObjectInstanceReference referenceInstance = (ClientDataObjectInstanceReference) reference;
+        InstanceRegistry instanceRegistry = getInstanceRegistry(call.getSlotNr());
+        CanonicalInstanceReference reference = instanceRegistry.getInstanceReference(call.getReturnInstanceId());
+
+        if (reference.getInstanceType() == CanonicalInstanceReference.InstanceType.CLIENT_DATA_OBJECT ||
+                reference.getInstanceType() == CanonicalInstanceReference.InstanceType.FILLED_DATA_INSTANCE) {
             logger.trace("execution complete for call {}. reference is {}", call, reference);
-            return referenceInstance.getObjectReference();
+            return instanceRegistry.getInstanceObject(call.getReturnInstanceId());
         }
-        logger.error("execution incomplete for call {}. reference is {}", call, reference);
+        logger.error("execution incomplete for call {}. reference has type {}", call, reference.getInstanceType());
         throw new RuntimeException("reference is not filled and thread escaped");
     }
 
@@ -60,10 +61,7 @@ public class MethodRecordContext {
         if (args != null && args.length > 0) {
             arguments = parseArguments(serviceSlotNr, args);
         }
-        MethodCall call = new MethodCall(method, serviceInstanceNr, -1, serviceSlotNr);
-        if (args != null && args.length > 0) {
-            call.setArgumentReferences(arguments);
-        }
+        CanonicalMethodCall call = CanonicalProtocolSerialFactory.createMethodCall(serviceSlotNr, serviceInstanceNr, -1, method, arguments);
         executionManager.pushMethodCall(call);
 
     }
@@ -76,10 +74,7 @@ public class MethodRecordContext {
             arguments = parseArguments(serviceSlotNr, args);
         }
         CanonicalInstanceRecorder<S> returnRecorder = getInstanceRegistry(serviceSlotNr).createKeyBinding(Key.get(returnType));
-        MethodCall call = new MethodCall(method, serviceInstanceNr, returnRecorder.getServiceInstanceNr(), serviceSlotNr);
-        if (args != null && args.length > 0) {
-            call.setArgumentReferences(arguments);
-        }
+        CanonicalMethodCall call = CanonicalProtocolSerialFactory.createMethodCall(serviceSlotNr, serviceInstanceNr, returnRecorder.getServiceInstanceNr(), method, arguments);
         executionManager.pushMethodCall(call);
         return returnRecorder;
     }
@@ -92,10 +87,7 @@ public class MethodRecordContext {
             arguments = parseArguments(serviceSlotNr, args);
         }
         int returnDataNr = getInstanceRegistry(serviceSlotNr).createPendingDataBinding(returnType);
-        MethodCall call = new MethodCall(method, serviceInstanceNr, returnDataNr, serviceSlotNr);
-        if (args != null && args.length > 0) {
-            call.setArgumentReferences(arguments);
-        }
+        CanonicalMethodCall call = CanonicalProtocolSerialFactory.createMethodCall(serviceSlotNr, serviceInstanceNr, returnDataNr, method, arguments);
         executionManager.forceResolveCall(call);
         return (S) getMethodCallReturnObject(call);
 

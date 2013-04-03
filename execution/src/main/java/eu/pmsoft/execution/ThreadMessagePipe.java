@@ -2,9 +2,9 @@ package eu.pmsoft.execution;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import eu.pmsoft.injectionUtils.logger.InjectLogger;
 import io.netty.channel.Channel;
 import org.slf4j.Logger;
-import eu.pmsoft.injectionUtils.logger.InjectLogger;
 
 import javax.annotation.Nullable;
 import java.net.URL;

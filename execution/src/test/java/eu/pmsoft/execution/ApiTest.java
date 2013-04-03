@@ -138,7 +138,7 @@ public class ApiTest {
             ThreadMessage message = new ThreadMessage();
             endpoint.sendMessage(message);
             ThreadMessage response = endpoint.waitResponse();
-            return (String) response.getPayload();
+            return new String(response.getPayload());
         }
 
 
@@ -168,7 +168,7 @@ public class ApiTest {
                 throw new RuntimeException("message pool can not be empty for protocol execution");
             }
             SimpleCallService localService = injector.getInstance(SimpleCallService.class);
-            msg.setPayload(localService.getAddress().toString());
+            msg.setPayload(localService.getAddress().toString().getBytes());
             this.headCommandPipe.sendMessage(msg);
         }
 

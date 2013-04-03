@@ -1,15 +1,10 @@
 package eu.pmsoft.sam.see.api.model;
 
-import java.io.Serializable;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-public class SIURL implements Serializable {
+public class SIURL {
 
-    /**
-     *
-     */
-    private static final long serialVersionUID = -827101818297868614L;
     private final URL serviceInstanceReference;
 
     public static SIURL fromUrl(URL serviceLocation) {

@@ -1,12 +1,15 @@
 package eu.pmsoft.sam.protocol.record;
 
+import com.dyuproject.protostuff.ByteString;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.assistedinject.Assisted;
-import eu.pmsoft.sam.protocol.transport.data.*;
+import eu.pmsoft.sam.protocol.transport.CanonicalInstanceReference;
+import eu.pmsoft.sam.protocol.transport.data.CanonicalProtocolSerialFactory;
+import eu.pmsoft.sam.protocol.transport.data.SerializableKey;
 import eu.pmsoft.sam.see.api.model.SamServiceInstance;
 
 import java.util.List;
@@ -25,19 +28,19 @@ class ServerExecutionInstanceRegistry extends AbstractInstanceRegistry {
         this.realServiceInjector = serviceInstance.getInjector();
     }
 
-    public List<AbstractInstanceReference> getInstanceReferenceToTransfer() {
-        Builder<AbstractInstanceReference> builder = ImmutableList.builder();
+    public List<CanonicalInstanceReference> getInstanceReferenceToTransfer() {
+        Builder<CanonicalInstanceReference> builder = ImmutableList.builder();
         int position = transferedInstanceReferenceMark;
         for (int i = transferedInstanceReferenceMark; i < instanceReferenceList.size(); i++) {
-            AbstractInstanceReference instanceRef = instanceReferenceList.get(position++);
-            if (instanceRef instanceof ServerPendingDataInstanceReference) {
+            CanonicalInstanceReference instanceRef = instanceReferenceList.get(position++);
+            if (instanceRef.getInstanceType() == CanonicalInstanceReference.InstanceType.SERVER_PENDING_DATA_REF) {
                 builder.add(instanceRef);
                 break;
             }
-            if (instanceRef instanceof ServerBindingKeyInstanceReference<?>) {
+            if (instanceRef.getInstanceType() == CanonicalInstanceReference.InstanceType.SERVER_BINDING_KEY) {
                 builder.add(instanceRef);
             }
-            if (instanceRef instanceof ServerDataObjectInstanceReference) {
+            if (instanceRef.getInstanceType() == CanonicalInstanceReference.InstanceType.SERVER_DATA_OBJECT) {
                 builder.add(instanceRef);
             }
         }
@@ -45,12 +48,12 @@ class ServerExecutionInstanceRegistry extends AbstractInstanceRegistry {
 
         position = pendingDataTransferReferenceMark;
         for (int i = pendingDataTransferReferenceMark; i < instanceReferenceList.size(); i++) {
-            AbstractInstanceReference instanceRef = instanceReferenceList.get(position++);
-            if (instanceRef instanceof PendingDataInstanceReference) {
+            CanonicalInstanceReference instanceRef = instanceReferenceList.get(position++);
+            if (instanceRef.getInstanceType() == CanonicalInstanceReference.InstanceType.PENDING_DATA_REF) {
                 position--;
                 break;
             }
-            if (instanceRef instanceof FilledDataInstanceReference) {
+            if (instanceRef.getInstanceType() == CanonicalInstanceReference.InstanceType.FILLED_DATA_INSTANCE) {
                 builder.add(instanceRef);
             }
 
@@ -62,7 +65,7 @@ class ServerExecutionInstanceRegistry extends AbstractInstanceRegistry {
     @Override
     public int createPendingDataBinding(Class<?> returnType) {
         int serviceInstanceNr = getNextInstanceNumber();
-        ServerPendingDataInstanceReference pendingInstance = new ServerPendingDataInstanceReference(serviceInstanceNr, returnType);
+        CanonicalInstanceReference pendingInstance = CanonicalProtocolSerialFactory.createServerPendingDataInstanceReference(serviceInstanceNr, returnType);
         instanceReferenceList.add(pendingInstance);
         instanceObjectList.add(null);
         return serviceInstanceNr;
@@ -70,7 +73,7 @@ class ServerExecutionInstanceRegistry extends AbstractInstanceRegistry {
 
     public int createDataBinding(Object arg) {
         int serviceInstanceNr = getNextInstanceNumber();
-        ServerDataObjectInstanceReference dataInstance = new ServerDataObjectInstanceReference(serviceInstanceNr, arg);
+        CanonicalInstanceReference dataInstance = CanonicalProtocolSerialFactory.createServerDataInstanceReference(serviceInstanceNr, arg);
         instanceReferenceList.add(dataInstance);
         instanceObjectList.add(arg);
         return serviceInstanceNr;
@@ -81,7 +84,7 @@ class ServerExecutionInstanceRegistry extends AbstractInstanceRegistry {
         int serviceInstanceNr = getNextInstanceNumber();
         CanonicalInstanceRecorder<T> recorder = new CanonicalInstanceRecorder<T>(executionContext, key, serviceInstanceNr, serviceSlotNr);
         T instanceObject = recorder.getInstance();
-        BindingKeyInstanceReference<T> bindingReference = new ServerBindingKeyInstanceReference<T>(serviceInstanceNr, key);
+        CanonicalInstanceReference bindingReference = CanonicalProtocolSerialFactory.createServerBindingKeyInstanceReference(serviceInstanceNr, key);
         instanceReferenceList.add(bindingReference);
         instanceObjectList.add(instanceObject);
         return recorder;
@@ -92,11 +95,9 @@ class ServerExecutionInstanceRegistry extends AbstractInstanceRegistry {
         Object existingInstance = super.getInstanceObject(instanceNumber);
         if (existingInstance == null) {
             // Check if this is a BindingKeyInstance that should be created
-            AbstractInstanceReference reference = instanceReferenceList.get(instanceNumber);
-            if (reference instanceof BindingKeyInstanceReference) {
-
-                BindingKeyInstanceReference<?> keyReference = (BindingKeyInstanceReference<?>) reference;
-                Key<?> key = keyReference.getKey();
+            CanonicalInstanceReference reference = instanceReferenceList.get(instanceNumber);
+            if (reference != null && reference.getInstanceType() == CanonicalInstanceReference.InstanceType.BINDING_KEY) {
+                Key<?> key = SerializableKey.toKey(reference.getKey());
                 checkArgument(realServiceInjector.getExistingBinding(key) != null,
                         "A Key binding not exposed by the service has not been filled by any previous method call. Canonical protocol critical exceptions");
                 existingInstance = realServiceInjector.getInstance(key);
@@ -113,67 +114,62 @@ class ServerExecutionInstanceRegistry extends AbstractInstanceRegistry {
         return internalInstanceCounter.getAndIncrement();
     }
 
-    public <T> void visitBindingKey(BindingKeyInstanceReference<T> bindingKeyInstanceReference) {
-        int currentInstanceNumber = getNextInstanceNumber();
-        checkState(bindingKeyInstanceReference.getInstanceNr() == currentInstanceNumber);
-        BindingKeyInstanceReference<T> bindingReference = new BindingKeyInstanceReference<T>(currentInstanceNumber, bindingKeyInstanceReference.getKey());
-        instanceReferenceList.add(bindingReference);
-        // Do not create the instance, because this keyBinding can be the result
-        // of a local method execution.
-        // NOT -> instanceObjectList.add(injector.getInstance(key));
-        instanceObjectList.add(null);
-    }
-
-    public <T> void visitExternalSlotInstance(ExternalSlotInstanceReference<T> externalSlotInstanceReference) {
-        int currentInstanceNumber = getNextInstanceNumber();
-        checkState(externalSlotInstanceReference.getInstanceNr() == currentInstanceNumber);
-        Key<T> key = externalSlotInstanceReference.getKey();
-        CanonicalInstanceRecorder<T> recorder = new CanonicalInstanceRecorder<T>(executionContext, key, currentInstanceNumber, SERVER_SLOT_NR);
-        ExternalSlotInstanceReference<T> reference = new ExternalSlotInstanceReference<T>(currentInstanceNumber, key);
-        instanceReferenceList.add(reference);
-        instanceObjectList.add(recorder.getInstance());
-    }
-
-    public <T> void visitServerBindingKeyInstanceReference(ServerBindingKeyInstanceReference<T> serverBindingKeyInstanceReference) {
-        throw new RuntimeException("not allowed type");
-    }
-
-    public void visitFilledDataInstance(FilledDataInstanceReference filledDataInstanceReference) {
-        int position = filledDataInstanceReference.getInstanceNr();
-        checkPositionIndex(position, instanceReferenceList.size());
-        AbstractInstanceReference instance = instanceReferenceList.get(position);
-        checkState(instance instanceof ServerPendingDataInstanceReference, "A server pending data position should be found, critical protocol exceptions");
-        Object objectReference = filledDataInstanceReference.getObjectReference();
-        ClientDataObjectInstanceReference dataRef = new ClientDataObjectInstanceReference(position, objectReference);
-        instanceReferenceList.set(position, dataRef);
-        instanceObjectList.set(position, objectReference);
-    }
-
-    public void visitServerPendingDataInstance(ServerPendingDataInstanceReference serverPendingDataInstanceReference) {
-        throw new RuntimeException("not allowed type");
-    }
-
-    public void visitPendingDataInstance(PendingDataInstanceReference pendingDataInstanceReference) {
-        int currentInstanceNumber = getNextInstanceNumber();
-        checkState(pendingDataInstanceReference.getInstanceNr() == currentInstanceNumber);
-        PendingDataInstanceReference dataRef = new PendingDataInstanceReference(currentInstanceNumber, pendingDataInstanceReference.getDataType());
-        instanceReferenceList.add(dataRef);
-        instanceObjectList.add(null);
-    }
-
     @Override
-    public void visitClientDataObjectInstance(ClientDataObjectInstanceReference dataObjectInstanceReference) {
-        int currentInstanceNumber = getNextInstanceNumber();
-        checkState(dataObjectInstanceReference.getInstanceNr() == currentInstanceNumber);
-        Object objectReference = dataObjectInstanceReference.getObjectReference();
-        ClientDataObjectInstanceReference dataRef = new ClientDataObjectInstanceReference(currentInstanceNumber, objectReference);
-        instanceReferenceList.add(dataRef);
-        instanceObjectList.add(objectReference);
-    }
-
-    @Override
-    public void visitServerDataObjectInstance(ServerDataObjectInstanceReference dataObjectInstanceReference) {
-        throw new RuntimeException("not allowed type");
+    public void merge(CanonicalInstanceReference instanceReference) {
+        CanonicalInstanceReference.InstanceType instanceType = instanceReference.getInstanceType();
+        int currentInstanceNumber;
+        switch (instanceType) {
+            case SERVER_BINDING_KEY:
+            case SERVER_PENDING_DATA_REF:
+            case SERVER_DATA_OBJECT:
+                throw new RuntimeException("not allowed type on server site");
+            case BINDING_KEY:
+                currentInstanceNumber = getNextInstanceNumber();
+                checkState(instanceReference.getInstanceNr() == currentInstanceNumber);
+                CanonicalInstanceReference bindingReference = CanonicalProtocolSerialFactory.createBindingKeyReference(currentInstanceNumber, instanceReference.getKey());
+                instanceReferenceList.add(bindingReference);
+                // Do not create the instance, because this keyBinding can be the result of a local method execution.
+                // NOT -> instanceObjectList.add(injector.getInstance(key));
+                // see method getInstanceObject
+                instanceObjectList.add(null);
+                break;
+            case EXTERNAL_INSTANCE_REFERENCE:
+                currentInstanceNumber = getNextInstanceNumber();
+                checkState(instanceReference.getInstanceNr() == currentInstanceNumber);
+                Key<?> key = SerializableKey.toKey(instanceReference.getKey());
+                CanonicalInstanceRecorder<?> recorder = new CanonicalInstanceRecorder(executionContext, key, currentInstanceNumber, SERVER_SLOT_NR);
+                CanonicalInstanceReference reference = CanonicalProtocolSerialFactory.createExternalInstanceReference(currentInstanceNumber, key);
+                instanceReferenceList.add(reference);
+                instanceObjectList.add(recorder.getInstance());
+                break;
+            case PENDING_DATA_REF:
+                currentInstanceNumber = getNextInstanceNumber();
+                checkState(instanceReference.getInstanceNr() == currentInstanceNumber);
+                CanonicalInstanceReference dataRef = CanonicalProtocolSerialFactory.createPendingDataInstanceReference(currentInstanceNumber, instanceReference.getDataType());
+                instanceReferenceList.add(dataRef);
+                instanceObjectList.add(null);
+                break;
+            case CLIENT_DATA_OBJECT:
+                currentInstanceNumber = getNextInstanceNumber();
+                checkState(instanceReference.getInstanceNr() == currentInstanceNumber);
+                ByteString objectReferenceClientData = instanceReference.getDataObjectSerialization();
+                CanonicalInstanceReference clientDataRef = CanonicalProtocolSerialFactory.createClientDataObject(currentInstanceNumber, objectReferenceClientData);
+                Object objectReferenceInstance = CanonicalProtocolSerialFactory.deserialize(objectReferenceClientData);
+                instanceReferenceList.add(clientDataRef);
+                instanceObjectList.add(objectReferenceInstance);
+                break;
+            case FILLED_DATA_INSTANCE:
+                int position = instanceReference.getInstanceNr();
+                checkPositionIndex(position, instanceReferenceList.size());
+                CanonicalInstanceReference instance = instanceReferenceList.get(position);
+                checkState(instance.getInstanceType() == CanonicalInstanceReference.InstanceType.SERVER_PENDING_DATA_REF, "A server pending data position should be found, critical protocol exceptions");
+                ByteString objectReferenceFilledData = instanceReference.getDataObjectSerialization();
+                CanonicalInstanceReference filledDataRef = CanonicalProtocolSerialFactory.createClientDataObject(position, objectReferenceFilledData);
+                Object objectReferenceFilledInstance = CanonicalProtocolSerialFactory.deserialize(objectReferenceFilledData);
+                instanceReferenceList.set(position, filledDataRef);
+                instanceObjectList.set(position, objectReferenceFilledInstance);
+                break;
+        }
     }
 
 }

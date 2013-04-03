@@ -9,6 +9,7 @@ import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
+import eu.pmsoft.injectionUtils.logger.InjectLogger;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -26,8 +27,9 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import io.netty.util.internal.logging.InternalLoggerFactory;
+import io.netty.util.internal.logging.Slf4JLoggerFactory;
 import org.slf4j.Logger;
-import eu.pmsoft.injectionUtils.logger.InjectLogger;
 
 import javax.annotation.Nullable;
 import java.net.InetSocketAddress;
@@ -75,6 +77,7 @@ public final class ThreadExecutionServer {
     }
 
     public void startServer() {
+        InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
         logger.debug("starting local server on address {}", serverAddress);
         // TODO async bind to socket address
         serverBootstrap.group(new NioEventLoopGroup(), new NioEventLoopGroup()).channel(NioServerSocketChannel.class).localAddress(serverAddress)
@@ -132,7 +135,8 @@ class ProviderConnectionHandler extends ChannelInboundMessageHandlerAdapter<Thre
         } catch (Exception anyException) {
             ThreadMessage exception = new ThreadMessage();
             exception.setMessageType(ThreadMessage.ThreadProtocolMessageType.EXCEPTION_MESSAGE);
-            exception.setPayload(anyException);
+            // TODO pass exceptions on the protocol for every level of execution.
+            exception.setPayload(anyException.toString().getBytes());
             ctx.write(exception);
             throw anyException;
         }
@@ -244,7 +248,7 @@ class ClientConnectionHandler extends ChannelInboundMessageHandlerAdapter<Thread
                 routeMessage(msg);
                 break;
             case EXCEPTION_MESSAGE:
-                throw (Exception) msg.getPayload();
+                throw new RuntimeException(new String(msg.getPayload()));
         }
     }
 

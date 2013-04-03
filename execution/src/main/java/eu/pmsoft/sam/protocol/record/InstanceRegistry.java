@@ -1,7 +1,7 @@
 package eu.pmsoft.sam.protocol.record;
 
 import com.google.inject.Key;
-import eu.pmsoft.sam.protocol.transport.data.AbstractInstanceReference;
+import eu.pmsoft.sam.protocol.transport.CanonicalInstanceReference;
 import eu.pmsoft.sam.protocol.transport.data.InstanceMergeVisitor;
 
 import java.util.List;
@@ -12,7 +12,7 @@ public interface InstanceRegistry {
     void setMethodRecordContext(MethodRecordContext context);
 
     // TRANSFER
-    public List<AbstractInstanceReference> getInstanceReferenceToTransfer();
+    public List<CanonicalInstanceReference> getInstanceReferenceToTransfer();
 
     // INSTANCE CREATION
     public int createPendingDataBinding(Class<?> returnType);
@@ -30,9 +30,9 @@ public interface InstanceRegistry {
     // INSTANCE INFORMATION
     public Object getInstanceObject(int instanceNumber);
 
-    public Object[] getArguments(int[] arguments);
+    public Object[] getArguments(List<Integer> arguments);
 
-    public AbstractInstanceReference getInstanceReference(int instanceNr);
+    public CanonicalInstanceReference getInstanceReference(int instanceNr);
 
     // MERGE API
     public InstanceMergeVisitor getMergeVisitor();

@@ -1,9 +1,9 @@
 package eu.pmsoft.sam.see.api;
 
-import org.testng.annotations.Test;
 import eu.pmsoft.exceptions.OperationCheckedException;
 import eu.pmsoft.sam.see.SEEServer;
 import eu.pmsoft.sam.see.api.data.TestServiceExecutionEnvironmentConfiguration;
+import org.testng.annotations.Test;
 
 public class TestSEEsetup {
 

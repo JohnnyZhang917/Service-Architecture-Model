@@ -5,14 +5,15 @@ import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import org.slf4j.Logger;
 import eu.pmsoft.execution.ThreadMessage;
 import eu.pmsoft.execution.ThreadMessagePipe;
-import eu.pmsoft.sam.protocol.transport.data.AbstractInstanceReference;
+import eu.pmsoft.sam.protocol.transport.CanonicalInstanceReference;
+import eu.pmsoft.sam.protocol.transport.CanonicalMethodCall;
+import eu.pmsoft.sam.protocol.transport.CanonicalRequest;
 import eu.pmsoft.sam.protocol.transport.data.CanonicalProtocolRequestData;
 import eu.pmsoft.sam.protocol.transport.data.InstanceMergeVisitor;
-import eu.pmsoft.sam.protocol.transport.data.MethodCall;
 import eu.pmsoft.sam.see.api.model.ExecutionStrategy;
+import org.slf4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -87,7 +88,7 @@ abstract class AbstractExecutionStackManager {
 
     public abstract void executeCanonicalProtocol();
 
-    public void pushMethodCall(MethodCall call) {
+    public void pushMethodCall(CanonicalMethodCall call) {
         MethodExecutionStack currentStack = stack.getCurrentStack();
         logger.debug("recording call {}", call);
         boolean slotChange = currentStack.addCall(call);
@@ -105,7 +106,7 @@ abstract class AbstractExecutionStackManager {
         }
     }
 
-    void forceResolveCall(MethodCall call) {
+    void forceResolveCall(CanonicalMethodCall call) {
         pushMethodCall(call);
         flushExecution();
     }
@@ -134,11 +135,12 @@ abstract class AbstractExecutionStackManager {
             }
             if (message != null) {
                 logger.trace("handling message back");
-                CanonicalProtocolRequestData payload = (CanonicalProtocolRequestData) message.getPayload();
-                if (payload == null) {
+                byte[] payloadData = message.getPayload();
+                if (payloadData == null) {
                     logger.trace("returning thread execution");
                     currentStack.markDone();
                 } else {
+                    CanonicalProtocolRequestData payload = new CanonicalProtocolRequestData(payloadData);
                     if (payload.isCloseThread()) {
                         logger.trace("handle returning message call - merge only for clossing execution thread");
                         InstanceRegistry executionRegistry = instanceRegistries.get(currentStack.waitingSlotNr);
@@ -156,9 +158,12 @@ abstract class AbstractExecutionStackManager {
                             stack.unbindStack();
                         }
                         // thread line returns to external slot
-                        CanonicalProtocolRequestData returnMessage = new CanonicalProtocolRequestData(executionRegistry.getInstanceReferenceToTransfer(), null, true);
+                        CanonicalRequest data = new CanonicalRequest();
+                        data.setCloseThread(true);
+                        data.setInstancesList(executionRegistry.getInstanceReferenceToTransfer());
+                        CanonicalProtocolRequestData returnMessage = new CanonicalProtocolRequestData(data);
                         ThreadMessage closeMsg = new ThreadMessage();
-                        closeMsg.setPayload(returnMessage);
+                        closeMsg.setPayload(returnMessage.getPayload());
                         threadMessagePipe.sendMessage(closeMsg);
                     }
                 }
@@ -172,7 +177,7 @@ abstract class AbstractExecutionStackManager {
 
             ThreadMessagePipe threadMessagePipe = getPipe(currentStack.waitingSlotNr);
             ThreadMessage message = new ThreadMessage();
-            message.setPayload(stackRequest);
+            message.setPayload(stackRequest.getPayload());
             threadMessagePipe.sendMessage(message);
             assert currentStack.waitingStatus == true;
         }
@@ -182,22 +187,24 @@ abstract class AbstractExecutionStackManager {
         return pipes.get(targetSlotNr);
     }
 
-    protected void mergeInstances(InstanceRegistry registry, List<AbstractInstanceReference> instanceReferences) {
+    protected void mergeInstances(InstanceRegistry registry, List<CanonicalInstanceReference> instanceReferences) {
+        if (instanceReferences == null) return;
         InstanceMergeVisitor executionMergeVisitor = registry.getMergeVisitor();
-        for (AbstractInstanceReference abstractInstanceReference : instanceReferences) {
-            abstractInstanceReference.visitToMergeOnInstanceRegistry(executionMergeVisitor);
+        for (CanonicalInstanceReference abstractInstanceReference : instanceReferences) {
+            executionMergeVisitor.merge(abstractInstanceReference);
         }
     }
 
-    protected final void executeCalls(List<MethodCall> serviceCalls, InstanceRegistry instanceRegistry) {
-        for (MethodCall methodCall : serviceCalls) {
+    protected final void executeCalls(List<CanonicalMethodCall> serviceCalls, InstanceRegistry instanceRegistry) {
+        for (CanonicalMethodCall methodCall : serviceCalls) {
             int calledInstance = methodCall.getInstanceNr();
-            int[] arguments = methodCall.getArgumentReferences();
+            // TODO change to int[] on protostuff
+            List<Integer> arguments = methodCall.getArgumentsReferenceList();
             int returnInstance = methodCall.getReturnInstanceId();
 
             Object headObject = instanceRegistry.getInstanceObject(calledInstance);
             Object[] argumentsObjects = null;
-            if (arguments != null && arguments.length > 0) {
+            if (arguments != null && arguments.size() > 0) {
                 argumentsObjects = instanceRegistry.getArguments(arguments);
             }
 
@@ -247,7 +254,7 @@ abstract class AbstractExecutionStackManager {
     }
 
     class MethodExecutionStack {
-        private final Deque<MethodCall> serviceCallStack = Lists.newLinkedList();
+        private final Deque<CanonicalMethodCall> serviceCallStack = Lists.newLinkedList();
         private final int slotReference;
         private boolean waitingStatus = false;
         private int waitingSlotNr;
@@ -272,32 +279,40 @@ abstract class AbstractExecutionStackManager {
             if (serviceCallStack.isEmpty()) {
                 return prepareMergeInstanceRequest();
             }
-            List<MethodCall> methodCalls = getAccesibleCalls();
+            List<CanonicalMethodCall> methodCalls = getAccesibleCalls();
             assert methodCalls.size() > 0 : "the serviceCallStack is not empty and list of method calls is empty???, critical exceptions";
             sendMark += methodCalls.size();
-            int targetSlot = methodCalls.get(0).getServiceSlotNr();
-            List<AbstractInstanceReference> instanceReference = instanceRegistries.get(targetSlot).getInstanceReferenceToTransfer();
-            CanonicalProtocolRequestData data = new CanonicalProtocolRequestData(instanceReference, methodCalls, false);
+            int targetSlot = methodCalls.get(0).getSlotNr();
+            List<CanonicalInstanceReference> instanceReference = instanceRegistries.get(targetSlot).getInstanceReferenceToTransfer();
+            CanonicalRequest serialData = new CanonicalRequest();
+            serialData.setInstancesList(instanceReference);
+            serialData.setCallsList(methodCalls);
+            serialData.setCloseThread(false);
+
+            CanonicalProtocolRequestData data = new CanonicalProtocolRequestData(serialData);
             waitingSlotNr = targetSlot;
             return data;
         }
 
         private CanonicalProtocolRequestData prepareMergeInstanceRequest() {
-            List<AbstractInstanceReference> instanceReference = instanceRegistries.get(waitingSlotNr).getInstanceReferenceToTransfer();
+            List<CanonicalInstanceReference> instanceReference = instanceRegistries.get(waitingSlotNr).getInstanceReferenceToTransfer();
             if (instanceReference == null || instanceReference.size() == 0) {
                 return null;
             }
-            CanonicalProtocolRequestData data = new CanonicalProtocolRequestData(instanceReference, null, false);
+            CanonicalRequest serialData = new CanonicalRequest();
+            serialData.setInstancesList(instanceReference);
+            serialData.setCloseThread(false);
+            CanonicalProtocolRequestData data = new CanonicalProtocolRequestData(serialData);
             return data;
         }
 
-        private List<MethodCall> getAccesibleCalls() {
-            ImmutableList.Builder<MethodCall> methodBuilder = ImmutableList.builder();
-            MethodCall firstTarget = serviceCallStack.peek();
-            int targetSlot = firstTarget.getServiceSlotNr();
+        private List<CanonicalMethodCall> getAccesibleCalls() {
+            ImmutableList.Builder<CanonicalMethodCall> methodBuilder = ImmutableList.builder();
+            CanonicalMethodCall firstTarget = serviceCallStack.peek();
+            int targetSlot = firstTarget.getSlotNr();
             while (true) {
-                MethodCall targetCall = serviceCallStack.peek();
-                if (targetCall == null || targetCall.getServiceSlotNr() != targetSlot) {
+                CanonicalMethodCall targetCall = serviceCallStack.peek();
+                if (targetCall == null || targetCall.getSlotNr() != targetSlot) {
                     break;
                 }
                 methodBuilder.add(serviceCallStack.poll());
@@ -305,12 +320,12 @@ abstract class AbstractExecutionStackManager {
             return methodBuilder.build();
         }
 
-        public boolean addCall(MethodCall call) {
+        public boolean addCall(CanonicalMethodCall call) {
             assert call != null;
-            MethodCall last = serviceCallStack.peek();
+            CanonicalMethodCall last = serviceCallStack.peek();
             serviceCallStack.addLast(call);
             recordMark++;
-            return last != null && last.getServiceSlotNr() != call.getServiceSlotNr();
+            return last != null && last.getSlotNr() != call.getSlotNr();
         }
 
         @Override

@@ -1,16 +1,16 @@
 package eu.pmsoft.sam.definition.instance;
 
 import com.google.inject.AbstractModule;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
-import org.mockito.stubbing.Stubber;
-import org.testng.annotations.Test;
 import eu.pmsoft.sam.definition.implementation.AbstractSamImplementationPackage;
 import eu.pmsoft.sam.definition.implementation.AbstractSamServiceImplementationDefinition;
 import eu.pmsoft.sam.definition.implementation.SamServiceImplementationLoader;
 import eu.pmsoft.sam.definition.implementation.SamServicePackageLoader;
 import eu.pmsoft.sam.definition.service.AbstractSamServiceDefinition;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.mockito.stubbing.Stubber;
+import org.testng.annotations.Test;
 
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.verify;

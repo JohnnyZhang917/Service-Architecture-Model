@@ -14,10 +14,9 @@ public class ThreadMessage implements Serializable {
         EXCEPTION_MESSAGE
     }
 
-    private static final long serialVersionUID = 8462213620673547714L;
     private UUID uuid;
     private URL targetUrl;
-    private Object payload;
+    private byte[] payload;
     private String signature;
     private ThreadProtocolMessageType messageType;
 
@@ -40,11 +39,11 @@ public class ThreadMessage implements Serializable {
         this.uuid = uuid;
     }
 
-    public Object getPayload() {
+    public byte[] getPayload() {
         return payload;
     }
 
-    public void setPayload(Object payload) {
+    public void setPayload(byte[] payload) {
         this.payload = payload;
     }
 

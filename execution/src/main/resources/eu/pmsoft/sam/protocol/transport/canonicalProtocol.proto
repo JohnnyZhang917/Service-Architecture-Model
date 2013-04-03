@@ -10,16 +10,19 @@ message CanonicalMethodCall {
     required int32 methodSignature = 1;
     required int32 instanceNr = 2;
     optional int32 returnInstanceId = 3;
-    optional repeated int32 argumentsReference = 4;
+    repeated int32 argumentsReference = 4;
+
+    required int32 slotNr = 5; // TODO usun tego pola, wrappuj gdzie indziej
 }
 
 message BindingKey {
-    optional string type = 1;
+    optional string type = 1; //TODO change to int from architecture precompilation
     optional string annotationType = 2;
+    optional bytes annotationInstance = 3;
 }
 
 message CanonicalInstanceReference {
-    required int32 intanceNr = 1;
+    required int32 instanceNr = 1;
     enum InstanceType {
         BINDING_KEY = 1;
         EXTERNAL_INSTANCE_REFERENCE = 2;
@@ -30,14 +33,14 @@ message CanonicalInstanceReference {
         SERVER_DATA_OBJECT = 7;
         CLIENT_DATA_OBJECT = 8;
       }
-    optional BindingKey key = 2;
-    optional string dataType = 3;
-    optional bytes dataObjectSerialization = 4;
-
-
+    required InstanceType instanceType = 2;
+    optional BindingKey key = 3;
+    optional string dataType = 4;
+    optional bytes dataObjectSerialization = 5;
 }
 
 message CanonicalRequest {
     repeated CanonicalMethodCall calls = 1;
     repeated CanonicalInstanceReference instances = 2;
+    optional bool closeThread = 3;
 }
