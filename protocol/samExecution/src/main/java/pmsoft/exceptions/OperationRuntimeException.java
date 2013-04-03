@@ -2,6 +2,12 @@ package pmsoft.exceptions;
 
 import com.google.common.base.Objects;
 
+/**
+ * Catch on the head of a operation context to look for internal errors.
+ *
+ * Normally You will translate this to a OperationCheckedException and throw it to the client code.
+ * The client should try to fix or repeat the operation.
+ */
 public class OperationRuntimeException extends RuntimeException {
     private static final long serialVersionUID = -6664261440597260760L;
     private final ErrorsReport errors;

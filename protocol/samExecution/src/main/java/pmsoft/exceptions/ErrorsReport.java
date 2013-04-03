@@ -6,7 +6,7 @@ import com.google.common.collect.Lists;
 import java.util.List;
 
 public class ErrorsReport {
-    List<ErrorMessage> errors = Lists.newArrayList();
+    private List<ErrorMessage> errors = Lists.newArrayList();
 
     public void addError(Throwable cause, String format, Object... objects) {
         String message = ErrorsReport.format(format, objects);
@@ -26,14 +26,13 @@ public class ErrorsReport {
         return !errors.isEmpty();
     }
 
-    public OperationCheckedException toException() {
+    public OperationCheckedException toCheckedException() {
         return new OperationCheckedException(this);
     }
 
     public OperationRuntimeException toRuntimeException() {
         return new OperationRuntimeException(this);
     }
-
 
     private static String format(String messageFormat, Object[] arguments) {
         return String.format(messageFormat, arguments);

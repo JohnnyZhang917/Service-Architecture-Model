@@ -16,8 +16,7 @@ import pmsoft.sam.definition.service.AbstractSamServiceDefinition;
 import java.util.Collection;
 import java.util.List;
 
-import static org.testng.AssertJUnit.assertNotNull;
-import static org.testng.AssertJUnit.assertTrue;
+import static org.testng.AssertJUnit.*;
 
 public class ArchitectureLoadingPositiveTest {
 
@@ -42,6 +41,25 @@ public class ArchitectureLoadingPositiveTest {
         for (SamService service : architecture.getAllService()) {
             assertTrue(service.getServiceContractAPI().size() > 0);
         }
+    }
+    @Test(dataProvider = "correctArchitecture")
+    public void loadArchitecturesCategories(SamArchitectureDefinition definition) throws IncorrectArchitectureDefinition {
+        SamArchitecture architecture = ArchitectureModelLoader.loadArchitectureModel(definition);
+        assertNotNull(architecture);
+        String[] expected = {"one","two","three","four"};
+        String[] noExpected = {"oneNOT","twoNOT","threeNOT","fourNOT"};
+        for (int i = 0; i < noExpected.length; i++) {
+            String dontExist = noExpected[i];
+            SamCategory category = architecture.getCategory(dontExist);
+            assertNull(category);
+        }
+        for (int i = 0; i < expected.length; i++) {
+            String mustExist = expected[i];
+            SamCategory category = architecture.getCategory(mustExist);
+            assertNotNull(category);
+            assertEquals(category.getCategoryId(),mustExist);
+        }
+
     }
 
     @Test(dataProvider = "correctArchitecture")

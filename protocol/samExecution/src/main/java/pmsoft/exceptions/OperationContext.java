@@ -6,7 +6,7 @@ public class OperationContext {
 
     private final OperationContext parent;
 
-    public OperationContext(OperationContext parent) {
+    OperationContext(OperationContext parent) {
         this.parent = parent;
         errors = new ErrorsReport();
     }
@@ -17,7 +17,7 @@ public class OperationContext {
 
     public void throwOnErrors() throws OperationCheckedException {
         if (errors.hasErrors()) {
-            throw errors.toException();
+            throw errors.toCheckedException();
         }
     }
 
