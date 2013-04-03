@@ -13,7 +13,6 @@
     <packaging>jar</packaging>
 
     <build>
-        <defaultGoal>install</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>com.dyuproject.protostuff</groupId>

@@ -1,17 +1,17 @@
-package pmsoft.sam.architecture.test;
+package eu.pmsoft.sam.architecture.test;
 
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 import org.testng.collections.Lists;
-import pmsoft.sam.architecture.definition.AbstractSamArchitectureDefinition;
-import pmsoft.sam.architecture.definition.SamArchitectureDefinition;
-import pmsoft.sam.architecture.definition.SamArchitectureLoader.SamCategoryLoader;
-import pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
-import pmsoft.sam.architecture.loader.ArchitectureModelLoader;
-import pmsoft.sam.architecture.model.SamArchitecture;
-import pmsoft.sam.architecture.model.SamCategory;
-import pmsoft.sam.architecture.model.SamService;
-import pmsoft.sam.definition.service.AbstractSamServiceDefinition;
+import eu.pmsoft.sam.architecture.definition.AbstractSamArchitectureDefinition;
+import eu.pmsoft.sam.architecture.definition.SamArchitectureDefinition;
+import eu.pmsoft.sam.architecture.definition.SamArchitectureLoader.SamCategoryLoader;
+import eu.pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
+import eu.pmsoft.sam.architecture.loader.ArchitectureModelLoader;
+import eu.pmsoft.sam.architecture.model.SamArchitecture;
+import eu.pmsoft.sam.architecture.model.SamCategory;
+import eu.pmsoft.sam.architecture.model.SamService;
+import eu.pmsoft.sam.definition.service.AbstractSamServiceDefinition;
 
 import java.util.Collection;
 import java.util.List;

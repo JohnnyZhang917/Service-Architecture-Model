@@ -1,0 +1,43 @@
+package InjectionBusModel;
+
+option optimize_for = SPEED;
+option java_package = "eu.pmsoft.sam.protocol.transport";
+option java_outer_classname = "InjectionBusMessage";
+
+
+
+message CanonicalMethodCall {
+    required int32 methodSignature = 1;
+    required int32 instanceNr = 2;
+    optional int32 returnInstanceId = 3;
+    optional repeated int32 argumentsReference = 4;
+}
+
+message BindingKey {
+    optional string type = 1;
+    optional string annotationType = 2;
+}
+
+message CanonicalInstanceReference {
+    required int32 intanceNr = 1;
+    enum InstanceType {
+        BINDING_KEY = 1;
+        EXTERNAL_INSTANCE_REFERENCE = 2;
+        SERVER_BINDING_KEY = 3;
+        PENDING_DATA_REF = 4;
+        SERVER_PENDING_DATA_REF = 5;
+        FILLED_DATA_INSTANCE = 6;
+        SERVER_DATA_OBJECT = 7;
+        CLIENT_DATA_OBJECT = 8;
+      }
+    optional BindingKey key = 2;
+    optional string dataType = 3;
+    optional bytes dataObjectSerialization = 4;
+
+
+}
+
+message CanonicalRequest {
+    repeated CanonicalMethodCall calls = 1;
+    repeated CanonicalInstanceReference instances = 2;
+}
