@@ -4,10 +4,10 @@
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.pmsoft.ibus</groupId>
-    <artifactId>InjectionBusParentPom</artifactId>
+    <artifactId>examplePomMaster</artifactId>
     <version>0.4.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>InjectionBus</name>
+    <name>Injection Bus Example Master</name>
 
     <build>
         <plugins>
@@ -89,12 +89,9 @@
     </dependencyManagement>
 
     <modules>
-        <module>doc</module>
-        <module>coreapi</module>
-        <module>model</module>
-        <module>infrastructure</module>
-        <module>execution</module>
-        <module>example</module>
+        <module>architecture</module>
+        <module>providers</module>
+        <module>server</module>
     </modules>
 
     <properties>

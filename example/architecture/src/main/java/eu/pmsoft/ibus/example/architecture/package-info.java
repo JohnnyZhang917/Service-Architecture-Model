@@ -1,0 +1,1 @@
+package eu.pmsoft.ibus.example.architecture;

@@ -2,16 +2,28 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <parent>
         <groupId>eu.pmsoft.ibus</groupId>
-        <artifactId>InjectionBusParentPom</artifactId>
+        <artifactId>examplePomMaster</artifactId>
         <version>0.4.0-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.pmsoft.ibus</groupId>
-    <artifactId>infrastructure</artifactId>
-    <name>InjectionBus :: Services Definition</name>
+    <artifactId>architecture</artifactId>
+    <version>0.4.0-SNAPSHOT</version>
+    <name>InjectionBus :: Example :: Architecture</name>
     <packaging>jar</packaging>
 
+    <dependencies>
+        <dependency>
+            <groupId>eu.pmsoft.ibus</groupId>
+            <artifactId>model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.dyuproject.protostuff</groupId>
+            <artifactId>protostuff-core</artifactId>
+        </dependency>
+    </dependencies>
     <build>
         <plugins>
             <plugin>
@@ -21,7 +33,7 @@
                 <configuration>
                     <protoModules>
                         <protoModule>
-                            <source>src/main/resources/eu/pmsoft/ibus/service/ibusMessages.proto</source>
+                            <source>src/main/resources/eu/pmsoft/ibus/example/architecture/citizen/citizenDomain.proto</source>
                             <outputDir>target/generated-sources</outputDir>
                             <output>java_bean</output>
                             <encoding>UTF-8</encoding>
@@ -54,11 +66,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>com.dyuproject.protostuff</groupId>
-            <artifactId>protostuff-core</artifactId>
-        </dependency>
-    </dependencies>
 </project>

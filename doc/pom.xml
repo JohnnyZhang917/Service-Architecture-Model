@@ -8,18 +8,38 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>eu.pmsoft.ibus</groupId>
-    <artifactId>coreapi</artifactId>
-    <name>InjectionBus :: CoreApi</name>
+    <artifactId>documentation</artifactId>
+    <name>InjectionBus :: Documentation examples</name>
     <packaging>jar</packaging>
 
     <dependencies>
         <dependency>
-            <groupId>com.dyuproject.protostuff</groupId>
-            <artifactId>protostuff-core</artifactId>
+            <groupId>eu.pmsoft.ibus</groupId>
+            <artifactId>coreapi</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.pmsoft.ibus</groupId>
+            <artifactId>model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>eu.pmsoft.ibus</groupId>
+            <artifactId>infrastructure</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-grapher</artifactId>
+            <version>3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.inject.extensions</groupId>
+            <artifactId>guice-assistedinject</artifactId>
         </dependency>
         <dependency>
             <groupId>org.testng</groupId>
@@ -29,8 +49,6 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-all</artifactId>
-            <scope>test</scope>
         </dependency>
     </dependencies>
-
 </project>

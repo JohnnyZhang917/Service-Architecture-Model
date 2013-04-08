@@ -68,6 +68,18 @@ morecomment=[s][\color{javadocblue}]{/**}{*/},
 \date{5 czerwca 2012}
 \begin{document}
 
+\lstdefinelanguage{XML}
+{
+  morestring=[b]",
+  morestring=[s]{>}{<},
+  morecomment=[s]{<?}{?>},
+  stringstyle=\color{black},
+  identifierstyle=\color{darkblue},
+  keywordstyle=\color{cyan},
+  morekeywords={xmlns,version,type}% list your attributes here
+}
+
+
 \begin{frame}
 \titlepage
 \end{frame}
