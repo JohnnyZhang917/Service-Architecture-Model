@@ -1,9 +1,10 @@
 package eu.pmsoft.ibus.example.architecture;
 
+import eu.pmsoft.ibus.example.architecture.citizen.control.CitizenControlAccessService;
 import eu.pmsoft.sam.architecture.definition.AbstractSamArchitectureDefinition;
 import eu.pmsoft.sam.architecture.definition.SamArchitectureLoader;
 
-public class IbusExampleArchitecture extends AbstractSamArchitectureDefinition {
+public class IbusCitizenArchitecture extends AbstractSamArchitectureDefinition {
 
     public String CITIZEN_ACCESS_CATEGORY = "CITIZEN_ACCESS";
 
@@ -55,6 +56,7 @@ public class IbusExampleArchitecture extends AbstractSamArchitectureDefinition {
         production
                 .accessToCategory(transaction);
 
+        citizen.withService(new CitizenControlAccessService());
 
 
 

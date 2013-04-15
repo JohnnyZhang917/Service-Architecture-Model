@@ -37,7 +37,8 @@ public class TestSEEexecution {
 
     @DataProvider(name = "executionStrategies")
     public Object[][] listOfArchitectures() {
-        return new Object[][]{{ExecutionStrategy.PROCEDURAL}, {ExecutionStrategy.SIMPLE_LAZY}};
+//        return new Object[][]{{ExecutionStrategy.PROCEDURAL}, {ExecutionStrategy.SIMPLE_LAZY}};
+        return new Object[][]{{ExecutionStrategy.SIMPLE_LAZY}};
     }
 
     @Test(dataProvider = "executionStrategies", sequential = true)

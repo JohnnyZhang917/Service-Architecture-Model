@@ -4,12 +4,8 @@ option optimize_for = SPEED;
 option java_package = "eu.pmsoft.ibus.example.architecture.citizen";
 option java_outer_classname = "InjectionBusModelExample";
 
-message AuthenticationSessionToken {
-    required string authenticationToken = 1;
-}
-
 message CitizenInfo {
-    required sint64 personId = 1;
+    required int64 citizenIID = 1;
     optional string firstName = 5;
     optional string secondName = 6;
     optional string familyName = 7;
