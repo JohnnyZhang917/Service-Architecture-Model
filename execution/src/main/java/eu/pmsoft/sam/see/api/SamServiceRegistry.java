@@ -23,12 +23,5 @@ public interface SamServiceRegistry {
      */
     public SamServiceImplementation getImplementation(SamServiceImplementationKey key);
 
-    /**
-     * Get a currently running transaction
-     *
-     * @param url SIURL identifying this transaction
-     * @return transaction by url
-     */
-    public SamInstanceTransaction getTransaction(SIURL url);
 
 }

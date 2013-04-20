@@ -1,17 +1,16 @@
 package eu.pmsoft.sam.see.api;
 
 import com.google.inject.*;
-import com.google.inject.name.Names;
 import eu.pmsoft.exceptions.OperationCheckedException;
 import eu.pmsoft.exceptions.OperationReportingModule;
+import eu.pmsoft.injectionUtils.logger.LoggerInjectorModule;
 import eu.pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
 import eu.pmsoft.sam.architecture.loader.ArchitectureModelLoader;
 import eu.pmsoft.sam.architecture.model.SamArchitecture;
 import eu.pmsoft.sam.architecture.model.ServiceKey;
 import eu.pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
-import eu.pmsoft.sam.protocol.CanonicalProtocolExecutionContext;
+import eu.pmsoft.sam.protocol.CanonicalProtocolThreadExecutionContext;
 import eu.pmsoft.sam.protocol.TransactionController;
-import eu.pmsoft.sam.see.SEEServer;
 import eu.pmsoft.sam.see.api.data.TestTransactionDefinition;
 import eu.pmsoft.sam.see.api.data.architecture.SeeTestArchitecture;
 import eu.pmsoft.sam.see.api.data.architecture.contract.TestInterfaceOne;
@@ -32,24 +31,14 @@ import org.testng.annotations.DataProvider;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
 
-import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.util.Set;
 
 import static org.testng.Assert.*;
 
 
-@Guice(modules = {OperationReportingModule.class, LocalSeeExecutionModule.class, LocalSeeInfrastructureModule.class, TestServiceExecutionCreationByStep.PortBindModule.class})
+@Guice(modules = {OperationReportingModule.class, LocalSeeExecutionModule.class, LocalSeeInfrastructureModule.class, TestSamEnvironment.class, LoggerInjectorModule.class})
 public class TestServiceExecutionCreationByStep {
-
-    public static class PortBindModule extends AbstractModule {
-
-        @Override
-        protected void configure() {
-            InetSocketAddress serverAddressBind = new InetSocketAddress(5111);
-            bind(InetSocketAddress.class).annotatedWith(Names.named(SEEServer.SERVER_ADDRESS_BIND)).toInstance(serverAddressBind);
-        }
-    }
 
     @Inject
     private SamArchitectureManagement architectureManager;
@@ -171,15 +160,12 @@ public class TestServiceExecutionCreationByStep {
         url = executionNode.setupInjectionTransaction(transaction, url, ExecutionStrategy.PROCEDURAL);
         SamInstanceTransaction transactionRegistered = executionNode.getTransaction(url);
         assertNotNull(transactionRegistered);
-        SamInstanceTransaction transanctionOnRegistry = samServiceRegistry.getTransaction(url);
-        assertNotNull(transanctionOnRegistry);
-        assertEquals(transactionRegistered, transanctionOnRegistry);
     }
 
     @Test(groups = "transactionsExecution", dependsOnGroups = "transactionsCreation")
     public void testInjectionTransactionExecutionForServiceOne() throws MalformedURLException {
 
-        CanonicalProtocolExecutionContext executionContext = executionNode.createTransactionExecutionContext(siurlLocalOne);
+        CanonicalProtocolThreadExecutionContext executionContext = executionNode.createTransactionExecutionContext(siurlLocalOne);
         Key<TestInterfaceOne> interfaceOneKey = Key.get(TestInterfaceOne.class);
         Injector injector = executionContext.getInjector();
         assertNotNull(injector);
@@ -199,7 +185,7 @@ public class TestServiceExecutionCreationByStep {
     public void testInjectionTransactionExecutionForServiceTwo(SIURL transactionURL) throws MalformedURLException {
         Key<TestInterfaceOne> interfaceOneKey = Key.get(TestInterfaceOne.class);
         Key<TestInterfaceTwo0> interfaceTwoKey = Key.get(TestInterfaceTwo0.class);
-        CanonicalProtocolExecutionContext executionContext = executionNode.createTransactionExecutionContext(transactionURL);
+        CanonicalProtocolThreadExecutionContext executionContext = executionNode.createTransactionExecutionContext(transactionURL);
         Injector injector = executionContext.getInjector();
 
         assertNotNull(injector);

@@ -10,6 +10,29 @@ import static org.testng.Assert.assertNull;
 @Guice(modules = OperationReportingModule.class)
 public class ExceptionsTest {
 
+//    public static class TestRootException extends Exception {
+//
+//    }
+//
+//    public static class SpecificOneExce extends TestRootException{}
+//    public static class SpecificTwoExce extends TestRootException{}
+//
+//    public static class TestRootRuntimeException extends RuntimeException {
+//
+//    }
+//
+//    public static class TestExceptionUseRoot {
+//
+//        public void businessMethod() {
+//
+//            try {
+//
+//            } catch (TestRootRuntimeException e) {
+//
+//            }
+//        }
+//    }
+
     @Inject
     OperationReportingFactory operationReportingFactory;
 

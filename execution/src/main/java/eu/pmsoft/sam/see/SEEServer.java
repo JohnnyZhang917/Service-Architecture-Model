@@ -1,14 +1,11 @@
 package eu.pmsoft.sam.see;
 
 import com.google.common.collect.Lists;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Module;
-import com.google.inject.name.Names;
+import com.google.inject.*;
 import com.google.inject.util.Modules;
 import eu.pmsoft.exceptions.*;
 import eu.pmsoft.execution.*;
+import eu.pmsoft.injectionUtils.logger.LoggerInjectorModule;
 import eu.pmsoft.sam.architecture.definition.SamArchitectureDefinition;
 import eu.pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
 import eu.pmsoft.sam.architecture.loader.ArchitectureModelLoader;
@@ -28,61 +25,72 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-
+@Singleton
 public class SEEServer {
-    public final static String SERVER_ADDRESS_BIND = "SERVER_ADDRESS_BIND";
 
-    private final Injector serverInjector;
     private final ThreadExecutionServer server;
-    private final InetSocketAddress address;
     private final OperationReportingFactory operationReportingFactory;
+    private final InetSocketAddress address;
+    private final SamArchitectureManagement architectureManager;
+    private final SamExecutionNode executionNode;
+    private final SamServiceRegistry samServiceRegistry;
+    private final SamServiceDiscovery serviceDiscovery;
+
+    @Inject
+    public SEEServer(ThreadExecutionServer server, OperationReportingFactory operationReportingFactory, SEEConfiguration configuration, SamArchitectureManagement architectureManager, SamExecutionNode executionNode, SamServiceRegistry samServiceRegistry, SamServiceDiscovery serviceDiscovery) throws OperationCheckedException {
+        this.server = server;
+        this.operationReportingFactory = operationReportingFactory;
+        this.architectureManager = architectureManager;
+        this.executionNode = executionNode;
+        this.samServiceRegistry = samServiceRegistry;
+        this.serviceDiscovery = serviceDiscovery;
+        this.address = configuration.address;
+        initializeServerNode(configuration);
+    }
+
+    public static SEEServer createServer(final SEEConfiguration configuration) {
+        Injector injector = Guice.createInjector(createServerModule(configuration));
+        return injector.getInstance(SEEServer.class);
+    }
+
 
     /**
      * Visible for testing
      *
-     * @param serverAddressBind
+     * @param configuration
      */
-    public static Module createServerModule(final InetSocketAddress serverAddressBind) {
+    public static Module createServerModule(final SEEConfiguration configuration) {
         List<Module> serverModules = Lists.newArrayList();
+        serverModules.addAll(configuration.pluginModules);
+        serverModules.add(new LoggerInjectorModule());
         serverModules.add(new ThreadExecutionModule());
         // TODO extract as configuration
         serverModules.add(new AbstractModule() {
             @Override
             protected void configure() {
                 bind(ExecutorService.class).toInstance(Executors.newCachedThreadPool());
-                bind(InternalLogicContextFactory.class).to(SEELogicContextFactory.class).asEagerSingleton();
+                bind(ThreadExecutionLoginProvider.class).to(SEELogicContextLogin.class).asEagerSingleton();
             }
         });
         serverModules.add(new LocalSeeExecutionModule());
         serverModules.add(new OperationReportingModule());
         serverModules.add(new LocalSeeInfrastructureModule());
         //TODO setup this some where else, without inner class
+        // TODO FIXME, dont inject address. Should be passed during initialization
         serverModules.add(new AbstractModule() {
             @Override
             protected void configure() {
-                bind(InetSocketAddress.class).annotatedWith(Names.named(SEEServer.SERVER_ADDRESS_BIND)).toInstance(serverAddressBind);
+                bind(SEEServer.class);
+                bind(SEEConfiguration.class).toInstance(configuration);
+                bind(InetSocketAddress.class).toInstance(configuration.address);
             }
         });
         return Modules.combine(serverModules);
     }
 
-    public SEEServer(final SEEConfiguration configuration) throws OperationCheckedException {
-        ErrorsReport initializationContext = new ErrorsReport();
-        this.address = configuration.address;
-        Module pluginsModule = Modules.combine(configuration.pluginModules);
-        serverInjector = Guice.createInjector(createServerModule(configuration.address), pluginsModule);
-        ThreadExecutionInfrastructure infrastructure = serverInjector.getInstance(ThreadExecutionInfrastructure.class);
-        this.server = infrastructure.createServer(address);
-        this.operationReportingFactory = serverInjector.getInstance(OperationReportingFactory.class);
-        initializeServerNode(configuration);
-    }
-
     private void initializeServerNode(SEEConfiguration configuration) throws OperationCheckedException {
         OperationContext operationContext = operationReportingFactory.ensureEmptyContext();
         try {
-            SamArchitectureManagement architectureManager = serverInjector.getInstance(SamArchitectureManagement.class);
-            SamExecutionNode executionNode = serverInjector.getInstance(SamExecutionNode.class);
-            SamServiceRegistry samServiceRegistry = serverInjector.getInstance(SamServiceRegistry.class);
 
             for (SamArchitectureDefinition architectureDef : configuration.architectures) {
                 SamArchitecture architecture;
@@ -97,7 +105,7 @@ public class SEEServer {
                 samServiceRegistry.registerServiceImplementationPackage(implPackage);
             }
             for (SEEServiceSetupAction setup : configuration.setupActions) {
-                setup.setupService(executionNode);
+                setup.setupService(executionNode,server);
             }
         } catch (OperationRuntimeException operationError) {
             operationContext.getErrors().addError(operationError);
@@ -110,8 +118,7 @@ public class SEEServer {
     public void executeSetupAction(SEEServiceSetupAction setup) throws OperationCheckedException {
         OperationContext operationContext = operationReportingFactory.openNestedContext();
         try {
-            SamExecutionNode executionNode = serverInjector.getInstance(SamExecutionNode.class);
-            setup.setupService(executionNode);
+            setup.setupService(executionNode, server);
         } catch (OperationRuntimeException operationError) {
             operationContext.getErrors().addError(operationError);
         } finally {
@@ -121,7 +128,7 @@ public class SEEServer {
     }
 
     public SamServiceDiscovery getServiceDiscovery() {
-        return serverInjector.getInstance(SamServiceDiscovery.class);
+        return this.serviceDiscovery;
     }
 
     public void startUpServer() {

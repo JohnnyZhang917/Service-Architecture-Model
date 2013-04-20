@@ -1,13 +1,14 @@
 package eu.pmsoft.sam.see.api;
 
-import eu.pmsoft.sam.protocol.CanonicalProtocolExecutionContext;
+import eu.pmsoft.execution.ServiceEndpointAddressProvider;
+import eu.pmsoft.sam.protocol.CanonicalProtocolThreadExecutionContext;
 import eu.pmsoft.sam.see.api.model.*;
 import eu.pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
 
 import java.util.Set;
 import java.util.UUID;
 
-public interface SamExecutionNode extends SamServiceRegistry {
+public interface SamExecutionNode {
 
     /**
      * Create a new instance of the given implementation with provided metadata.
@@ -41,7 +42,7 @@ public interface SamExecutionNode extends SamServiceRegistry {
      */
     public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, SIURL url, ExecutionStrategy executionStrategy);
 
-    public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, ExecutionStrategy executionStrategy);
+    public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, ExecutionStrategy executionStrategy, ServiceEndpointAddressProvider serverEndpoint);
 
     /**
      * Publish to service Transaction on the ServiceDiscovery infrastructure
@@ -51,8 +52,8 @@ public interface SamExecutionNode extends SamServiceRegistry {
      */
     public SamInstanceTransaction getTransaction(SIURL url);
 
-    public CanonicalProtocolExecutionContext createTransactionExecutionContext(SIURL url);
+    public CanonicalProtocolThreadExecutionContext createTransactionExecutionContext(SIURL url);
 
-    public CanonicalProtocolExecutionContext openTransactionExecutionContext(SIURL targetUrl, UUID transactionUniqueId);
+    public CanonicalProtocolThreadExecutionContext openTransactionExecutionContext(SIURL targetUrl, UUID transactionUniqueId);
 
 }

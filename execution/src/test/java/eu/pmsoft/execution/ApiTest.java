@@ -25,28 +25,35 @@ public class ApiTest {
 
     @Test
     public void localInjectorCreation() {
-        Injector injector = Guice.createInjector(new FakeInternalLogicModule());
-        assertNotNull(injector);
-        Binding<ThreadExecutionInfrastructure> infrastructureBind = injector.getExistingBinding(Key.get(ThreadExecutionInfrastructure.class));
-        assertNotNull(infrastructureBind);
-        ThreadExecutionInfrastructure infrastructure = injector.getInstance(ThreadExecutionInfrastructure.class);
         InetSocketAddress address = new InetSocketAddress(5000);
-        ThreadExecutionServer server = infrastructure.createServer(address);
+        Injector injector = Guice.createInjector(new FakeInternalLogicModule(address));
+        assertNotNull(injector);
+        Binding<ThreadExecutionServer> serverBind = injector.getExistingBinding(Key.get(ThreadExecutionServer.class));
+        assertNotNull(serverBind);
+        ThreadExecutionServer server = injector.getInstance(ThreadExecutionServer.class);
         server.startServer();
         server.shutdownServer();
     }
 
     public static class FakeInternalLogicModule extends AbstractModule {
 
+        private final InetSocketAddress address;
+
+        public FakeInternalLogicModule(InetSocketAddress address) {
+            this.address = address;
+
+        }
+
         @Override
         protected void configure() {
-            bind(InternalLogicContextFactory.class).toInstance(new InternalLogicContextFactory() {
+            bind(ThreadExecutionLoginProvider.class).toInstance(new ThreadExecutionLoginProvider() {
                 @Override
-                public ExecutionContextInternalLogic open(URL targetURL) {
+                public ThreadExecutionContextInternalLogic open(URL targetURL) {
                     return null;
                 }
             });
             bind(ExecutorService.class).toInstance(Executors.newFixedThreadPool(5));
+            bind(InetSocketAddress.class).toInstance(address);
             install(new ThreadExecutionModule());
         }
 
@@ -74,10 +81,10 @@ public class ApiTest {
 
     @Test
     public void executeSimpleCall() throws ExecutionException, InterruptedException {
-        Injector injector = Guice.createInjector(new SimpleCallLogicModule());
-        ThreadExecutionInfrastructure infrastructure = injector.getInstance(ThreadExecutionInfrastructure.class);
-        ThreadExecutionServer one = infrastructure.createServer(new InetSocketAddress(5001));
-        ThreadExecutionServer two = infrastructure.createServer(new InetSocketAddress(5002));
+
+        ThreadExecutionServer one = Guice.createInjector(new SimpleCallLogicModule(new InetSocketAddress(5001))).getInstance(ThreadExecutionServer.class);
+        ThreadExecutionServer two = Guice.createInjector(new SimpleCallLogicModule(new InetSocketAddress(5002))).getInstance(ThreadExecutionServer.class);
+
         one.startServer();
         two.startServer();
         Future<String> testFuture = one.executeServiceAction(new ServiceAction<String, SimpleCallService>(serviceOne, Key.get(SimpleCallService.class)) {
@@ -94,20 +101,27 @@ public class ApiTest {
 
     static class SimpleCallLogicModule extends AbstractModule {
 
+        private final InetSocketAddress address;
+
+        public SimpleCallLogicModule(InetSocketAddress address) {
+            this.address = address;
+        }
+
         @Override
         protected void configure() {
-            bind(InternalLogicContextFactory.class).toInstance(new InternalLogicContextFactory() {
+            bind(ThreadExecutionLoginProvider.class).toInstance(new ThreadExecutionLoginProvider() {
                 @Override
-                public ExecutionContextInternalLogic open(URL targetURL) {
+                public ThreadExecutionContextInternalLogic open(URL targetURL) {
                     return new SimpleExecutionlogic(targetURL);
                 }
             });
             bind(ExecutorService.class).toInstance(Executors.newFixedThreadPool(5));
             install(new ThreadExecutionModule());
+            bind(InetSocketAddress.class).toInstance(address);
         }
     }
 
-    static class SimpleExecutionlogic implements ExecutionContextInternalLogic, CallExternal {
+    static class SimpleExecutionlogic implements ThreadExecutionContextInternalLogic, CallExternal {
 
         private final URL target;
         private final Injector injector;
@@ -157,7 +171,7 @@ public class ApiTest {
         }
 
         @Override
-        public List<URL> getEndpointAdressList() {
+        public List<URL> getEndpointAddressList() {
             return externalServices;
         }
 

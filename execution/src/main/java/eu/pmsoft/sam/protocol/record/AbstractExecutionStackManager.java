@@ -142,12 +142,12 @@ abstract class AbstractExecutionStackManager {
                 } else {
                     CanonicalProtocolRequestData payload = new CanonicalProtocolRequestData(payloadData);
                     if (payload.isCloseThread()) {
-                        logger.trace("handle returning message call - merge only for clossing execution thread");
+                        logger.trace("handleOperationException returning message call - merge only for clossing execution thread");
                         InstanceRegistry executionRegistry = instanceRegistries.get(currentStack.waitingSlotNr);
                         mergeInstances(executionRegistry, payload.getInstanceReferences());
                         currentStack.markDone();
                     } else {
-                        logger.trace("handle returning message call");
+                        logger.trace("handleOperationException returning message call");
 
                         InstanceRegistry executionRegistry = instanceRegistries.get(currentStack.waitingSlotNr);
                         mergeInstances(executionRegistry, payload.getInstanceReferences());
@@ -236,7 +236,7 @@ abstract class AbstractExecutionStackManager {
                 }
             } catch (IllegalArgumentException e) {
                 // FIXME exception policy.
-                // FIXME how to handle errors on invocations to real services??
+                // FIXME how to handleOperationException errors on invocations to real services??
                 e.printStackTrace();
                 throw new RuntimeException(e);
             } catch (IllegalAccessException e) {

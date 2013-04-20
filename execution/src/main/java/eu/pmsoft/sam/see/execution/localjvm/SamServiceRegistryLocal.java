@@ -3,6 +3,7 @@ package eu.pmsoft.sam.see.execution.localjvm;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import com.google.common.collect.Sets.SetView;
+import com.google.inject.Inject;
 import com.google.inject.Module;
 import eu.pmsoft.exceptions.OperationContext;
 import eu.pmsoft.exceptions.OperationReportingFactory;
@@ -23,19 +24,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class SamServiceRegistryLocal implements SamServiceRegistry {
+class SamServiceRegistryLocal implements SamServiceRegistry {
 
     private final Map<SamServiceImplementationKey, ServiceImplementationObject> register = Maps.newHashMap();
 
-    protected final SamArchitectureRegistry architectureRegistry;
-
-    protected final SamServiceDiscovery serviceDiscoveryRegistry;
-
     private final OperationReportingFactory operationReportingFactory;
 
-    SamServiceRegistryLocal(SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry, OperationReportingFactory operationReportingFactory) {
-        this.architectureRegistry = architectureRegistry;
-        this.serviceDiscoveryRegistry = serviceDiscoveryRegistry;
+    @Inject
+    SamServiceRegistryLocal(OperationReportingFactory operationReportingFactory) {
         this.operationReportingFactory = operationReportingFactory;
     }
 

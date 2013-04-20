@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.*;
 import eu.pmsoft.sam.architecture.model.ServiceKey;
-import eu.pmsoft.sam.protocol.CanonicalProtocolExecutionContext;
+import eu.pmsoft.sam.protocol.CanonicalProtocolThreadExecutionContext;
 import eu.pmsoft.sam.protocol.CanonicalProtocolInfrastructure;
 import eu.pmsoft.sam.protocol.TransactionController;
 import eu.pmsoft.sam.protocol.freebinding.ExternalBindingController;
@@ -32,17 +32,17 @@ class CanonicalProtocolModel implements CanonicalProtocolInfrastructure {
     }
 
     @Override
-    public CanonicalProtocolExecutionContext bindExecutionContext(SamInstanceTransaction transaction, UUID transactionUniqueId) {
+    public CanonicalProtocolThreadExecutionContext bindExecutionContext(SamInstanceTransaction transaction, UUID transactionUniqueId) {
         return internalCreateExecutionContext(transaction, transactionUniqueId);
     }
 
     @Override
-    public CanonicalProtocolExecutionContext createExecutionContext(SamInstanceTransaction functionContract) {
+    public CanonicalProtocolThreadExecutionContext createExecutionContext(SamInstanceTransaction functionContract) {
         return internalCreateExecutionContext(functionContract, UUID.randomUUID());
     }
 
-    public CanonicalProtocolExecutionContext internalCreateExecutionContext(final SamInstanceTransaction functionContract, final UUID transactionUniqueId) {
-        CanonicalProtocolExecutionContext context = functionContract.accept(new SamInjectionModelVisitorAdapter<CanonicalProtocolExecutionContext>() {
+    public CanonicalProtocolThreadExecutionContext internalCreateExecutionContext(final SamInstanceTransaction functionContract, final UUID transactionUniqueId) {
+        CanonicalProtocolThreadExecutionContext context = functionContract.accept(new SamInjectionModelVisitorAdapter<CanonicalProtocolThreadExecutionContext>() {
 
             private final ImmutableList.Builder<InstanceRegistry> externalRegistryBuilder = ImmutableList.builder();
             private final ImmutableList.Builder<URL> externalAddressBuilder = ImmutableList.builder();
@@ -54,7 +54,7 @@ class CanonicalProtocolModel implements CanonicalProtocolInfrastructure {
             private int serviceSlotNr = 0;
 
             @Override
-            public CanonicalProtocolExecutionContext visitTransaction(SamInstanceTransaction transaction) {
+            public CanonicalProtocolThreadExecutionContext visitTransaction(SamInstanceTransaction transaction) {
                 super.visitTransaction(transaction);
                 SamInjectionConfiguration headInjectionConfiguration = functionContract.getInjectionConfiguration();
                 Injector realServiceInjector = lookForRealInjector(headInjectionConfiguration.getExposedServiceInstance());
@@ -75,7 +75,7 @@ class CanonicalProtocolModel implements CanonicalProtocolInfrastructure {
                 ProviderExecutionStackManager executorHead = createProviderExecutor(transaction.getExecutionStrategy(), executionInstanceRegistryList);
                 MethodRecordContext executionContext = modelFactory.methodRecordContext(executionInstanceRegistryList, executorHead);
 
-                CanonicalProtocolExecutionContextObject buildedContext = modelFactory.canonicalProtocolExecutionContextObject(recordContext, executionContext,
+                CanonicalProtocolThreadExecutionContextObject buildedContext = modelFactory.canonicalProtocolExecutionContextObject(recordContext, executionContext,
                         transactionUniqueId, controller, externalAddressBuilder.build(), new InjectorReference(glueInjector));
                 return buildedContext;
             }

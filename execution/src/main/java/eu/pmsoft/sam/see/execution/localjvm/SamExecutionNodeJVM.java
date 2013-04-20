@@ -5,44 +5,47 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.inject.*;
-import com.google.inject.name.Named;
 import eu.pmsoft.exceptions.OperationContext;
 import eu.pmsoft.exceptions.OperationReportingFactory;
 import eu.pmsoft.exceptions.OperationRuntimeException;
+import eu.pmsoft.execution.ServiceEndpointAddressProvider;
 import eu.pmsoft.sam.architecture.model.SamService;
 import eu.pmsoft.sam.architecture.model.ServiceKey;
-import eu.pmsoft.sam.protocol.CanonicalProtocolExecutionContext;
+import eu.pmsoft.sam.protocol.CanonicalProtocolThreadExecutionContext;
 import eu.pmsoft.sam.protocol.CanonicalProtocolInfrastructure;
 import eu.pmsoft.sam.protocol.freebinding.FreeVariableBindingBuilder;
-import eu.pmsoft.sam.see.SEEServer;
 import eu.pmsoft.sam.see.api.SamArchitectureRegistry;
 import eu.pmsoft.sam.see.api.SamExecutionNodeInternalApi;
 import eu.pmsoft.sam.see.api.SamServiceDiscovery;
+import eu.pmsoft.sam.see.api.SamServiceRegistry;
 import eu.pmsoft.sam.see.api.model.*;
 import eu.pmsoft.sam.see.api.transaction.BindPointSIID;
 import eu.pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
 import eu.pmsoft.sam.see.api.transaction.SamInjectionModelVisitorAdapter;
-import eu.pmsoft.sam.see.injectionUtils.ServiceKeyOrder;
 
-import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.util.*;
 
-public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamExecutionNodeInternalApi {
+public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
 
     private final Map<SIID, SamServiceInstanceObject> runningInstances = Maps.newHashMap();
     private final Multimap<SamServiceImplementationKey, SIID> typeOfRunningInstance = HashMultimap.create();
     private final Map<SIURL, SamInstanceTransaction> transactions = Maps.newHashMap();
     private final CanonicalProtocolInfrastructure canonicalProtocol;
-    private final InetSocketAddress serverAddress;
+
+    private final SamServiceRegistry samServiceRegistry;
+    private final SamArchitectureRegistry architectureRegistry;
+
+    private final SamServiceDiscovery serviceDiscoveryRegistry;
+
     private final OperationReportingFactory operationReportingFactory;
 
     @Inject
-    public SamExecutionNodeJVM(SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry,
-                               CanonicalProtocolInfrastructure canonicalProtocol, @Named(SEEServer.SERVER_ADDRESS_BIND) InetSocketAddress serverAddress, OperationReportingFactory operationReportingFactory) {
-        super(architectureRegistry, serviceDiscoveryRegistry, operationReportingFactory);
+    public SamExecutionNodeJVM(CanonicalProtocolInfrastructure canonicalProtocol, SamServiceRegistry samServiceRegistry, SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry, OperationReportingFactory operationReportingFactory) {
         this.canonicalProtocol = canonicalProtocol;
-        this.serverAddress = serverAddress;
+        this.samServiceRegistry = samServiceRegistry;
+        this.architectureRegistry = architectureRegistry;
+        this.serviceDiscoveryRegistry = serviceDiscoveryRegistry;
         this.operationReportingFactory = operationReportingFactory;
     }
 
@@ -53,26 +56,26 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
 
 
     @Override
-    public CanonicalProtocolExecutionContext createTransactionExecutionContext(SIURL url) {
+    public CanonicalProtocolThreadExecutionContext createTransactionExecutionContext(SIURL url) {
         Preconditions.checkNotNull(url);
         SamInstanceTransaction transaction = getTransaction(url);
-        CanonicalProtocolExecutionContext executionContext = canonicalProtocol.createExecutionContext(transaction);
+        CanonicalProtocolThreadExecutionContext executionContext = canonicalProtocol.createExecutionContext(transaction);
         protocolExecutionContext.put(url, executionContext.getContextUniqueID(), executionContext);
         return executionContext;
     }
 
-    private final Table<SIURL, UUID, CanonicalProtocolExecutionContext> protocolExecutionContext = HashBasedTable.create();
+    private final Table<SIURL, UUID, CanonicalProtocolThreadExecutionContext> protocolExecutionContext = HashBasedTable.create();
 
     //TODO service live cycle, to open/close transacitons
     @Override
-    public CanonicalProtocolExecutionContext openTransactionExecutionContext(SIURL targetUrl, UUID transactionUniqueId) {
+    public CanonicalProtocolThreadExecutionContext openTransactionExecutionContext(SIURL targetUrl, UUID transactionUniqueId) {
         Preconditions.checkNotNull(transactionUniqueId);
         if (protocolExecutionContext.contains(targetUrl, transactionUniqueId)) {
             return protocolExecutionContext.get(targetUrl, transactionUniqueId);
         }
         SamInstanceTransaction transaction = getTransaction(targetUrl);
         Preconditions.checkNotNull(transaction, "Request to non registered transaction, URL: %s", targetUrl);
-        CanonicalProtocolExecutionContext executionContext = canonicalProtocol.bindExecutionContext(transaction, transactionUniqueId);
+        CanonicalProtocolThreadExecutionContext executionContext = canonicalProtocol.bindExecutionContext(transaction, transactionUniqueId);
         protocolExecutionContext.put(targetUrl, transactionUniqueId, executionContext);
         return executionContext;
     }
@@ -80,12 +83,12 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
     int counter = 0;
 
     @Override
-    public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, ExecutionStrategy executionStrategy) {
+    public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, ExecutionStrategy executionStrategy, ServiceEndpointAddressProvider serverEndpoint) {
         OperationContext operationContext = operationReportingFactory.openExistingContext();
+        String serverAddress = serverEndpoint.getServerEndpointBase();
         SIURL url = null;
         try {
-            //TODO create a real service registry related to the server bind port and address, maybe in configuration must be set
-            url = SIURL.fromUrlString("http://" + serverAddress.getHostName() + ":" + serverAddress.getPort() + "/service" + counter++);
+            url = SIURL.fromUrlString("http://" + serverAddress + "/service" + counter++);
         } catch (MalformedURLException e) {
             operationContext.getErrors().addError(e, "Error creating service address");
         }
@@ -156,7 +159,7 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
         try {
             Preconditions.checkArgument(key != null);
 
-            SamServiceImplementation serviceImplementation = getImplementation(key);
+            SamServiceImplementation serviceImplementation = samServiceRegistry.getImplementation(key);
             Preconditions.checkNotNull(serviceImplementation, "Service Implementation not found for key [%s]", key);
 
             SIID id = new SIID();
@@ -194,7 +197,7 @@ public class SamExecutionNodeJVM extends SamServiceRegistryLocal implements SamE
         }
 
         List<ServiceKey> injectServices = serviceImplementation.getBindedServices();
-        ImmutableList<ServiceKey> orderedInjectServices = ServiceKeyOrder.orderAndRequiereUnique(injectServices);
+        ImmutableList<ServiceKey> orderedInjectServices = ServiceKey.orderAndRequireUnique(injectServices);
         List<List<Key<?>>> injectedFreeVariableBinding = Lists.newLinkedList();
         for (ServiceKey externalServiceKey : orderedInjectServices) {
             List<Key<?>> serviceKeys = Lists.newArrayList();

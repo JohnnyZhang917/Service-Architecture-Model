@@ -37,8 +37,7 @@ public class TestSEEexecution {
 
     @DataProvider(name = "executionStrategies")
     public Object[][] listOfArchitectures() {
-//        return new Object[][]{{ExecutionStrategy.PROCEDURAL}, {ExecutionStrategy.SIMPLE_LAZY}};
-        return new Object[][]{{ExecutionStrategy.SIMPLE_LAZY}};
+        return new Object[][]{{ExecutionStrategy.PROCEDURAL}, {ExecutionStrategy.SIMPLE_LAZY}};
     }
 
     @Test(dataProvider = "executionStrategies", sequential = true)
@@ -46,7 +45,7 @@ public class TestSEEexecution {
         int clientPort = 4989;
         int storePort = 4988;
         int courierPort = 4987;
-        SEEServer client = new SEEServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(clientPort));
+        SEEServer client = SEEServer.createServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(clientPort));
         client.startUpServer();
 
         SEEServiceSetupAction storeSetupAction = new SEEServiceSetupAction() {
@@ -56,10 +55,10 @@ public class TestSEEexecution {
                 setupServiceTransaction(SamTransactionConfigurationUtil.createTransactionOn(StoreService.class).providedByServiceInstance(storeInstanceId), strategy);
             }
         };
-        SEEServer store = new SEEServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(storePort, storeSetupAction));
+        SEEServer store = SEEServer.createServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(storePort, storeSetupAction));
         store.startUpServer();
 
-        SEEServer courier = new SEEServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(courierPort));
+        SEEServer courier = SEEServer.createServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(courierPort));
         courier.startUpServer();
 
         try {
@@ -118,9 +117,9 @@ public class TestSEEexecution {
         SEEServer clientNode = null;
         SEEServer server = null;
         try {
-            server = new SEEServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(serverPort));
+            server = SEEServer.createServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(serverPort));
             server.startUpServer();
-            clientNode = new SEEServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(clientPort));
+            clientNode = SEEServer.createServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(clientPort));
             clientNode.startUpServer();
 
             server.executeSetupAction(new SEEServiceSetupAction() {

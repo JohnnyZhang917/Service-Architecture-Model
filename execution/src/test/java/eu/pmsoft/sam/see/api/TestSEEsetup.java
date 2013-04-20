@@ -10,7 +10,7 @@ public class TestSEEsetup {
     @Test
     public void testSEEConfigurationSetup() throws OperationCheckedException {
         int serverPort = 4999;
-        SEEServer server = new SEEServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(serverPort));
+        SEEServer server = SEEServer.createServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(serverPort));
         server.startUpServer();
         server.shutdownServer();
     }

@@ -6,8 +6,8 @@ import java.util.UUID;
 
 public interface CanonicalProtocolInfrastructure {
 
-    public CanonicalProtocolExecutionContext createExecutionContext(final SamInstanceTransaction functionContract);
+    public CanonicalProtocolThreadExecutionContext createExecutionContext(final SamInstanceTransaction functionContract);
 
-    public CanonicalProtocolExecutionContext bindExecutionContext(SamInstanceTransaction transaction, UUID transactionUniqueId);
+    public CanonicalProtocolThreadExecutionContext bindExecutionContext(SamInstanceTransaction transaction, UUID transactionUniqueId);
 
 }
