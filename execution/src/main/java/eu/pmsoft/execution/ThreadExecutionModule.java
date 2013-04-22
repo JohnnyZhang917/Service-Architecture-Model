@@ -17,7 +17,6 @@ public class ThreadExecutionModule extends AbstractModule {
         bind(ClientConnectionHandler.class);
         bind(ThreadConnectionManager.class).asEagerSingleton();
         install(new FactoryModuleBuilder().build(ThreadExecutionModelFactory.class));
-        install(new LoggerInjectorModule());
     }
 
 }

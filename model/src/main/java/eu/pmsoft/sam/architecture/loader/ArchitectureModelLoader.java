@@ -34,22 +34,22 @@ public class ArchitectureModelLoader implements SamArchitectureLoader {
         if (categories.isEmpty())
             throw new IncorrectArchitectureDefinition("No categories defined");
 
-        for (SamCategoryLoaderImpl catloader : categories.values()) {
-            if (catloader.services.isEmpty())
-                throw new IncorrectArchitectureDefinition("Category with no services defined:" + catloader.categoryId);
+        for (SamCategoryLoaderImpl categoryLoader : categories.values()) {
+            if (categoryLoader.services.isEmpty())
+                throw new IncorrectArchitectureDefinition("Category with no services defined:" + categoryLoader.categoryId);
             ImmutableSet.Builder<SamService> serviceCategoryBuilder = ImmutableSet.builder();
-            for (SamCategoryLoaderImpl.SamServiceLoaderImpl serviceLoad : catloader.services) {
+            for (SamCategoryLoaderImpl.SamServiceLoaderImpl serviceLoad : categoryLoader.services) {
                 SamServiceObject service = serviceLoad.buildService();
                 serviceBuilder.put(service.key, service);
                 serviceCategoryBuilder.add(service);
             }
-            SamCategoryObject co = new SamCategoryObject(catloader.categoryId, serviceCategoryBuilder.build());
+            SamCategoryObject co = new SamCategoryObject(categoryLoader.categoryId, serviceCategoryBuilder.build());
             catBuilder.put(co.categoryId, co);
         }
         ImmutableMap<String, SamCategory> categorySet = catBuilder.build();
-        for (SamCategoryLoaderImpl catloader : categories.values()) {
-            SamCategory sourceCategoryAccess = categorySet.get(catloader.categoryId);
-            for (String accessedCatId : catloader.accessible) {
+        for (SamCategoryLoaderImpl categoryLoader : categories.values()) {
+            SamCategory sourceCategoryAccess = categorySet.get(categoryLoader.categoryId);
+            for (String accessedCatId : categoryLoader.accessible) {
                 if (accessedCatId.compareTo(sourceCategoryAccess.getCategoryId()) == 0) {
                     throw new IncorrectArchitectureDefinition("Self-accessible category: " + accessedCatId);
                 }
@@ -62,8 +62,8 @@ public class ArchitectureModelLoader implements SamArchitectureLoader {
             SamCategoryObject real = (SamCategoryObject) categoryReady;
             real.closeCategory();
         }
-        SamArchitectureImpl architectue = new SamArchitectureImpl(categorySet, serviceBuilder.build(), annotationBuilder.build());
-        return architectue;
+        SamArchitectureImpl architecture = new SamArchitectureImpl(categorySet, serviceBuilder.build(), annotationBuilder.build());
+        return architecture;
     }
 
     private final Map<String, SamCategoryLoaderImpl> categories = new HashMap<String, SamCategoryLoaderImpl>();

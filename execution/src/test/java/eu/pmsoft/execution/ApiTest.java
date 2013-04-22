@@ -5,11 +5,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.*;
 import com.google.inject.name.Named;
 import com.google.inject.name.Names;
+import eu.pmsoft.injectionUtils.logger.LoggerInjectorModule;
+import eu.pmsoft.sam.see.configuration.SEEConfiguration;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 import io.netty.util.internal.logging.Slf4JLoggerFactory;
 import org.testng.annotations.Test;
 
-import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -25,8 +26,7 @@ public class ApiTest {
 
     @Test
     public void localInjectorCreation() {
-        InetSocketAddress address = new InetSocketAddress(5000);
-        Injector injector = Guice.createInjector(new FakeInternalLogicModule(address));
+        Injector injector = Guice.createInjector(new FakeInternalLogicModule());
         assertNotNull(injector);
         Binding<ThreadExecutionServer> serverBind = injector.getExistingBinding(Key.get(ThreadExecutionServer.class));
         assertNotNull(serverBind);
@@ -37,24 +37,18 @@ public class ApiTest {
 
     public static class FakeInternalLogicModule extends AbstractModule {
 
-        private final InetSocketAddress address;
-
-        public FakeInternalLogicModule(InetSocketAddress address) {
-            this.address = address;
-
-        }
-
         @Override
         protected void configure() {
-            bind(ThreadExecutionLoginProvider.class).toInstance(new ThreadExecutionLoginProvider() {
+            bind(ThreadExecutionLogicProvider.class).toInstance(new ThreadExecutionLogicProvider() {
                 @Override
                 public ThreadExecutionContextInternalLogic open(URL targetURL) {
                     return null;
                 }
             });
             bind(ExecutorService.class).toInstance(Executors.newFixedThreadPool(5));
-            bind(InetSocketAddress.class).toInstance(address);
+            bind(SEEConfiguration.class).toInstance(SEEConfiguration.empty());
             install(new ThreadExecutionModule());
+            install(new LoggerInjectorModule());
         }
 
     }
@@ -68,7 +62,7 @@ public class ApiTest {
             serviceOne = new URL("http://localhost:5001/one");
             serviceTwo = new URL("http://localhost:5002/two");
         } catch (MalformedURLException e) {
-            // ignore
+            // ignore, will fail tests
         }
     }
 
@@ -82,8 +76,8 @@ public class ApiTest {
     @Test
     public void executeSimpleCall() throws ExecutionException, InterruptedException {
 
-        ThreadExecutionServer one = Guice.createInjector(new SimpleCallLogicModule(new InetSocketAddress(5001))).getInstance(ThreadExecutionServer.class);
-        ThreadExecutionServer two = Guice.createInjector(new SimpleCallLogicModule(new InetSocketAddress(5002))).getInstance(ThreadExecutionServer.class);
+        ThreadExecutionServer one = Guice.createInjector(new SimpleCallLogicModule(SEEConfiguration.empty())).getInstance(ThreadExecutionServer.class);
+        ThreadExecutionServer two = Guice.createInjector(new SimpleCallLogicModule(SEEConfiguration.emptyOnPort(5002))).getInstance(ThreadExecutionServer.class);
 
         one.startServer();
         two.startServer();
@@ -101,15 +95,15 @@ public class ApiTest {
 
     static class SimpleCallLogicModule extends AbstractModule {
 
-        private final InetSocketAddress address;
+        private final SEEConfiguration configuration;
 
-        public SimpleCallLogicModule(InetSocketAddress address) {
-            this.address = address;
+        SimpleCallLogicModule(SEEConfiguration configuration) {
+            this.configuration = configuration;
         }
 
         @Override
         protected void configure() {
-            bind(ThreadExecutionLoginProvider.class).toInstance(new ThreadExecutionLoginProvider() {
+            bind(ThreadExecutionLogicProvider.class).toInstance(new ThreadExecutionLogicProvider() {
                 @Override
                 public ThreadExecutionContextInternalLogic open(URL targetURL) {
                     return new SimpleExecutionlogic(targetURL);
@@ -117,7 +111,8 @@ public class ApiTest {
             });
             bind(ExecutorService.class).toInstance(Executors.newFixedThreadPool(5));
             install(new ThreadExecutionModule());
-            bind(InetSocketAddress.class).toInstance(address);
+            bind(SEEConfiguration.class).toInstance(configuration);
+            install(new LoggerInjectorModule());
         }
     }
 

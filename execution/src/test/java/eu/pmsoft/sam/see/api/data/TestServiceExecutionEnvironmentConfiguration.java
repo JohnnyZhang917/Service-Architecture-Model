@@ -20,6 +20,10 @@ public class TestServiceExecutionEnvironmentConfiguration {
         return createArchitectureConfiguration().bindToAddress(new InetSocketAddress(port));
     }
 
+    public static SEEConfiguration createSEEConfiguration() {
+        return createArchitectureConfiguration().clientOnlyMode();
+    }
+
     private static SEEConfigurationGrammar createArchitectureConfiguration() {
         return SEEConfigurationBuilder.configuration().withPlugin(new AbstractModule() {
             @Override

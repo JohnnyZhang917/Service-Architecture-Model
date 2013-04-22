@@ -88,6 +88,7 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
         String serverAddress = serverEndpoint.getServerEndpointBase();
         SIURL url = null;
         try {
+            // TODO change http to some custom protocol name
             url = SIURL.fromUrlString("http://" + serverAddress + "/service" + counter++);
         } catch (MalformedURLException e) {
             operationContext.getErrors().addError(e, "Error creating service address");

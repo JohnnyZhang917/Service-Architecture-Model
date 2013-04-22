@@ -42,11 +42,11 @@ public class TestSEEexecution {
 
     @Test(dataProvider = "executionStrategies", sequential = true)
     public void testCourierSetup(final ExecutionStrategy strategy) throws ExecutionException, OperationCheckedException {
-        int clientPort = 4989;
+//        int clientPort = 4989;
         int storePort = 4988;
         int courierPort = 4987;
-        SEEServer client = SEEServer.createServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(clientPort));
-        client.startUpServer();
+        SEEServer client = SEEServer.createServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration());
+        client.startUpEnvironment();
 
         SEEServiceSetupAction storeSetupAction = new SEEServiceSetupAction() {
             @Override
@@ -56,10 +56,10 @@ public class TestSEEexecution {
             }
         };
         SEEServer store = SEEServer.createServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(storePort, storeSetupAction));
-        store.startUpServer();
+        store.startUpEnvironment();
 
         SEEServer courier = SEEServer.createServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(courierPort));
-        courier.startUpServer();
+        courier.startUpEnvironment();
 
         try {
             courier.executeSetupAction(new SEEServiceSetupAction() {
@@ -103,9 +103,9 @@ public class TestSEEexecution {
             }
             assertTrue(shoppingCount > 0);
         } finally {
-            client.shutdownServer();
-            store.shutdownServer();
-            courier.shutdownServer();
+            client.shutdownEnvironment();
+            store.shutdownEnvironment();
+            courier.shutdownEnvironment();
         }
     }
 
@@ -118,9 +118,9 @@ public class TestSEEexecution {
         SEEServer server = null;
         try {
             server = SEEServer.createServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(serverPort));
-            server.startUpServer();
+            server.startUpEnvironment();
             clientNode = SEEServer.createServer(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(clientPort));
-            clientNode.startUpServer();
+            clientNode.startUpEnvironment();
 
             server.executeSetupAction(new SEEServiceSetupAction() {
                 @Override
@@ -175,9 +175,9 @@ public class TestSEEexecution {
 
         } finally {
             if (server != null)
-                server.shutdownServer();
+                server.shutdownEnvironment();
             if (clientNode != null)
-                clientNode.shutdownServer();
+                clientNode.shutdownEnvironment();
         }
 
     }

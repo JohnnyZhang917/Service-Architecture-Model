@@ -30,21 +30,22 @@ public class SEEServer {
 
     private final ThreadExecutionServer server;
     private final OperationReportingFactory operationReportingFactory;
-    private final InetSocketAddress address;
     private final SamArchitectureManagement architectureManager;
     private final SamExecutionNode executionNode;
     private final SamServiceRegistry samServiceRegistry;
     private final SamServiceDiscovery serviceDiscovery;
 
     @Inject
-    public SEEServer(ThreadExecutionServer server, OperationReportingFactory operationReportingFactory, SEEConfiguration configuration, SamArchitectureManagement architectureManager, SamExecutionNode executionNode, SamServiceRegistry samServiceRegistry, SamServiceDiscovery serviceDiscovery) throws OperationCheckedException {
+    public SEEServer(ThreadExecutionServer server, OperationReportingFactory operationReportingFactory,
+                     SEEConfiguration configuration, SamArchitectureManagement architectureManager,
+                     SamExecutionNode executionNode, SamServiceRegistry samServiceRegistry,
+                     SamServiceDiscovery serviceDiscovery) throws OperationCheckedException {
         this.server = server;
         this.operationReportingFactory = operationReportingFactory;
         this.architectureManager = architectureManager;
         this.executionNode = executionNode;
         this.samServiceRegistry = samServiceRegistry;
         this.serviceDiscovery = serviceDiscovery;
-        this.address = configuration.address;
         initializeServerNode(configuration);
     }
 
@@ -61,15 +62,15 @@ public class SEEServer {
      */
     public static Module createServerModule(final SEEConfiguration configuration) {
         List<Module> serverModules = Lists.newArrayList();
-        serverModules.addAll(configuration.pluginModules);
         serverModules.add(new LoggerInjectorModule());
+        serverModules.addAll(configuration.pluginModules);
         serverModules.add(new ThreadExecutionModule());
         // TODO extract as configuration
         serverModules.add(new AbstractModule() {
             @Override
             protected void configure() {
                 bind(ExecutorService.class).toInstance(Executors.newCachedThreadPool());
-                bind(ThreadExecutionLoginProvider.class).to(SEELogicContextLogin.class).asEagerSingleton();
+                bind(ThreadExecutionLogicProvider.class).to(SEELogicContextLogic.class).asEagerSingleton();
             }
         });
         serverModules.add(new LocalSeeExecutionModule());
@@ -82,7 +83,7 @@ public class SEEServer {
             protected void configure() {
                 bind(SEEServer.class);
                 bind(SEEConfiguration.class).toInstance(configuration);
-                bind(InetSocketAddress.class).toInstance(configuration.address);
+//                bind(InetSocketAddress.class).toInstance(configuration.address);
             }
         });
         return Modules.combine(serverModules);
@@ -91,7 +92,6 @@ public class SEEServer {
     private void initializeServerNode(SEEConfiguration configuration) throws OperationCheckedException {
         OperationContext operationContext = operationReportingFactory.ensureEmptyContext();
         try {
-
             for (SamArchitectureDefinition architectureDef : configuration.architectures) {
                 SamArchitecture architecture;
                 try {
@@ -131,11 +131,11 @@ public class SEEServer {
         return this.serviceDiscovery;
     }
 
-    public void startUpServer() {
+    public void startUpEnvironment() {
         server.startServer();
     }
 
-    public void shutdownServer() {
+    public void shutdownEnvironment() {
         server.shutdownServer();
     }
 

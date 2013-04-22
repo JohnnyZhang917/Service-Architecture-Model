@@ -13,12 +13,12 @@ import java.util.concurrent.ConcurrentMap;
 class ExecutionContextManager {
     private final ConcurrentMap<UUID, ThreadExecutionContext> localExecutionMap;
     private final ConcurrentMap<String, ThreadExecutionContext> externalExecutionMap;
-    private final ThreadExecutionLoginProvider internalLogicFactory;
+    private final ThreadExecutionLogicProvider internalLogicFactory;
     private final ThreadExecutionModelFactory factory;
     private final ThreadConnectionManager connectionManager;
 
     @Inject
-    ExecutionContextManager(ThreadExecutionLoginProvider internalLogicFactory, ThreadExecutionModelFactory factory, ThreadConnectionManager connectionManager) {
+    ExecutionContextManager(ThreadExecutionLogicProvider internalLogicFactory, ThreadExecutionModelFactory factory, ThreadConnectionManager connectionManager) {
         super();
         this.localExecutionMap = Maps.newConcurrentMap();
         this.externalExecutionMap = Maps.newConcurrentMap();

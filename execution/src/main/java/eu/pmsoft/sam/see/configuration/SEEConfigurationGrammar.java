@@ -18,4 +18,6 @@ public interface SEEConfigurationGrammar {
     public SEEConfigurationGrammar setupAction(SEEServiceSetupAction action);
 
     public SEEConfiguration bindToAddress(InetSocketAddress address);
+
+    public SEEConfiguration clientOnlyMode();
 }

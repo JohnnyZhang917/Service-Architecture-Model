@@ -51,5 +51,11 @@ public class SEEConfigurationBuilder {
             return config;
         }
 
+        @Override
+        public SEEConfiguration clientOnlyMode() {
+            SEEConfiguration config = new SEEConfiguration(pluginModules.build(), architectures.build(), implementationPackages.build(),
+                    setupActions.build(), null);
+            return config;
+        }
     }
 }

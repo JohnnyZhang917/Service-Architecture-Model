@@ -10,6 +10,7 @@ import com.google.inject.Key;
 import com.google.inject.Provider;
 import com.google.inject.assistedinject.Assisted;
 import eu.pmsoft.injectionUtils.logger.InjectLogger;
+import eu.pmsoft.sam.see.configuration.SEEConfiguration;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
@@ -56,33 +57,37 @@ public final class ThreadExecutionServer implements ServiceEndpointAddressProvid
     private Logger logger;
 
     @Inject
-    ThreadExecutionServer(ThreadExecutionManager executionService, Provider<ProviderConnectionHandler> providerServerConnectionHandler, InetSocketAddress serverAddress) {
+    ThreadExecutionServer(ThreadExecutionManager executionService, Provider<ProviderConnectionHandler> providerServerConnectionHandler, SEEConfiguration configuration) {
         super();
         this.executionService = executionService;
-        this.serverAddress = serverAddress;
+        this.serverAddress = configuration.address;
         this.serverBootstrap = new ServerBootstrap();
         this.providerServerConnectionHandler = providerServerConnectionHandler;
     }
 
     public void startServer() {
         InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
-        logger.debug("starting local server on address {}", serverAddress);
-        // TODO async bind to socket address
-        serverBootstrap.group(new NioEventLoopGroup(), new NioEventLoopGroup()).channel(NioServerSocketChannel.class).localAddress(serverAddress)
-                .childHandler(new ChannelInitializer<SocketChannel>() {
-                    @Override
-                    public void initChannel(SocketChannel ch) throws Exception {
-                        ch.pipeline().addLast(new LoggingHandler(LogLevel.TRACE)).addLast(new WriteTimeoutHandler(3000)).addLast(new ReadTimeoutHandler(3000))
-                                .addLast(new ObjectEncoder(), new ObjectDecoder(ClassResolvers.cacheDisabled(null)), providerServerConnectionHandler.get());
-                    }
-                });
-        Channel channel = serverBootstrap.bind().syncUninterruptibly().channel();
-        assert channel != null;
+        if( serverAddress != null ){
+            logger.debug("starting local server on address {}", serverAddress);
+            // TODO async bind to socket address
+            serverBootstrap.group(new NioEventLoopGroup(), new NioEventLoopGroup()).channel(NioServerSocketChannel.class).localAddress(serverAddress)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        public void initChannel(SocketChannel ch) throws Exception {
+                            ch.pipeline().addLast(new LoggingHandler(LogLevel.TRACE)).addLast(new WriteTimeoutHandler(3000)).addLast(new ReadTimeoutHandler(3000))
+                                    .addLast(new ObjectEncoder(), new ObjectDecoder(ClassResolvers.cacheDisabled(null)), providerServerConnectionHandler.get());
+                        }
+                    });
+            Channel channel = serverBootstrap.bind().syncUninterruptibly().channel();
+            assert channel != null;
+        }
     }
 
     public void shutdownServer() {
-        logger.debug("shutdown local server on address {}", serverAddress);
-        serverBootstrap.shutdown();
+        if( serverAddress != null ){
+            logger.debug("shutdown local server on address {}", serverAddress);
+            serverBootstrap.shutdown();
+        }
     }
 
     public <R, T> Future<R> executeServiceAction(ServiceAction<R, T> serviceAction) {
@@ -92,6 +97,10 @@ public final class ThreadExecutionServer implements ServiceEndpointAddressProvid
 
     @Override
     public String getServerEndpointBase() {
+        if( serverAddress == null) {
+            // TODO client mode execution marked as global state
+            return "localhost:0000";
+        }
         return serverAddress.getHostName() + ":" + serverAddress.getPort();
     }
 }
