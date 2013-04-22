@@ -42,7 +42,7 @@ public interface SamExecutionNode {
      */
     public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, SIURL url, ExecutionStrategy executionStrategy);
 
-    public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, ExecutionStrategy executionStrategy, ServiceEndpointAddressProvider serverEndpoint);
+    public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, ExecutionStrategy executionStrategy);
 
     /**
      * Publish to service Transaction on the ServiceDiscovery infrastructure

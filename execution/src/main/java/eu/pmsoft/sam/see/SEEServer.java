@@ -19,7 +19,6 @@ import eu.pmsoft.sam.see.configuration.SEEConfiguration;
 import eu.pmsoft.sam.see.execution.localjvm.LocalSeeExecutionModule;
 import eu.pmsoft.sam.see.infrastructure.localjvm.LocalSeeInfrastructureModule;
 
-import java.net.InetSocketAddress;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -105,7 +104,7 @@ public class SEEServer {
                 samServiceRegistry.registerServiceImplementationPackage(implPackage);
             }
             for (SEEServiceSetupAction setup : configuration.setupActions) {
-                setup.setupService(executionNode,server);
+                setup.setupService(executionNode);
             }
         } catch (OperationRuntimeException operationError) {
             operationContext.getErrors().addError(operationError);
@@ -118,7 +117,7 @@ public class SEEServer {
     public void executeSetupAction(SEEServiceSetupAction setup) throws OperationCheckedException {
         OperationContext operationContext = operationReportingFactory.openNestedContext();
         try {
-            setup.setupService(executionNode, server);
+            setup.setupService(executionNode);
         } catch (OperationRuntimeException operationError) {
             operationContext.getErrors().addError(operationError);
         } finally {

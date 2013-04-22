@@ -95,8 +95,8 @@ public final class ThreadExecutionServer implements ServiceEndpointAddressProvid
         return executionService.executeServiceAction(serviceAction);
     }
 
-    @Override
     public String getServerEndpointBase() {
+        // TODO delete me
         if( serverAddress == null) {
             // TODO client mode execution marked as global state
             return "localhost:0000";

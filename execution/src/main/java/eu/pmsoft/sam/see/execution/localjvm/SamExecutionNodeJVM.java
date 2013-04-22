@@ -22,6 +22,7 @@ import eu.pmsoft.sam.see.api.model.*;
 import eu.pmsoft.sam.see.api.transaction.BindPointSIID;
 import eu.pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
 import eu.pmsoft.sam.see.api.transaction.SamInjectionModelVisitorAdapter;
+import eu.pmsoft.sam.see.transport.SamTransportLayer;
 
 import java.net.MalformedURLException;
 import java.util.*;
@@ -40,13 +41,16 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
 
     private final OperationReportingFactory operationReportingFactory;
 
+    private final SamTransportLayer transportLayer;
+
     @Inject
-    public SamExecutionNodeJVM(CanonicalProtocolInfrastructure canonicalProtocol, SamServiceRegistry samServiceRegistry, SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry, OperationReportingFactory operationReportingFactory) {
+    public SamExecutionNodeJVM(CanonicalProtocolInfrastructure canonicalProtocol, SamServiceRegistry samServiceRegistry, SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry, OperationReportingFactory operationReportingFactory, SamTransportLayer transportLayer) {
         this.canonicalProtocol = canonicalProtocol;
         this.samServiceRegistry = samServiceRegistry;
         this.architectureRegistry = architectureRegistry;
         this.serviceDiscoveryRegistry = serviceDiscoveryRegistry;
         this.operationReportingFactory = operationReportingFactory;
+        this.transportLayer = transportLayer;
     }
 
     @Override
@@ -83,9 +87,10 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
     int counter = 0;
 
     @Override
-    public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, ExecutionStrategy executionStrategy, ServiceEndpointAddressProvider serverEndpoint) {
+    public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, ExecutionStrategy executionStrategy) {
         OperationContext operationContext = operationReportingFactory.openExistingContext();
-        String serverAddress = serverEndpoint.getServerEndpointBase();
+
+        String serverAddress = transportLayer.getServerEndpointBase();
         SIURL url = null;
         try {
             // TODO change http to some custom protocol name
