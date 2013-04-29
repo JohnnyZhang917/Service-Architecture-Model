@@ -10,12 +10,12 @@ import java.lang.annotation.Annotation;
 public abstract class AbstractSamServiceDefinition implements
         SamServiceDefinition {
 
-    private SamServiceLoader loaderRef;
+    private SamServiceLoaderBase.SamServiceLoader loaderRef;
 
-    public void loadServiceDefinition(SamServiceLoader loader) {
+    public void loadServiceDefinition(SamServiceLoaderBase loader) {
         try {
-            loader.setupLoadContext(this.getClass());
-            this.loaderRef = loader;
+
+            this.loaderRef = loader.setupLoadContext(this.getClass());;
             loadServiceDefinition();
         } finally {
             this.loaderRef = null;

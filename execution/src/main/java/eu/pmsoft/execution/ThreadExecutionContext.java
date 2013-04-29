@@ -4,6 +4,8 @@ import com.google.inject.Inject;
 import com.google.inject.Key;
 import com.google.inject.assistedinject.Assisted;
 import eu.pmsoft.injectionUtils.logger.InjectLogger;
+import eu.pmsoft.sam.see.api.model.STID;
+import eu.pmsoft.sam.see.transport.SamTransportChannel;
 import org.slf4j.Logger;
 
 import javax.annotation.Nullable;
@@ -11,57 +13,71 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-class ThreadExecutionContext {
+public class ThreadExecutionContext {
+    private final AtomicBoolean globalTransactionInitialized = new AtomicBoolean(false);
     private final AtomicBoolean running = new AtomicBoolean(false);
     private final ThreadExecutionContextInternalLogic internalLogic;
-    // Head pipe is null for execution context directly connected to service interactions on local server
-    private final ThreadMessagePipe headCommandPipe;
-    private final List<ThreadMessagePipe> endpoints;
+//    private final ThreadMessagePipe headCommandPipe;
     private final UUID transactionID;
     @InjectLogger
     private Logger logger;
+    private List<SamTransportChannel> clientConnectionChannels;
 
     @Inject
-    ThreadExecutionContext(@Assisted ThreadExecutionContextInternalLogic internalLogic, @Nullable @Assisted ThreadMessagePipe headCommandPipe,
-                           @Assisted List<ThreadMessagePipe> endpoints, @Assisted UUID transactionID) {
+    ThreadExecutionContext(@Assisted ThreadExecutionContextInternalLogic internalLogic,
+//                           @Nullable @Assisted ThreadMessagePipe headCommandPipe,
+                           @Assisted UUID transactionID) {
         super();
+//        this.headCommandPipe = headCommandPipe;
         this.internalLogic = internalLogic;
-        this.headCommandPipe = headCommandPipe;
-        this.endpoints = endpoints;
         this.transactionID = transactionID;
     }
+
+    public ThreadExecutionContextInternalLogic getInternalLogic() {
+        return internalLogic;
+    }
+
+    public void initializeClientConnectionChannels(List<SamTransportChannel> clientConnectionChannels) {
+        assert this.clientConnectionChannels == null;
+        this.clientConnectionChannels = clientConnectionChannels;
+        assert this.clientConnectionChannels != null;
+    }
+
+
 
     public UUID getTransactionID() {
         return transactionID;
     }
 
-    ThreadMessagePipe getHeadCommandPipe() {
-        return this.headCommandPipe;
-    }
+//    ThreadMessagePipe getHeadCommandPipe() {
+//        return this.headCommandPipe;
+//    }
 
 
     <T> T getInstance(Key<T> key) {
         return internalLogic.getInstance(key);
     }
 
-    <R, T> R executeInteraction(ServiceAction<R, T> interaction) {
+    public <R, T> R executeInteraction(ServiceAction<R, T> interaction) {
+        assert !globalTransactionInitialized.get();
         T instance = getInstance(interaction.getInterfaceKey());
         return interaction.executeInteraction(instance);
     }
 
-    void executeCanonicalProtocol() {
+    public void executeCanonicalProtocol() {
         internalLogic.executeCanonicalProtocol();
     }
 
-    boolean enterExecutionContext() {
+    public boolean enterExecutionContext() {
         if (running.compareAndSet(false, true)) {
-            internalLogic.enterExecution(headCommandPipe, endpoints);
+//            internalLogic.enterExecution(headCommandPipe, endpoints);
+            internalLogic.enterExecution();
             return true;
         }
         return false;
     }
 
-    void exitTransactionContext() {
+    public void exitTransactionContext() {
         if (running.compareAndSet(true, false)) {
             internalLogic.exitExecution();
         }
@@ -71,20 +87,21 @@ class ThreadExecutionContext {
         return running.get();
     }
 
-    public void initGrobalTransactionContext() {
+    public void initGrobalTransactionContext(UUID transactionId) {
         internalLogic.initTransaction();
-        for (int i = 0; i < endpoints.size(); i++) {
-            ThreadMessagePipe pipe = endpoints.get(i);
-            pipe.initializeTransactionConnection();
-        }
+//        for (int i = 0; i < endpoints.size(); i++) {
+//            ThreadMessagePipe pipe = endpoints.get(i);
+//            pipe.initializeTransactionConnection();
+//        }
     }
 
     public void exitGrobalTransactionContext() {
-        for (int i = 0; i < endpoints.size(); i++) {
-            ThreadMessagePipe pipe = endpoints.get(i);
-            pipe.closeTransactionConnection();
-        }
+//        for (int i = 0; i < endpoints.size(); i++) {
+//            ThreadMessagePipe pipe = endpoints.get(i);
+//            pipe.closeTransactionConnection();
+//        }
         internalLogic.closeTransaction();
 
     }
+
 }

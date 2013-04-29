@@ -5,6 +5,7 @@ import eu.pmsoft.sam.see.api.data.architecture.service.TestServiceTwo;
 import eu.pmsoft.sam.see.api.data.architecture.service.TestServiceZero;
 import eu.pmsoft.sam.see.api.model.SIID;
 import eu.pmsoft.sam.see.api.model.SIURL;
+import eu.pmsoft.sam.see.api.model.STID;
 import eu.pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
 
 import static eu.pmsoft.sam.see.api.transaction.SamTransactionConfigurationUtil.createTransactionOn;
@@ -37,4 +38,5 @@ public class TestTransactionDefinition {
                 .urlBinding(TestServiceOne.class, serviceOneURL)
                 .providedByServiceInstance(serviceTwoIID);
     }
+
 }

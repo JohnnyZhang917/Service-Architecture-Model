@@ -26,9 +26,9 @@ interface InjectionFactoryRecordModel {
 
     ServerExecutionInstanceRegistry serverExecutionInstanceRegistry(SamServiceInstance serviceInstance);
 
-    ProviderExecutionStackManager providerExecutionStackManager(ImmutableList<InstanceRegistry> instanceRegistries, ExecutionStrategy executionStrategy);
+    ProviderExecutionStackManager providerExecutionStackManager(ImmutableList<InstanceRegistry> instanceRegistries);
 
-    ClientExecutionStackManager clientExecutionStackManager(ImmutableList<InstanceRegistry> instanceRegistries, ExecutionStrategy executionStrategy);
+    ClientExecutionStackManager clientExecutionStackManager(ImmutableList<InstanceRegistry> instanceRegistries);
 
     MethodRecordContext methodRecordContext(ImmutableList<InstanceRegistry> instanceRegistries, AbstractExecutionStackManager executionManager);
 

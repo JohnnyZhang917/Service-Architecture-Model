@@ -51,12 +51,12 @@ class ThreadClientConnection {
 
     }
 
-    ThreadMessagePipe bindPipe(String signature, UUID transactionID, URL address) {
-        Preconditions.checkNotNull(signature);
-        Preconditions.checkNotNull(transactionID);
-        ThreadMessagePipe pipe = model.createPipe(channel, signature, transactionID, address);
-        clientConnectionHandler.bindPipe(signature, pipe);
-        return pipe;
-    }
+//    ThreadMessagePipe bindPipe(String signature, UUID transactionID, URL address) {
+//        Preconditions.checkNotNull(signature);
+//        Preconditions.checkNotNull(transactionID);
+//        ThreadMessagePipe pipe = model.createPipe(channel, signature, transactionID, address);
+//        clientConnectionHandler.bindPipe(signature, pipe);
+//        return pipe;
+//    }
 
 }

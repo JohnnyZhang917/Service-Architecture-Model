@@ -6,12 +6,12 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.*;
 import eu.pmsoft.sam.architecture.model.ServiceKey;
+import eu.pmsoft.sam.protocol.CanonicalProtocolRecordingModel;
 import eu.pmsoft.sam.protocol.CanonicalProtocolThreadExecutionContext;
-import eu.pmsoft.sam.protocol.CanonicalProtocolInfrastructure;
 import eu.pmsoft.sam.protocol.TransactionController;
 import eu.pmsoft.sam.protocol.freebinding.ExternalBindingController;
 import eu.pmsoft.sam.protocol.freebinding.ExternalInstanceProvider;
-import eu.pmsoft.sam.see.api.SamExecutionNodeInternalApi;
+import eu.pmsoft.sam.see.api.setup.SamExecutionNodeInternalApi;
 import eu.pmsoft.sam.see.api.model.*;
 import eu.pmsoft.sam.see.api.transaction.*;
 
@@ -19,29 +19,27 @@ import java.net.URL;
 import java.util.Set;
 import java.util.UUID;
 
-class CanonicalProtocolModel implements CanonicalProtocolInfrastructure {
-
-    private final SamExecutionNodeInternalApi executionNode;
+class CanonicalProtocolModel implements CanonicalProtocolRecordingModel {
 
     private final InjectionFactoryRecordModel modelFactory;
 
     @Inject
-    public CanonicalProtocolModel(SamExecutionNodeInternalApi executionNode, InjectionFactoryRecordModel modelFactory) {
-        this.executionNode = executionNode;
+    public CanonicalProtocolModel(InjectionFactoryRecordModel modelFactory) {
         this.modelFactory = modelFactory;
     }
 
     @Override
-    public CanonicalProtocolThreadExecutionContext bindExecutionContext(SamInstanceTransaction transaction, UUID transactionUniqueId) {
-        return internalCreateExecutionContext(transaction, transactionUniqueId);
+    public CanonicalProtocolThreadExecutionContext createExecutionContext(SamServiceInstanceTransaction functionContract, SamExecutionNodeInternalApi samExecutionNodeJVM) {
+        return internalCreateExecutionContext(functionContract, UUID.randomUUID(),samExecutionNodeJVM);
     }
 
     @Override
-    public CanonicalProtocolThreadExecutionContext createExecutionContext(SamInstanceTransaction functionContract) {
-        return internalCreateExecutionContext(functionContract, UUID.randomUUID());
+    public CanonicalProtocolThreadExecutionContext bindExecutionContext(SamServiceInstanceTransaction transaction, UUID transactionUniqueId, SamExecutionNodeInternalApi samExecutionNodeJVM) {
+        return internalCreateExecutionContext(transaction, transactionUniqueId, samExecutionNodeJVM);
     }
 
-    public CanonicalProtocolThreadExecutionContext internalCreateExecutionContext(final SamInstanceTransaction functionContract, final UUID transactionUniqueId) {
+
+    public CanonicalProtocolThreadExecutionContext internalCreateExecutionContext(final SamServiceInstanceTransaction functionContract, final UUID transactionUniqueId, final SamExecutionNodeInternalApi executionNode) {
         CanonicalProtocolThreadExecutionContext context = functionContract.accept(new SamInjectionModelVisitorAdapter<CanonicalProtocolThreadExecutionContext>() {
 
             private final ImmutableList.Builder<InstanceRegistry> externalRegistryBuilder = ImmutableList.builder();
@@ -54,7 +52,7 @@ class CanonicalProtocolModel implements CanonicalProtocolInfrastructure {
             private int serviceSlotNr = 0;
 
             @Override
-            public CanonicalProtocolThreadExecutionContext visitTransaction(SamInstanceTransaction transaction) {
+            public CanonicalProtocolThreadExecutionContext visitTransaction(SamServiceInstanceTransaction transaction) {
                 super.visitTransaction(transaction);
                 SamInjectionConfiguration headInjectionConfiguration = functionContract.getInjectionConfiguration();
                 Injector realServiceInjector = lookForRealInjector(headInjectionConfiguration.getExposedServiceInstance());
@@ -67,12 +65,12 @@ class CanonicalProtocolModel implements CanonicalProtocolInfrastructure {
                 TransactionController controller = modelFactory.transactionController(controlToInstanceProviderMap);
 
                 ImmutableList<InstanceRegistry> recordInstanceRegistries = externalRegistryBuilder.build();
-                ClientExecutionStackManager executorTail = createClientExecutor(transaction.getExecutionStrategy(), recordInstanceRegistries);
+                ClientExecutionStackManager executorTail = createClientExecutor( recordInstanceRegistries);
                 MethodRecordContext recordContext = modelFactory.methodRecordContext(recordInstanceRegistries, executorTail);
 
                 InstanceRegistry executionInstanceRegistry = modelFactory.serverExecutionInstanceRegistry(getServiceInstance(headInjectionConfiguration.getExposedServiceInstance()));
                 ImmutableList<InstanceRegistry> executionInstanceRegistryList = ImmutableList.of(executionInstanceRegistry);
-                ProviderExecutionStackManager executorHead = createProviderExecutor(transaction.getExecutionStrategy(), executionInstanceRegistryList);
+                ProviderExecutionStackManager executorHead = createProviderExecutor( executionInstanceRegistryList);
                 MethodRecordContext executionContext = modelFactory.methodRecordContext(executionInstanceRegistryList, executorHead);
 
                 CanonicalProtocolThreadExecutionContextObject buildedContext = modelFactory.canonicalProtocolExecutionContextObject(recordContext, executionContext,
@@ -80,12 +78,12 @@ class CanonicalProtocolModel implements CanonicalProtocolInfrastructure {
                 return buildedContext;
             }
 
-            private ProviderExecutionStackManager createProviderExecutor(ExecutionStrategy executionStrategy, ImmutableList<InstanceRegistry> instanceRegistries) {
-                return modelFactory.providerExecutionStackManager(instanceRegistries, executionStrategy);
+            private ProviderExecutionStackManager createProviderExecutor( ImmutableList<InstanceRegistry> instanceRegistries) {
+                return modelFactory.providerExecutionStackManager(instanceRegistries);
             }
 
-            private ClientExecutionStackManager createClientExecutor(ExecutionStrategy executionStrategy, ImmutableList<InstanceRegistry> instanceRegistries) {
-                return modelFactory.clientExecutionStackManager(instanceRegistries, executionStrategy);
+            private ClientExecutionStackManager createClientExecutor( ImmutableList<InstanceRegistry> instanceRegistries) {
+                return modelFactory.clientExecutionStackManager(instanceRegistries);
             }
 
 

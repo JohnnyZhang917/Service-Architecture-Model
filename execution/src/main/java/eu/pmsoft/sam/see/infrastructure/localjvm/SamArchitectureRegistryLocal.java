@@ -5,7 +5,7 @@ import eu.pmsoft.exceptions.OperationRuntimeException;
 import eu.pmsoft.sam.architecture.model.SamArchitecture;
 import eu.pmsoft.sam.architecture.model.SamService;
 import eu.pmsoft.sam.architecture.model.ServiceKey;
-import eu.pmsoft.sam.see.api.SamArchitectureManagement;
+import eu.pmsoft.sam.see.api.infrastructure.SamArchitectureManagement;
 
 import java.util.Set;
 
@@ -22,14 +22,13 @@ public class SamArchitectureRegistryLocal implements SamArchitectureManagement {
 
     @Override
     public SamService getService(ServiceKey serviceKey) {
-        // TODO merge architectures definitions
         for (SamArchitecture arch : architectures) {
             SamService service = arch.getService(serviceKey);
             if (service != null) {
                 return service;
             }
         }
-        throw new OperationRuntimeException("service not found on architecture" + serviceKey);
+        return null;
     }
 
     @Override

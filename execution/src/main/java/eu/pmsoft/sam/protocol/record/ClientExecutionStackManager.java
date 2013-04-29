@@ -9,8 +9,8 @@ import org.slf4j.LoggerFactory;
 class ClientExecutionStackManager extends AbstractExecutionStackManager {
 
     @Inject
-    public ClientExecutionStackManager(@Assisted ImmutableList<InstanceRegistry> instanceRegistries, @Assisted ExecutionStrategy executionStrategy) {
-        super(instanceRegistries, LoggerFactory.getLogger(ClientExecutionStackManager.class), executionStrategy);
+    public ClientExecutionStackManager(@Assisted ImmutableList<InstanceRegistry> instanceRegistries) {
+        super(instanceRegistries, LoggerFactory.getLogger(ClientExecutionStackManager.class));
     }
 
     @Override

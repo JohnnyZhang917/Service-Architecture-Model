@@ -4,6 +4,7 @@ import eu.pmsoft.sam.architecture.model.ServiceKey;
 import eu.pmsoft.sam.definition.service.SamServiceDefinition;
 import eu.pmsoft.sam.see.api.model.SIID;
 import eu.pmsoft.sam.see.api.model.SIURL;
+import eu.pmsoft.sam.see.api.model.STID;
 
 public interface SamInjectionTransactionDefinitionGrammar {
 
@@ -14,14 +15,14 @@ public interface SamInjectionTransactionDefinitionGrammar {
     // SIURL | InjectionConfiguration
     //
 
-    public SamInjectionTransactionDefinitionGrammar idBinding(Class<? extends SamServiceDefinition> bindedService, SIID instanceId);
+    public SamInjectionTransactionDefinitionGrammar idBinding(Class<? extends SamServiceDefinition> bindService, SIID instanceId);
 
-    public SamInjectionTransactionDefinitionGrammar urlBinding(Class<? extends SamServiceDefinition> bindedService,
+    public SamInjectionTransactionDefinitionGrammar urlBinding(Class<? extends SamServiceDefinition> bindService,
                                                                SIURL instanceUrl);
 
-    public SamInjectionTransactionDefinitionGrammar urlBinding(ServiceKey bindedService, SIURL instanceUrl);
+    public SamInjectionTransactionDefinitionGrammar urlBinding(ServiceKey bindService, SIURL instanceUrl);
 
-    public SamInjectionTransactionDefinitionGrammar idBinding(ServiceKey bindedService, SIID instanceId);
+    public SamInjectionTransactionDefinitionGrammar idBinding(ServiceKey bindService, SIID instanceId);
 
     public SamInjectionTransactionDefinitionGrammar nestedTransactionBinding(SamInjectionConfiguration transaction);
 

@@ -10,10 +10,10 @@ public class ThreadExecutionModule extends AbstractModule {
     @Override
     protected void configure() {
         binder().requireExplicitBindings();
-        bind(ThreadExecutionServer.class).asEagerSingleton();
+//        bind(ThreadExecutionServer.class).asEagerSingleton();
         bind(ExecutionContextManager.class);
-        bind(ThreadExecutionManager.class);
-        bind(ProviderConnectionHandler.class);
+//        bind(ThreadExecutionManager.class);
+//        bind(ProviderConnectionHandler.class);
         bind(ClientConnectionHandler.class);
         bind(ThreadConnectionManager.class).asEagerSingleton();
         install(new FactoryModuleBuilder().build(ThreadExecutionModelFactory.class));

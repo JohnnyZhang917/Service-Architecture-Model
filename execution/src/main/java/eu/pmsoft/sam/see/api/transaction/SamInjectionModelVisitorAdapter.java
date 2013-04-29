@@ -1,7 +1,7 @@
 package eu.pmsoft.sam.see.api.transaction;
 
 import com.google.common.collect.ImmutableList;
-import eu.pmsoft.sam.see.api.model.SamInstanceTransaction;
+import eu.pmsoft.sam.see.api.model.SamServiceInstanceTransaction;
 
 public class SamInjectionModelVisitorAdapter<T> implements SamInjectionModelVisitor<T> {
 
@@ -13,7 +13,7 @@ public class SamInjectionModelVisitorAdapter<T> implements SamInjectionModelVisi
     }
 
     @Override
-    public T visitTransaction(SamInstanceTransaction transaction) {
+    public T visitTransaction(SamServiceInstanceTransaction transaction) {
         transaction.getInjectionConfiguration().accept(this);
         return null;
     }

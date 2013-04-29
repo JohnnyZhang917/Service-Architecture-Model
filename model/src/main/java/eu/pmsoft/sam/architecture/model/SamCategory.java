@@ -4,8 +4,6 @@ import java.util.Set;
 
 public interface SamCategory {
 
-    public String getCategoryId();
-
     public Set<SamCategory> getAccessibleCategories();
 
     public Set<SamCategory> getInverseAccessibleCategories();

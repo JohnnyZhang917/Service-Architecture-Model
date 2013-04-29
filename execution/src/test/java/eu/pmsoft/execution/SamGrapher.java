@@ -15,9 +15,9 @@ public class SamGrapher {
 
     public static void main(String[] args) {
         int anyPort = 1234;
-        Injector samServerInjector = Guice.createInjector(SEEServer.createServerModule(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(anyPort)));
+//        Injector samServerInjector = Guice.createInjector(SEEServer.createServerModule(TestServiceExecutionEnvironmentConfiguration.createSEEConfiguration(anyPort)));
 
-        graphGood("/tmp/sam.dot", samServerInjector);
+//        graphGood("/tmp/sam.dot", samServerInjector);
     }
 
     public final static Injector graphGood(String filename, Injector inj) {

@@ -7,6 +7,10 @@ import com.google.inject.Module;
  */
 public class SamServiceImplementationKey {
 
+    public static SamServiceImplementationKey definedBy(Class<? extends Module> implementationModule) {
+        return new SamServiceImplementationKey(implementationModule);
+    }
+
     private final String key;
 
     public SamServiceImplementationKey(String key) {

@@ -6,13 +6,13 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import eu.pmsoft.execution.ThreadMessage;
-import eu.pmsoft.execution.ThreadMessagePipe;
 import eu.pmsoft.sam.protocol.transport.CanonicalInstanceReference;
 import eu.pmsoft.sam.protocol.transport.CanonicalMethodCall;
 import eu.pmsoft.sam.protocol.transport.CanonicalRequest;
 import eu.pmsoft.sam.protocol.transport.data.CanonicalProtocolRequestData;
 import eu.pmsoft.sam.protocol.transport.data.InstanceMergeVisitor;
 import eu.pmsoft.sam.see.api.model.ExecutionStrategy;
+import eu.pmsoft.sam.see.transport.SamTransportChannel;
 import org.slf4j.Logger;
 
 import java.lang.reflect.InvocationTargetException;
@@ -25,13 +25,13 @@ abstract class AbstractExecutionStackManager {
 
     protected final ImmutableList<InstanceRegistry> instanceRegistries;
     protected final Logger logger;
-    protected ImmutableList<ThreadMessagePipe> pipes;
+    protected ImmutableList<SamTransportChannel> channels;
     private final StackOfStack stack;
-    private final ExecutionStrategy executionStrategy;
+    // TODO provide this parameter during execution
+    private final ExecutionStrategy executionStrategy = ExecutionStrategy.SIMPLE_LAZY;
 
-    AbstractExecutionStackManager(ImmutableList<InstanceRegistry> instanceRegistries, Logger logger, ExecutionStrategy executionStrategy) {
+    AbstractExecutionStackManager(ImmutableList<InstanceRegistry> instanceRegistries, Logger logger) {
         this.instanceRegistries = instanceRegistries;
-        this.executionStrategy = executionStrategy;
         this.stack = new StackOfStack();
         this.logger = logger;
     }
@@ -46,17 +46,17 @@ abstract class AbstractExecutionStackManager {
         stack.unbindStack();
     }
 
-    public void bindExecutionPipes(ImmutableList<ThreadMessagePipe> pipes) {
-        Preconditions.checkNotNull(pipes);
-        Preconditions.checkState(instanceRegistries.size() == pipes.size());
-        this.pipes = pipes;
+    public void bindExecutionPipes(ImmutableList<SamTransportChannel> channels) {
+        Preconditions.checkNotNull(channels);
+        Preconditions.checkState(instanceRegistries.size() == channels.size());
+        this.channels = channels;
     }
 
     public void unbindPipe() {
-        Preconditions.checkNotNull(pipes);
-        // after this call, transaction is closed and pipes are closed. Maybe deleted in future is not necessary at all
-        // setting pipes to null just to get errors if it is used
-        pipes = null;
+        Preconditions.checkNotNull(channels);
+        // after this call, transaction is closed and channels are closed. Maybe deleted in future is not necessary at all
+        // setting channels to null just to get errors if it is used
+        channels = null;
     }
 
     private class StackOfStack {
@@ -124,7 +124,7 @@ abstract class AbstractExecutionStackManager {
 
     protected void pushProtocolExecution(boolean forceWait, MethodExecutionStack currentStack) {
         if (currentStack.waitingStatus) {
-            ThreadMessagePipe threadMessagePipe = getPipe(currentStack.waitingSlotNr);
+            SamTransportChannel threadMessagePipe = getPipe(currentStack.waitingSlotNr);
             ThreadMessage message;
             if (forceWait) {
                 logger.trace("forcing wait response on execution");
@@ -175,7 +175,7 @@ abstract class AbstractExecutionStackManager {
             CanonicalProtocolRequestData stackRequest = currentStack.createStackRequest();
             logger.trace("sending request to slot [{}]", currentStack.waitingSlotNr);
 
-            ThreadMessagePipe threadMessagePipe = getPipe(currentStack.waitingSlotNr);
+            SamTransportChannel threadMessagePipe = getPipe(currentStack.waitingSlotNr);
             ThreadMessage message = new ThreadMessage();
             message.setPayload(stackRequest.getPayload());
             threadMessagePipe.sendMessage(message);
@@ -183,8 +183,9 @@ abstract class AbstractExecutionStackManager {
         }
     }
 
-    private ThreadMessagePipe getPipe(int targetSlotNr) {
-        return pipes.get(targetSlotNr);
+    private SamTransportChannel getPipe(int targetSlotNr) {
+        assert channels != null;
+        return channels.get(targetSlotNr);
     }
 
     protected void mergeInstances(InstanceRegistry registry, List<CanonicalInstanceReference> instanceReferences) {

@@ -5,116 +5,139 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.inject.*;
-import eu.pmsoft.exceptions.OperationContext;
-import eu.pmsoft.exceptions.OperationReportingFactory;
-import eu.pmsoft.exceptions.OperationRuntimeException;
-import eu.pmsoft.execution.ServiceEndpointAddressProvider;
 import eu.pmsoft.sam.architecture.model.SamService;
 import eu.pmsoft.sam.architecture.model.ServiceKey;
+import eu.pmsoft.sam.protocol.CanonicalProtocolRecordingModel;
 import eu.pmsoft.sam.protocol.CanonicalProtocolThreadExecutionContext;
-import eu.pmsoft.sam.protocol.CanonicalProtocolInfrastructure;
 import eu.pmsoft.sam.protocol.freebinding.FreeVariableBindingBuilder;
-import eu.pmsoft.sam.see.api.SamArchitectureRegistry;
-import eu.pmsoft.sam.see.api.SamExecutionNodeInternalApi;
-import eu.pmsoft.sam.see.api.SamServiceDiscovery;
-import eu.pmsoft.sam.see.api.SamServiceRegistry;
+import eu.pmsoft.sam.see.api.infrastructure.SamArchitectureRegistry;
+import eu.pmsoft.sam.see.api.setup.SamExecutionNodeInternalApi;
+import eu.pmsoft.sam.see.api.infrastructure.SamServiceDiscovery;
+import eu.pmsoft.sam.see.api.infrastructure.SamServiceRegistry;
 import eu.pmsoft.sam.see.api.model.*;
 import eu.pmsoft.sam.see.api.transaction.BindPointSIID;
 import eu.pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
 import eu.pmsoft.sam.see.api.transaction.SamInjectionModelVisitorAdapter;
-import eu.pmsoft.sam.see.transport.SamTransportLayer;
+import eu.pmsoft.sam.see.configuration.SEENodeConfiguration;
+import eu.pmsoft.sam.see.configuration.SEEServiceSetupAction;
+import eu.pmsoft.sam.see.transport.SamTransportCommunicationContext;
 
-import java.net.MalformedURLException;
 import java.util.*;
 
 public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
 
     private final Map<SIID, SamServiceInstanceObject> runningInstances = Maps.newHashMap();
     private final Multimap<SamServiceImplementationKey, SIID> typeOfRunningInstance = HashMultimap.create();
-    private final Map<SIURL, SamInstanceTransaction> transactions = Maps.newHashMap();
-    private final CanonicalProtocolInfrastructure canonicalProtocol;
+    private final Map<STID, SamServiceInstanceTransaction> transactions = Maps.newHashMap();
+    private final Map<STID, ServiceKey> transactionsType = Maps.newHashMap();
+    private final CanonicalProtocolRecordingModel canonicalProtocol;
 
     private final SamServiceRegistry samServiceRegistry;
     private final SamArchitectureRegistry architectureRegistry;
 
     private final SamServiceDiscovery serviceDiscoveryRegistry;
 
-    private final OperationReportingFactory operationReportingFactory;
+    private final SamExecutionApiJVM samExecutionApi = null;
 
-    private final SamTransportLayer transportLayer;
+    private SamTransportCommunicationContext transportServer;
+
 
     @Inject
-    public SamExecutionNodeJVM(CanonicalProtocolInfrastructure canonicalProtocol, SamServiceRegistry samServiceRegistry, SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry, OperationReportingFactory operationReportingFactory, SamTransportLayer transportLayer) {
+    public SamExecutionNodeJVM(CanonicalProtocolRecordingModel canonicalProtocol, SamServiceRegistry samServiceRegistry, SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry, LocalSeeExecutionNodeModel localNodeExecutionModel) {
         this.canonicalProtocol = canonicalProtocol;
         this.samServiceRegistry = samServiceRegistry;
         this.architectureRegistry = architectureRegistry;
         this.serviceDiscoveryRegistry = serviceDiscoveryRegistry;
-        this.operationReportingFactory = operationReportingFactory;
-        this.transportLayer = transportLayer;
+//        this.samExecutionApi = localNodeExecutionModel.newSamExecutionApi(this);
     }
+
+//    @Override
+//    public SamExecutionApi getExecutionApi() {
+//        return samExecutionApi;
+//    }
 
     @Override
     public SamServiceInstance getInternalServiceInstance(SIID exposedService) {
         return runningInstances.get(exposedService);
     }
 
+    @Override
+    public void bindToServer(SamTransportCommunicationContext executionEndpoint) {
+        assert transportServer == null;
+        this.transportServer = executionEndpoint;
+        assert transportServer != null;
+    }
 
     @Override
-    public CanonicalProtocolThreadExecutionContext createTransactionExecutionContext(SIURL url) {
-        Preconditions.checkNotNull(url);
-        SamInstanceTransaction transaction = getTransaction(url);
-        CanonicalProtocolThreadExecutionContext executionContext = canonicalProtocol.createExecutionContext(transaction);
-        protocolExecutionContext.put(url, executionContext.getContextUniqueID(), executionContext);
+    public SamTransportCommunicationContext getNodeTransportServer() {
+        assert transportServer != null;
+        return transportServer;
+    }
+
+    @Override
+    public SIURL exposeInjectionConfiguration(STID stid) {
+        assert transportServer != null;
+        Preconditions.checkState(transactions.containsKey(stid));
+        SIURL siurl = transportServer.liftServiceTransaction(stid);
+        serviceDiscoveryRegistry.serviceTransactionCreated(siurl, transactionsType.get(stid));
+        return siurl;
+    }
+
+    @Override
+    public void setupConfiguration(SEENodeConfiguration nodeConfiguration) {
+        for (SEEServiceSetupAction setupAction : nodeConfiguration.setupActions) {
+            setupAction.setupService(this);
+        }
+    }
+
+    @Override
+    public CanonicalProtocolThreadExecutionContext createTransactionExecutionContext(STID serviceTransactionDefinitionID) {
+        Preconditions.checkNotNull(serviceTransactionDefinitionID);
+        SamServiceInstanceTransaction transaction = getTransaction(serviceTransactionDefinitionID);
+        CanonicalProtocolThreadExecutionContext executionContext = canonicalProtocol.createExecutionContext(transaction,this);
+        protocolExecutionContext.put(serviceTransactionDefinitionID, executionContext.getContextUniqueID(), executionContext);
         return executionContext;
     }
 
-    private final Table<SIURL, UUID, CanonicalProtocolThreadExecutionContext> protocolExecutionContext = HashBasedTable.create();
+    private final Table<STID, UUID, CanonicalProtocolThreadExecutionContext> protocolExecutionContext = HashBasedTable.create();
 
     //TODO service live cycle, to open/close transacitons
     @Override
-    public CanonicalProtocolThreadExecutionContext openTransactionExecutionContext(SIURL targetUrl, UUID transactionUniqueId) {
+    public CanonicalProtocolThreadExecutionContext openTransactionExecutionContext(STID targetUrl, UUID transactionUniqueId) {
         Preconditions.checkNotNull(transactionUniqueId);
         if (protocolExecutionContext.contains(targetUrl, transactionUniqueId)) {
             return protocolExecutionContext.get(targetUrl, transactionUniqueId);
         }
-        SamInstanceTransaction transaction = getTransaction(targetUrl);
+        SamServiceInstanceTransaction transaction = getTransaction(targetUrl);
         Preconditions.checkNotNull(transaction, "Request to non registered transaction, URL: %s", targetUrl);
-        CanonicalProtocolThreadExecutionContext executionContext = canonicalProtocol.bindExecutionContext(transaction, transactionUniqueId);
+        CanonicalProtocolThreadExecutionContext executionContext = canonicalProtocol.bindExecutionContext(transaction, transactionUniqueId, null);
         protocolExecutionContext.put(targetUrl, transactionUniqueId, executionContext);
         return executionContext;
     }
 
-    int counter = 0;
-
     @Override
-    public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, ExecutionStrategy executionStrategy) {
-        OperationContext operationContext = operationReportingFactory.openExistingContext();
-
-        String serverAddress = transportLayer.getServerEndpointBase();
-        SIURL url = null;
-        try {
-            // TODO change http to some custom protocol name
-            url = SIURL.fromUrlString("http://" + serverAddress + "/service" + counter++);
-        } catch (MalformedURLException e) {
-            operationContext.getErrors().addError(e, "Error creating service address");
-        }
-        return setupInjectionTransaction(configuration, url, executionStrategy);
+    public STID setupInjectionTransaction(SamInjectionConfiguration configuration) {
+        return setupInjectionTransaction(configuration, STID.createNewUnique());
     }
 
-    @Override
-    public SIURL setupInjectionTransaction(SamInjectionConfiguration configuration, SIURL url, ExecutionStrategy executionStrategy) {
-        Preconditions.checkNotNull(url);
+
+    private STID setupInjectionTransaction(SamInjectionConfiguration configuration, STID transactionID) {
+        Preconditions.checkNotNull(transactionID);
         Preconditions.checkNotNull(configuration);
-        Preconditions.checkNotNull(executionStrategy);
-        Preconditions.checkState(!transactions.containsKey(url));
-        SamInstanceTransaction transaction = new SamInjectionTransactionObject(configuration, url, executionStrategy);
+        Preconditions.checkState(!transactions.containsKey(transactionID));
+        SamServiceInstanceTransaction transaction = new SamServiceInjectionTransactionObject(configuration, transactionID);
         validateTransaction(transaction);
-        transactions.put(url, transaction);
-        serviceDiscoveryRegistry.serviceTransactionCreated(url, transaction.getInjectionConfiguration().getProvidedService());
-        return url;
+        transactions.put(transactionID, transaction);
+        transactionsType.put(transactionID,configuration.getProvidedService());
+        return transactionID;
     }
 
-    private void validateTransaction(SamInstanceTransaction transaction) {
+    @Override
+    public Map<STID, ServiceKey> getServiceTransactionSetup() {
+        return ImmutableMap.copyOf(transactionsType);
+    }
+
+    private void validateTransaction(SamServiceInstanceTransaction transaction) {
         final List<String> errors = Lists.newArrayList();
         transaction.accept(new SamInjectionModelVisitorAdapter<Void>() {
             @Override
@@ -139,7 +162,7 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
     }
 
     @Override
-    public SamInstanceTransaction getTransaction(SIURL url) {
+    public SamServiceInstanceTransaction getTransaction(STID url) {
         Preconditions.checkArgument(transactions.containsKey(url), "no transaction for url %s", url);
         return transactions.get(url);
     }
@@ -160,9 +183,9 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
 
     @Override
     public SamServiceInstance createServiceInstance(SamServiceImplementationKey key, ServiceMetadata metadata) {
-        OperationContext operationContext = operationReportingFactory.openNestedContext();
+//        OperationContext operationContext = operationReportingFactory.openNestedContext();
         SamServiceInstanceObject instance = null;
-        try {
+//        try {
             Preconditions.checkArgument(key != null);
 
             SamServiceImplementation serviceImplementation = samServiceRegistry.getImplementation(key);
@@ -177,29 +200,31 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
             runningInstances.put(id, instance);
             typeOfRunningInstance.put(key, id);
 
-        } catch (OperationRuntimeException operationError) {
-            operationContext.getErrors().addError(operationError);
-        } finally {
-            operationReportingFactory.closeContext(operationContext);
-            if (operationContext.getErrors().hasErrors()) {
-                throw operationContext.getRuntimeError();
-            }
-        }
+//        } catch (OperationRuntimeException operationError) {
+//            operationContext.getErrors().addError(operationError);
+//        } finally {
+//            operationReportingFactory.closeContext(operationContext);
+//            if (operationContext.getErrors().hasErrors()) {
+//                throw operationContext.getRuntimeError();
+//            }
+//        }
         return instance;
     }
 
     private Injector createServiceInstanceInjector(SamServiceImplementation serviceImplementation) {
-        OperationContext operationContext = operationReportingFactory.openExistingContext();
+//        OperationContext operationContext = operationReportingFactory.openExistingContext();
         Class<? extends Module> implModule = serviceImplementation.getModule();
         Module implModuleInstance;
         try {
             implModuleInstance = implModule.newInstance();
         } catch (InstantiationException e) {
-            operationContext.getErrors().addError(e);
-            throw operationContext.getRuntimeError();
+//            operationContext.getErrors().addError(e);
+//            throw operationContext.getRuntimeError();
+            throw new RuntimeException(e);
         } catch (IllegalAccessException e) {
-            operationContext.getErrors().addError(e);
-            throw operationContext.getRuntimeError();
+//            operationContext.getErrors().addError(e);
+//            throw operationContext.getRuntimeError();
+            throw new RuntimeException(e);
         }
 
         List<ServiceKey> injectServices = serviceImplementation.getBindedServices();
@@ -222,12 +247,13 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
     }
 
     private void validateInjectorWithServiceContract(Injector implInjector, SamServiceImplementation serviceImplementation) {
-        OperationContext operationContext = operationReportingFactory.openExistingContext();
+//        OperationContext operationContext = operationReportingFactory.openExistingContext();
         SamService externalServiceSpec = architectureRegistry.getService(serviceImplementation.getSpecificationKey());
         Set<Key<?>> contract = externalServiceSpec.getServiceContractAPI();
         for (Key<?> key : contract) {
             if (implInjector.getExistingBinding(key) == null) {
-                operationContext.getErrors().addError("missing implementation fo key %s on service implementation %s declared to implement contract %s", key, serviceImplementation, serviceImplementation.getSpecificationKey());
+//                operationContext.getErrors().addError("missing implementation fo key %s on service implementation %s declared to implement contract %s", key, serviceImplementation, serviceImplementation.getSpecificationKey());
+                throw new RuntimeException("missing implementation fo key");
             }
         }
     }

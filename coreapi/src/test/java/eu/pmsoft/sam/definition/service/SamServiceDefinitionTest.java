@@ -1,9 +1,12 @@
 package eu.pmsoft.sam.definition.service;
 
 import com.google.inject.name.Names;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.testng.annotations.Test;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 public class SamServiceDefinitionTest {
@@ -26,14 +29,16 @@ public class SamServiceDefinitionTest {
 
     @Test
     public void testServiceDefinitionReader() {
-        SamServiceLoader loader = Mockito.mock(SamServiceLoader.class);
+        SamServiceLoaderBase loader = Mockito.mock(SamServiceLoaderBase.class);
+        SamServiceLoaderBase.SamServiceLoader lmock= Mockito.mock(SamServiceLoaderBase.SamServiceLoader.class);
+        Mockito.when(loader.setupLoadContext(Matchers.<Class<? extends SamServiceDefinition>>any())).thenReturn(lmock);
         TestServiceDefinition definition = new TestServiceDefinition();
         definition.loadServiceDefinition(loader);
         verify(loader).setupLoadContext(TestServiceDefinition.class);
-        verify(loader).addInterface(AnyInterface1.class);
-        verify(loader).addInterface(AnyInterface2.class);
-        verify(loader).addInterface(AnyInterface1.class, Names.named("test1"));
-        verify(loader).addInterface(AnyInterface2.class, Names.named("test2"));
+        verify(lmock).addInterface(AnyInterface1.class);
+        verify(lmock).addInterface(AnyInterface2.class);
+        verify(lmock).addInterface(AnyInterface1.class, Names.named("test1"));
+        verify(lmock).addInterface(AnyInterface2.class, Names.named("test2"));
     }
 
 

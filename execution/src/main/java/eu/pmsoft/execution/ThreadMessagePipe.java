@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+@Deprecated
 public final class ThreadMessagePipe {
 
     private final ConcurrentLinkedQueue<ThreadMessage> messageInputQueue = new ConcurrentLinkedQueue<ThreadMessage>();
@@ -72,7 +73,7 @@ public final class ThreadMessagePipe {
 
     public void initializeTransactionConnection() {
         ThreadMessage initConnectionMessage = new ThreadMessage();
-        initConnectionMessage.setUuid(transactionID);
+        initConnectionMessage.setTransactionId(transactionID);
         initConnectionMessage.setSignature(signature);
         initConnectionMessage.setTargetUrl(address);
         initConnectionMessage.setMessageType(ThreadMessage.ThreadProtocolMessageType.INITIALIZE_TRANSACTION);

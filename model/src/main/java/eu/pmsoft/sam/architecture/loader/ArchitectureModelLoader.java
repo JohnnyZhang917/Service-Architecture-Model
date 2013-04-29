@@ -18,8 +18,10 @@ import eu.pmsoft.sam.definition.service.SamServiceLoader;
 import java.lang.annotation.Annotation;
 import java.util.*;
 
+@Deprecated
 public class ArchitectureModelLoader implements SamArchitectureLoader {
 
+    @Deprecated
     public static SamArchitecture loadArchitectureModel(SamArchitectureDefinition definition)
             throws IncorrectArchitectureDefinition {
         ArchitectureModelLoader loader = new ArchitectureModelLoader();
@@ -50,7 +52,7 @@ public class ArchitectureModelLoader implements SamArchitectureLoader {
         for (SamCategoryLoaderImpl categoryLoader : categories.values()) {
             SamCategory sourceCategoryAccess = categorySet.get(categoryLoader.categoryId);
             for (String accessedCatId : categoryLoader.accessible) {
-                if (accessedCatId.compareTo(sourceCategoryAccess.getCategoryId()) == 0) {
+                if (accessedCatId.compareTo(categoryLoader.categoryId) == 0) {
                     throw new IncorrectArchitectureDefinition("Self-accessible category: " + accessedCatId);
                 }
                 SamCategory targetCategoryAccess = categorySet.get(accessedCatId);
@@ -85,6 +87,11 @@ public class ArchitectureModelLoader implements SamArchitectureLoader {
 
         public SamCategoryLoaderImpl(String categoryId) {
             this.categoryId = categoryId;
+        }
+
+        @Override
+        public String getCategoryId() {
+            return categoryId;
         }
 
         @Override
@@ -194,11 +201,6 @@ public class ArchitectureModelLoader implements SamArchitectureLoader {
             super();
             this.categoryId = categoryId;
             this.services = services;
-        }
-
-        @Override
-        public String getCategoryId() {
-            return categoryId;
         }
 
         @Override

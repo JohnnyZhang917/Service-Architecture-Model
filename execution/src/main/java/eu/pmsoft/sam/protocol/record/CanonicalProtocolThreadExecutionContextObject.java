@@ -55,12 +55,14 @@ class CanonicalProtocolThreadExecutionContextObject implements CanonicalProtocol
     }
 
     @Override
-    public void enterExecution(ThreadMessagePipe headCommandPipe, List<ThreadMessagePipe> endpoints) {
+    public void enterExecution(
+//            ThreadMessagePipe headCommandPipe, List<ThreadMessagePipe> endpoints
+    ) {
         controller.enterTransactionContext();
-        if (headCommandPipe != null) {
-            this.executionStack.getExecutionManager().bindExecutionPipes(ImmutableList.of(headCommandPipe));
-        }
-        this.recordStack.getExecutionManager().bindExecutionPipes(ImmutableList.copyOf(endpoints));
+//        if (headCommandPipe != null) {
+//            this.executionStack.getExecutionManager().bindExecutionPipes(ImmutableList.of(headCommandPipe));
+//        }
+//        this.recordStack.getExecutionManager().bindExecutionPipes(ImmutableList.copyOf(endpoints));
     }
 
     @Override
@@ -86,7 +88,6 @@ class CanonicalProtocolThreadExecutionContextObject implements CanonicalProtocol
 
     @Override
     public void closeTransaction() {
-        this.recordStack.getExecutionManager().unbindPipe();
         this.recordStack.getExecutionManager().unbindTransaction();
         this.executionStack.getExecutionManager().unbindTransaction();
     }

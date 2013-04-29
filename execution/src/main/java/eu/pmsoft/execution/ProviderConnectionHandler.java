@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 
 import java.util.Map;
 
+@Deprecated
 class ProviderConnectionHandler extends ChannelInboundMessageHandlerAdapter<ThreadMessage> {
 
     @InjectLogger
@@ -51,13 +52,14 @@ class ProviderConnectionHandler extends ChannelInboundMessageHandlerAdapter<Thre
     }
 
     private void execute(ThreadMessage msg) {
-        Preconditions.checkState(transactionBinding.containsKey(msg.getSignature()));
-        ThreadExecutionContext context = transactionBinding.get(msg.getSignature());
-        ThreadMessagePipe head = context.getHeadCommandPipe();
-        head.receiveMessage(msg);
-        if (!context.isExecutionRunning()) {
-            executionManager.runExecutionContext(context);
-        }
+//        Preconditions.checkState(transactionBinding.containsKey(msg.getSignature()));
+//        ThreadExecutionContext context = transactionBinding.get(msg.getSignature());
+//        //TODO message routing
+////        ThreadMessagePipe head = context.getHeadCommandPipe();
+////        head.receiveMessage(msg);
+//        if (!context.isExecutionRunning()) {
+//            executionManager.runExecutionContext(context);
+//        }
     }
 
     private void closeTransaction(ChannelHandlerContext ctx, ThreadMessage msg) {
@@ -69,13 +71,15 @@ class ProviderConnectionHandler extends ChannelInboundMessageHandlerAdapter<Thre
         Preconditions.checkState(!context.isExecutionRunning());
     }
 
+    //TODO extract this operation to a top level priority: open of server context for CP execution
     private void initializeTransaction(ChannelHandlerContext ctx, ThreadMessage msg) {
         ThreadExecutionContext context;
         Preconditions.checkState(!transactionBinding.containsKey(msg.getSignature()));
         logger.trace("initializeTransaction. Create context on base of message {}", msg);
         // the pipe signature is used as key, because a transaction can have multiple service instance running in one server node
-        context = contextManager.openExecutionContextForProtocolExecution(msg.getSignature(), msg.getUuid(), msg.getTargetUrl(), ctx.channel());
-        context.initGrobalTransactionContext();
+        context = contextManager.openExecutionContextForProtocolExecution( msg.getTransactionId(), null);
+//        context = contextManager.openExecutionContextForProtocolExecution( msg.getTransactionId(), msg.getTargetUrl());
+        context.initGrobalTransactionContext(msg.getTransactionId());
         transactionBinding.put(msg.getSignature(), context);
     }
 

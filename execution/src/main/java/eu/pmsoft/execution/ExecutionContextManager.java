@@ -2,71 +2,68 @@ package eu.pmsoft.execution;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
-import com.google.inject.Inject;
-import io.netty.channel.Channel;
+import eu.pmsoft.sam.protocol.CanonicalProtocolThreadExecutionContext;
+import eu.pmsoft.sam.see.api.model.STID;
 
-import java.net.URL;
-import java.util.List;
+import javax.inject.Inject;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentMap;
 
-class ExecutionContextManager {
+public class ExecutionContextManager {
     private final ConcurrentMap<UUID, ThreadExecutionContext> localExecutionMap;
     private final ConcurrentMap<String, ThreadExecutionContext> externalExecutionMap;
-    private final ThreadExecutionLogicProvider internalLogicFactory;
+//    private final ThreadExecutionLogicProvider internalLogicFactory;
     private final ThreadExecutionModelFactory factory;
-    private final ThreadConnectionManager connectionManager;
+//    private final ThreadConnectionManager connectionManager;
 
     @Inject
-    ExecutionContextManager(ThreadExecutionLogicProvider internalLogicFactory, ThreadExecutionModelFactory factory, ThreadConnectionManager connectionManager) {
+    ExecutionContextManager(ThreadExecutionModelFactory factory) {
         super();
         this.localExecutionMap = Maps.newConcurrentMap();
         this.externalExecutionMap = Maps.newConcurrentMap();
-        this.internalLogicFactory = internalLogicFactory;
+//        this.internalLogicFactory = internalLogicFactory;
         this.factory = factory;
-        this.connectionManager = connectionManager;
+//        this.connectionManager = connectionManager;
     }
 
-    UUID createExecutionContextForServiceInteraction(URL transactionURL) {
-        return openExecutionContextForServiceInteraction(UUID.randomUUID(), transactionURL).getTransactionID();
-    }
-
-    ThreadExecutionContext openExecutionContextForServiceInteraction(UUID transactionID, URL transactionURL) {
-        Preconditions.checkNotNull(transactionID);
-        Preconditions.checkNotNull(transactionURL);
-        if (!localExecutionMap.containsKey(transactionID)) {
-            ThreadExecutionContext context = createExecutionContext(null, transactionID, transactionURL, null);
-            localExecutionMap.putIfAbsent(transactionID, context);
-        }
+    public ThreadExecutionContext createExecutionContextForServiceInteraction(ThreadExecutionContextInternalLogic threadExecutionInternalLogic, UUID transactionID) {
+        Preconditions.checkNotNull(threadExecutionInternalLogic);
+        ThreadExecutionContext context = createExecutionContext(transactionID, threadExecutionInternalLogic);
+        localExecutionMap.put(transactionID,context);
         return localExecutionMap.get(transactionID);
     }
 
-    ThreadExecutionContext openExecutionContextForProtocolExecution(String headPipeSignature, UUID transactionID, URL transactionURL, Channel channel) {
-        Preconditions.checkNotNull(headPipeSignature);
-        Preconditions.checkNotNull(channel);
+    // TODO FIXME
+    ThreadExecutionContext openExecutionContextForProtocolExecution(UUID transactionID, STID transactionURL) {
         Preconditions.checkNotNull(transactionID);
         Preconditions.checkNotNull(transactionURL);
-        return internalOpenExecutionContext(headPipeSignature, transactionID, transactionURL, channel);
+        return internalOpenExecutionContext(transactionID, transactionURL);
 
     }
 
-    private ThreadExecutionContext internalOpenExecutionContext(String headPipeSignature, UUID transactionID, URL transactionURL, Channel channel) {
-        if (!externalExecutionMap.containsKey(headPipeSignature)) {
-            ThreadExecutionContext context = createExecutionContext(headPipeSignature, transactionID, transactionURL, channel);
-            externalExecutionMap.putIfAbsent(headPipeSignature, context);
-        }
-        return externalExecutionMap.get(headPipeSignature);
+    private ThreadExecutionContext internalOpenExecutionContext(UUID transactionID, STID transactionURL) {
+        throw new RuntimeException("TODO REFACTOR");
+//        String headPipeSignature = transactionID.toString() + transactionURL.toString();
+//        if (!externalExecutionMap.containsKey(headPipeSignature)) {
+//            ThreadExecutionContext context = createExecutionContext(transactionID, transactionURL);
+//            externalExecutionMap.putIfAbsent(headPipeSignature, context);
+//        }
+//        return externalExecutionMap.get(headPipeSignature);
     }
 
 
-    private ThreadExecutionContext createExecutionContext(String headPipeSignature, UUID transactionID, URL transactionURL, Channel channel) {
-        ThreadExecutionContextInternalLogic internalLogic = internalLogicFactory.open(transactionURL);
-        ThreadMessagePipe headPipe = null;
-        if (channel != null) {
-            headPipe = connectionManager.createHeadPipe(headPipeSignature, channel);
-        }
-        List<ThreadMessagePipe> endpoints = connectionManager.openPipes(transactionID, internalLogic.getEndpointAddressList());
-        ThreadExecutionContext context = factory.threadExecutionContext(internalLogic, headPipe, endpoints, transactionID);
+    private ThreadExecutionContext createExecutionContext(UUID transactionID, ThreadExecutionContextInternalLogic internalLogic) {
+        assert internalLogic != null;
+        assert transactionID != null;
+//        ThreadExecutionContextInternalLogic internalLogic = internalLogicFactory.open(transactionURL);
+//        ThreadMessagePipe headPipe = null;
+//        if (channel != null) {
+//            headPipe = connectionManager.createHeadPipe(headPipeSignature, channel);
+//        }
+//        List<ThreadMessagePipe> endpoints = connectionManager.openPipes(transactionID, internalLogic.getEndpointAddressList());
+        ThreadExecutionContext context = factory.threadExecutionContext(internalLogic,
+//                headPipe, endpoints,
+                transactionID);
         return context;
     }
 

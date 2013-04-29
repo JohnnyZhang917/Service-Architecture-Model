@@ -9,6 +9,8 @@ public interface SamArchitectureLoader {
 
     static public interface SamCategoryLoader {
 
+        public String getCategoryId();
+
         public SamCategoryLoader accessToCategory(SamCategoryLoader accesibleCategory);
 
         public SamCategoryLoader withService(SamServiceDefinition serviceDefinition);

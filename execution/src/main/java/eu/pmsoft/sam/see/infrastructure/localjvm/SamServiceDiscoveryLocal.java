@@ -3,8 +3,9 @@ package eu.pmsoft.sam.see.infrastructure.localjvm;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import eu.pmsoft.sam.architecture.model.ServiceKey;
-import eu.pmsoft.sam.see.api.SamServiceDiscovery;
+import eu.pmsoft.sam.see.api.infrastructure.SamServiceDiscovery;
 import eu.pmsoft.sam.see.api.model.SIURL;
+import eu.pmsoft.sam.see.api.model.STID;
 
 import java.util.Map;
 

@@ -8,6 +8,7 @@ import eu.pmsoft.sam.architecture.model.ServiceKey;
 import eu.pmsoft.sam.definition.service.SamServiceDefinition;
 import eu.pmsoft.sam.see.api.model.SIID;
 import eu.pmsoft.sam.see.api.model.SIURL;
+import eu.pmsoft.sam.see.api.model.STID;
 
 import java.util.Set;
 
@@ -41,24 +42,28 @@ public class SamTransactionConfigurationUtil {
         }
 
         @Override
-        public SamInjectionTransactionDefinitionGrammar idBinding(Class<? extends SamServiceDefinition> bindedService, SIID instanceId) {
-            ServiceKey serviceKey = new ServiceKey(bindedService);
+        public SamInjectionTransactionDefinitionGrammar idBinding(Class<? extends SamServiceDefinition> bindService, SIID instanceId) {
+            ServiceKey serviceKey = new ServiceKey(bindService);
             return idBinding(serviceKey, instanceId);
         }
 
         @Override
         public SamInjectionTransactionDefinitionGrammar idBinding(ServiceKey key, SIID instanceId) {
+            Preconditions.checkNotNull(instanceId);
+            Preconditions.checkNotNull(key);
             return loadReference(key, new BindPointSIID(key, instanceId));
         }
 
         @Override
-        public SamInjectionTransactionDefinitionGrammar urlBinding(Class<? extends SamServiceDefinition> bindedService, SIURL instanceUrl) {
-            ServiceKey serviceKey = new ServiceKey(bindedService);
+        public SamInjectionTransactionDefinitionGrammar urlBinding(Class<? extends SamServiceDefinition> bindService, SIURL instanceUrl) {
+            ServiceKey serviceKey = new ServiceKey(bindService);
             return urlBinding(serviceKey, instanceUrl);
         }
 
         @Override
         public SamInjectionTransactionDefinitionGrammar urlBinding(ServiceKey key, SIURL instanceUrl) {
+            Preconditions.checkNotNull(key);
+            Preconditions.checkNotNull(instanceUrl);
             return loadReference(key, new BindPointSIURL(key, instanceUrl));
         }
 
@@ -69,6 +74,8 @@ public class SamTransactionConfigurationUtil {
 
         @Override
         public SamInjectionConfiguration providedByServiceInstance(SIID serviceInstance) {
+            Preconditions.checkNotNull(serviceInstance);
+
             Preconditions.checkState(definitionOpen, "Definition already build. Dont reuse builder reference");
             definitionOpen = false;
             ImmutableList<BindPoint> bindPoints = bindPointBuilder.build();

@@ -8,13 +8,16 @@ import java.util.UUID;
 
 public class ThreadMessage implements Serializable {
 
+    private static final long serialVersionUID = 4155532844270180398L;
+
     public enum ThreadProtocolMessageType {
         INITIALIZE_TRANSACTION, CLOSE_TRANSACTION,
         CANONICAL_PROTOCOL_EXECUTION,
         EXCEPTION_MESSAGE
     }
 
-    private UUID uuid;
+    private UUID transactionId;
+    private URL sourceUrl;
     private URL targetUrl;
     private byte[] payload;
     private String signature;
@@ -31,12 +34,12 @@ public class ThreadMessage implements Serializable {
         this.messageType = messageType;
     }
 
-    public UUID getUuid() {
-        return uuid;
+    public UUID getTransactionId() {
+        return transactionId;
     }
 
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
+    public void setTransactionId(UUID transactionId) {
+        this.transactionId = transactionId;
     }
 
     public byte[] getPayload() {
@@ -58,7 +61,7 @@ public class ThreadMessage implements Serializable {
     @Override
     public String toString() {
         return Objects.toStringHelper(this).omitNullValues()
-                .add("uuid", uuid)
+                .add("transactionId", transactionId)
                 .add("targetUrl", targetUrl)
                 .add("payload", payload)
                 .add("signature", signature)
@@ -68,6 +71,14 @@ public class ThreadMessage implements Serializable {
 
     public String getSignature() {
         return signature;
+    }
+
+    public URL getSourceUrl() {
+        return sourceUrl;
+    }
+
+    public void setSourceUrl(URL sourceUrl) {
+        this.sourceUrl = sourceUrl;
     }
 
     public void setSignature(String signature) {
