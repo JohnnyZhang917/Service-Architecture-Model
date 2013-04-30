@@ -8,8 +8,8 @@ public class TestServiceTwo extends AbstractSamServiceDefinition {
 
     @Override
     public void loadServiceDefinition() {
-        addInterface(TestInterfaceTwo0.class);
-        addInterface(TestInterfaceTwo1.class);
+        withKey(TestInterfaceTwo0.class);
+        withKey(TestInterfaceTwo1.class);
     }
 
 }

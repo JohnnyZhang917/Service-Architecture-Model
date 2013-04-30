@@ -4,6 +4,6 @@ import eu.pmsoft.sam.definition.service.SamServiceDefinition;
 
 public interface SamServiceImplementationDefinition<T extends SamServiceDefinition> {
 
-    public void loadServiceImplementationDefinition(SamServiceImplementationLoader loader);
+    public void loadServiceImplementationDefinition(SamServiceImplementationDefinitionLoader loader);
 
 }

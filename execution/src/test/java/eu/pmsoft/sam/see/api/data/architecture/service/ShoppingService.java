@@ -7,7 +7,7 @@ public class ShoppingService extends AbstractSamServiceDefinition {
 
     @Override
     public void loadServiceDefinition() {
-        addInterface(ShoppingStoreWithCourierInteraction.class);
+        withKey(ShoppingStoreWithCourierInteraction.class);
     }
 
 }

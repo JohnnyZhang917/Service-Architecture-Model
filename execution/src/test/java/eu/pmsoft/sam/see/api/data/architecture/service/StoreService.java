@@ -7,7 +7,7 @@ public class StoreService extends AbstractSamServiceDefinition {
 
     @Override
     public void loadServiceDefinition() {
-        addInterface(StoreServiceContract.class);
+        withKey(StoreServiceContract.class);
     }
 
 }

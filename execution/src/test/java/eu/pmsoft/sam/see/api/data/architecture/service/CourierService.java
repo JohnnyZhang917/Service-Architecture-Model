@@ -8,7 +8,7 @@ public class CourierService extends AbstractSamServiceDefinition {
     @Override
     public void loadServiceDefinition() {
         // Only exposed interfaces are defined in the service contract
-        addInterface(CourierServiceContract.class);
+        withKey(CourierServiceContract.class);
     }
 
 }

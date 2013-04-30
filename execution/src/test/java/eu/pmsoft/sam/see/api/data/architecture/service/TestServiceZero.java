@@ -7,7 +7,7 @@ public class TestServiceZero extends AbstractSamServiceDefinition {
 
     @Override
     public void loadServiceDefinition() {
-        addInterface(TestInterfaceZero.class);
+        withKey(TestInterfaceZero.class);
     }
 
 }

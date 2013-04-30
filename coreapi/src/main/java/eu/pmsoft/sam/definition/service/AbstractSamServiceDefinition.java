@@ -1,21 +1,21 @@
 package eu.pmsoft.sam.definition.service;
 
+import com.google.inject.Key;
+
 import java.lang.annotation.Annotation;
 
 /**
- * Definition of ONE service contract ( a set of interfaces )
+ * Definition of ONE service contract ( a set of keys )
  *
  * @author pawel
  */
-public abstract class AbstractSamServiceDefinition implements
-        SamServiceDefinition {
+public abstract class AbstractSamServiceDefinition implements SamServiceDefinition {
 
-    private SamServiceLoaderBase.SamServiceLoader loaderRef;
+    private SamServiceDefinitionLoader.SamServiceDefinitionInterfacesLoader loaderRef;
 
-    public void loadServiceDefinition(SamServiceLoaderBase loader) {
+    public void loadServiceDefinition(SamServiceDefinitionLoader loader) {
         try {
-
-            this.loaderRef = loader.setupLoadContext(this.getClass());;
+            this.loaderRef = loader.definedIn(this.getClass());
             loadServiceDefinition();
         } finally {
             this.loaderRef = null;
@@ -24,11 +24,16 @@ public abstract class AbstractSamServiceDefinition implements
 
     abstract public void loadServiceDefinition();
 
-    protected void addInterface(Class<?> interfaceReference) {
-        loaderRef.addInterface(interfaceReference);
+    protected void withKey(Class<?> interfaceReference) {
+        loaderRef.withKey(interfaceReference);
     }
 
-    protected void addInterface(Class<?> interfaceReference, Annotation annotation) {
-        loaderRef.addInterface(interfaceReference, annotation);
+    protected void withKey(Class<?> interfaceReference, Annotation annotation) {
+        loaderRef.withKey(interfaceReference, annotation);
     }
+
+    protected void withKey(Key<?> key) {
+        loaderRef.withKey(key);
+    }
+
 }

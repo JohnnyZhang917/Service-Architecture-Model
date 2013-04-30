@@ -12,8 +12,8 @@ public class TestServiceOne extends AbstractSamServiceDefinition {
 
     @Override
     public void loadServiceDefinition() {
-        addInterface(TestInterfaceOne.class);
-        addInterface(TestInterfaceOne.class, TEST_NAME);
+        withKey(TestInterfaceOne.class);
+        withKey(TestInterfaceOne.class, TEST_NAME);
     }
 
 }

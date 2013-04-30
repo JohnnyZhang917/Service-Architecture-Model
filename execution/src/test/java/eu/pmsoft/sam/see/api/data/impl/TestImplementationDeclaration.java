@@ -12,46 +12,41 @@ public class TestImplementationDeclaration extends AbstractSamImplementationPack
     @Override
     public void packageDefinition() {
 
-        registerImplementation(new AbstractSamServiceImplementationDefinition<TestServiceZero>(TestServiceZero.class) {
+        registerImplementation(new AbstractSamServiceImplementationDefinition<TestServiceZero>(TestServiceZero.class, TestServiceZeroModule.class) {
             @Override
             protected void implementationDefinition() {
-                implementedInModule(TestServiceZeroModule.class);
+
             }
         });
-        registerImplementation(new AbstractSamServiceImplementationDefinition<TestServiceOne>(TestServiceOne.class) {
+        registerImplementation(new AbstractSamServiceImplementationDefinition<TestServiceOne>(TestServiceOne.class, TestServiceOneModule.class) {
             @Override
             protected void implementationDefinition() {
-                implementedInModule(TestServiceOneModule.class);
             }
         });
 
-        registerImplementation(new AbstractSamServiceImplementationDefinition<TestServiceTwo>(TestServiceTwo.class) {
+        registerImplementation(new AbstractSamServiceImplementationDefinition<TestServiceTwo>(TestServiceTwo.class, TestServiceTwoModule.class) {
             @Override
             protected void implementationDefinition() {
                 withBindingsTo(TestServiceOne.class);
                 withBindingsTo(TestServiceZero.class);
-                implementedInModule(TestServiceTwoModule.class);
             }
         });
-        registerImplementation(new AbstractSamServiceImplementationDefinition<StoreService>(StoreService.class) {
+        registerImplementation(new AbstractSamServiceImplementationDefinition<StoreService>(StoreService.class, TestStoreServiceModule.class) {
             @Override
             protected void implementationDefinition() {
-                implementedInModule(TestStoreServiceModule.class);
             }
         });
 
-        registerImplementation(new AbstractSamServiceImplementationDefinition<CourierService>(CourierService.class) {
+        registerImplementation(new AbstractSamServiceImplementationDefinition<CourierService>(CourierService.class, TestCourierServiceModule.class) {
             @Override
             protected void implementationDefinition() {
-                implementedInModule(TestCourierServiceModule.class);
             }
         });
-        registerImplementation(new AbstractSamServiceImplementationDefinition<ShoppingService>(ShoppingService.class) {
+        registerImplementation(new AbstractSamServiceImplementationDefinition<ShoppingService>(ShoppingService.class, TestShoppingModule.class) {
             @Override
             protected void implementationDefinition() {
                 withBindingsTo(StoreService.class);
                 withBindingsTo(CourierService.class);
-                implementedInModule(TestShoppingModule.class);
 
             }
         });

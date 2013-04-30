@@ -6,16 +6,18 @@ import eu.pmsoft.sam.definition.service.SamServiceDefinition;
 public abstract class AbstractSamServiceImplementationDefinition<T extends SamServiceDefinition> implements SamServiceImplementationDefinition<T> {
 
     private final Class<T> serviceContract;
-    private SamServiceImplementationLoader.InternalServiceImplementationDefinition definitionLoader;
+    private final Class<? extends Module> implementationModule;
+    private SamServiceImplementationDefinitionLoader.ContractAndModule definitionLoader;
 
-    protected AbstractSamServiceImplementationDefinition(Class<T> serviceContract) {
+    protected AbstractSamServiceImplementationDefinition(Class<T> serviceContract, Class<? extends Module> implementationModule) {
         this.serviceContract = serviceContract;
+        this.implementationModule = implementationModule;
     }
 
     @Override
-    public final void loadServiceImplementationDefinition(SamServiceImplementationLoader loader) {
+    public final void loadServiceImplementationDefinition(SamServiceImplementationDefinitionLoader loader) {
         try {
-            this.definitionLoader = loader.provideContract(serviceContract);
+            this.definitionLoader = loader.signature(serviceContract,implementationModule);
             implementationDefinition();
         } finally {
             this.definitionLoader = null;
@@ -26,10 +28,6 @@ public abstract class AbstractSamServiceImplementationDefinition<T extends SamSe
 
     protected final void withBindingsTo(Class<? extends SamServiceDefinition> userService) {
         definitionLoader.withBindingsTo(userService);
-    }
-
-    protected final void implementedInModule(Class<? extends Module> serviceImplementationModule) {
-        definitionLoader.implementedInModule(serviceImplementationModule);
     }
 
 }

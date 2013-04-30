@@ -3,7 +3,7 @@ package eu.pmsoft.sam.definition.instance;
 import com.google.inject.AbstractModule;
 import eu.pmsoft.sam.definition.implementation.AbstractSamImplementationPackage;
 import eu.pmsoft.sam.definition.implementation.AbstractSamServiceImplementationDefinition;
-import eu.pmsoft.sam.definition.implementation.SamServiceImplementationLoader;
+import eu.pmsoft.sam.definition.implementation.SamServiceImplementationDefinitionLoader;
 import eu.pmsoft.sam.definition.implementation.SamServicePackageLoader;
 import eu.pmsoft.sam.definition.service.AbstractSamServiceDefinition;
 import org.mockito.Mockito;
@@ -50,14 +50,13 @@ public class SamImplementationTest {
     static class FakeServiceImplementation extends AbstractSamServiceImplementationDefinition<FakeServiceDefinitionImpl> {
 
         protected FakeServiceImplementation() {
-            super(FakeServiceDefinitionImpl.class);
+            super(FakeServiceDefinitionImpl.class, FakeServiceModule.class);
         }
 
         @Override
         protected void implementationDefinition() {
             withBindingsTo(FakeServiceDefinitionExternalOne.class);
             withBindingsTo(FakeServiceDefinitionExternalTwo.class);
-            implementedInModule(FakeServiceModule.class);
         }
     }
 
@@ -79,24 +78,23 @@ public class SamImplementationTest {
 
     @Test
     public void simpleServiceImplementationDefinition() {
-        SamServiceImplementationLoader mockLoader = Mockito.mock(SamServiceImplementationLoader.class);
-        final SamServiceImplementationLoader.InternalServiceImplementationDefinition mockInternalDefinition = Mockito.mock(SamServiceImplementationLoader.InternalServiceImplementationDefinition.class);
-        Stubber stubber = Mockito.doAnswer(new Answer<SamServiceImplementationLoader.InternalServiceImplementationDefinition>() {
+        SamServiceImplementationDefinitionLoader mockLoader = Mockito.mock(SamServiceImplementationDefinitionLoader.class);
+        final SamServiceImplementationDefinitionLoader.ContractAndModule mockInternalDefinition = Mockito.mock(SamServiceImplementationDefinitionLoader.ContractAndModule.class);
+
+        Stubber stubber = Mockito.doAnswer(new Answer<SamServiceImplementationDefinitionLoader.ContractAndModule>() {
             @Override
-            public SamServiceImplementationLoader.InternalServiceImplementationDefinition answer(InvocationOnMock invocation) throws Throwable {
+            public SamServiceImplementationDefinitionLoader.ContractAndModule answer(InvocationOnMock invocation) throws Throwable {
                 return mockInternalDefinition;
             }
         });
-        stubber.when(mockLoader).provideContract(FakeServiceDefinitionImpl.class);
-//        stubber.when(mockInternalDefinition).withBindingsTo(any(Class.class));
+        stubber.when(mockLoader).signature(FakeServiceDefinitionImpl.class,FakeServiceModule.class);
 
         FakeServiceImplementation implementationDefinition = new FakeServiceImplementation();
         implementationDefinition.loadServiceImplementationDefinition(mockLoader);
 
-        verify(mockLoader).provideContract(FakeServiceDefinitionImpl.class);
+        verify(mockLoader).signature(FakeServiceDefinitionImpl.class,FakeServiceModule.class);
         verify(mockInternalDefinition).withBindingsTo(FakeServiceDefinitionExternalOne.class);
         verify(mockInternalDefinition).withBindingsTo(FakeServiceDefinitionExternalTwo.class);
-        verify(mockInternalDefinition).implementedInModule(FakeServiceModule.class);
     }
 
 }

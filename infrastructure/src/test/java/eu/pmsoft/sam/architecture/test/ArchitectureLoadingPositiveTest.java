@@ -101,52 +101,52 @@ public class ArchitectureLoadingPositiveTest {
     static class SD_11 extends AbstractSamServiceDefinition {
         @Override
         public void loadServiceDefinition() {
-            addInterface(fakeServiceInterface0.class);
+            withKey(fakeServiceInterface0.class);
         }
     }
 
     static class SD_12 extends AbstractSamServiceDefinition {
         @Override
         public void loadServiceDefinition() {
-            addInterface(fakeServiceInterface0.class);
+            withKey(fakeServiceInterface0.class);
         }
     }
 
     static class SD_13 extends AbstractSamServiceDefinition {
         @Override
         public void loadServiceDefinition() {
-            addInterface(fakeServiceInterface0.class);
+            withKey(fakeServiceInterface0.class);
         }
     }
 
     static class SD_14 extends AbstractSamServiceDefinition {
         @Override
         public void loadServiceDefinition() {
-            addInterface(fakeServiceInterface0.class);
-            addInterface(fakeServiceInterface1.class);
-            addInterface(fakeServiceInterface2.class);
-            addInterface(fakeServiceInterface3.class);
+            withKey(fakeServiceInterface0.class);
+            withKey(fakeServiceInterface1.class);
+            withKey(fakeServiceInterface2.class);
+            withKey(fakeServiceInterface3.class);
         }
     }
 
     static class SD_21 extends AbstractSamServiceDefinition {
         @Override
         public void loadServiceDefinition() {
-            addInterface(fakeServiceInterface1.class);
+            withKey(fakeServiceInterface1.class);
         }
     }
 
     static class SD_31 extends AbstractSamServiceDefinition {
         @Override
         public void loadServiceDefinition() {
-            addInterface(fakeServiceInterface2.class);
+            withKey(fakeServiceInterface2.class);
         }
     }
 
     static class SD_41 extends AbstractSamServiceDefinition {
         @Override
         public void loadServiceDefinition() {
-            addInterface(fakeServiceInterface3.class);
+            withKey(fakeServiceInterface3.class);
         }
     }
 

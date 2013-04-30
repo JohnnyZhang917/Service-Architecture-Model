@@ -3,14 +3,10 @@ package eu.pmsoft.sam.see.infrastructure.localjvm;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import com.google.common.collect.Sets.SetView;
-import com.google.inject.Inject;
 import com.google.inject.Module;
-import eu.pmsoft.exceptions.OperationContext;
-import eu.pmsoft.exceptions.OperationReportingFactory;
-import eu.pmsoft.exceptions.OperationRuntimeException;
 import eu.pmsoft.sam.architecture.model.ServiceKey;
 import eu.pmsoft.sam.definition.implementation.AbstractSamServiceImplementationDefinition;
-import eu.pmsoft.sam.definition.implementation.SamServiceImplementationLoader;
+import eu.pmsoft.sam.definition.implementation.SamServiceImplementationDefinitionLoader;
 import eu.pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
 import eu.pmsoft.sam.definition.implementation.SamServicePackageLoader;
 import eu.pmsoft.sam.definition.service.SamServiceDefinition;
@@ -22,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+@Deprecated
 class SamServiceRegistryLocal implements SamServiceRegistry {
 
     private final Map<SamServiceImplementationKey, ServiceImplementationObject> register = Maps.newHashMap();
@@ -57,8 +54,9 @@ class SamServiceRegistryLocal implements SamServiceRegistry {
         return register.get(key);
     }
 
+    @Deprecated
     private class SamServicePackageLoaderImpl implements SamServicePackageLoader {
-        private List<SamServiceImplementationLoaderImplementation> implementations = Lists.newArrayList();
+//        private List<SamServiceImplementationLoaderImplementationDefinition> implementations = Lists.newArrayList();
 //        private final OperationContext operationContext;
 
 //        public SamServicePackageLoaderImpl(OperationContext operationContext) {
@@ -67,35 +65,38 @@ class SamServiceRegistryLocal implements SamServiceRegistry {
 
         @Override
         public void registerImplementation(AbstractSamServiceImplementationDefinition<? extends SamServiceDefinition> serviceImplementationContract) {
-            SamServiceImplementationLoaderImplementation loader = new SamServiceImplementationLoaderImplementation();
-            serviceImplementationContract.loadServiceImplementationDefinition(loader);
-            implementations.add(loader);
+//            SamServiceImplementationLoaderImplementationDefinition loader = new SamServiceImplementationLoaderImplementationDefinition();
+//            serviceImplementationContract.loadServiceImplementationDefinition(loader);
+//            implementations.add(loader);
 
         }
 
         public Set<ServiceImplementationObject> buildImplementations() {
             ImmutableSet.Builder<ServiceImplementationObject> builder = ImmutableSet.builder();
-            for (SamServiceImplementationLoaderImplementation definition : implementations) {
-                builder.add(definition.build());
-            }
+//            for (SamServiceImplementationLoaderImplementationDefinition definition : implementations) {
+//                builder.add(definition.build());
+//            }
             return builder.build();
         }
 
-        private class SamServiceImplementationLoaderImplementation implements SamServiceImplementationLoader {
-            InternalServiceImplementationDefinitionImplementation internal = new InternalServiceImplementationDefinitionImplementation();
+        @Deprecated
+        private class SamServiceImplementationLoaderImplementationDefinition
+//                implements SamServiceImplementationDefinitionLoader
+        {
+//            InternalServiceImplementationDefinitionImplementation internal = new InternalServiceImplementationDefinitionImplementation();
             private Class<? extends SamServiceDefinition> serviceDefinition = null;
             private final Set<Class<? extends SamServiceDefinition>> bindings = Sets.newHashSet();
             private Class<? extends Module> module = null;
 
-            @Override
-            public InternalServiceImplementationDefinition provideContract(Class<? extends SamServiceDefinition> serviceDefinition) {
-                if (this.serviceDefinition != null) {
-//                    operationContext.getErrors().addError("duplicated call to provideContract on service implementation definition for %s", serviceDefinition);
-                    // TODO
-                }
-                this.serviceDefinition = serviceDefinition;
-                return internal;
-            }
+//            @Override
+//            public Contract provideContract(Class<? extends SamServiceDefinition> contract) {
+//                if (this.serviceDefinition != null) {
+////                    operationContext.getErrors().addError("duplicated call to provideContract on service implementation definition for %s", serviceDefinition);
+//                    // TODO
+//                }
+//                this.serviceDefinition = contract;
+//                return internal;
+//            }
 
             public ServiceImplementationObject build() {
                 Preconditions.checkState(module != null);
@@ -108,25 +109,27 @@ class SamServiceRegistryLocal implements SamServiceRegistry {
                 return new ServiceImplementationObject(module, key, contract, binds.build());
             }
 
-            private class InternalServiceImplementationDefinitionImplementation implements InternalServiceImplementationDefinition {
-
-                @Override
-                public void withBindingsTo(Class<? extends SamServiceDefinition> userService) {
-                    if (!bindings.add(userService)) {
-//                        operationContext.getErrors().addError("service binding to contract declared two times for %s", userService);
-                        // TODO
-                    }
-                }
-
-                @Override
-                public void implementedInModule(Class<? extends Module> serviceImplementationModule) {
-                    if (module != null) {
-//                        operationContext.getErrors().addError("duplicated declaration of service implementation module for %s", serviceImplementationModule);
-                        // TODO
-                    }
-                    module = serviceImplementationModule;
-                }
-            }
+//            private class InternalServiceImplementationDefinitionImplementation implements ContractAndModule,Contract {
+//
+//                @Override
+//                public ContractAndModule withBindingsTo(Class<? extends SamServiceDefinition> userService) {
+//                    if (!bindings.add(userService)) {
+////                        operationContext.getErrors().addError("service binding to contract declared two times for %s", userService);
+//                        // TODO
+//                    }
+//                    return this;
+//                }
+//
+//                @Override
+//                public ContractAndModule implementedInModule(Class<? extends Module> serviceImplementationModule) {
+//                    if (module != null) {
+////                        operationContext.getErrors().addError("duplicated declaration of service implementation module for %s", serviceImplementationModule);
+//                        // TODO
+//                    }
+//                    module = serviceImplementationModule;
+//                    return this;
+//                }
+//            }
         }
 
     }
