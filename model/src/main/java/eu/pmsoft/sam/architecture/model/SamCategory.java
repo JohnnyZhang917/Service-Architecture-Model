@@ -2,6 +2,7 @@ package eu.pmsoft.sam.architecture.model;
 
 import java.util.Set;
 
+@Deprecated
 public interface SamCategory {
 
     public Set<SamCategory> getAccessibleCategories();

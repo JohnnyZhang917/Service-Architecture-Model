@@ -5,7 +5,7 @@ import eu.pmsoft.sam.architecture.definition.SamArchitectureDefinition;
 import eu.pmsoft.sam.architecture.definition.SamArchitectureLoader.SamCategoryLoader;
 import eu.pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
 import eu.pmsoft.sam.definition.service.AbstractSamServiceDefinition;
-import eu.pmsoft.sam.model.ArchitectureModelLoader;
+import eu.pmsoft.sam.model.SamModelBuilder;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -19,7 +19,7 @@ public class ArchitectureLoadingNegativeTest {
 
     @Test(dataProvider = "incorrectArchitecture", expectedExceptions = {IncorrectArchitectureDefinition.class})
     public void loadArchitecturesCorrectly(SamArchitectureDefinition definition) throws IncorrectArchitectureDefinition {
-        ArchitectureModelLoader.loadArchitectureModel(definition);
+        SamModelBuilder.loadArchitectureDefinition(definition);
     }
 
     // Empty architecture

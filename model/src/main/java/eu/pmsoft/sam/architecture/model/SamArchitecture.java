@@ -3,6 +3,7 @@ package eu.pmsoft.sam.architecture.model;
 import java.lang.annotation.Annotation;
 import java.util.Collection;
 
+@Deprecated
 public interface SamArchitecture {
 
     Collection<SamService> getAllService();

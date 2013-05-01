@@ -1,15 +1,22 @@
 package eu.pmsoft.sam.model
 
-import eu.pmsoft.sam.architecture.definition.SamArchitectureDefinition
+import eu.pmsoft.sam.architecture.definition.{SamArchitectureLoader, SamArchitectureDefinition}
 import eu.pmsoft.sam.definition.implementation.{SamServiceImplementationDefinitionLoader, SamServiceImplementationPackageContract}
 import java.lang.annotation.Annotation
 import com.google.inject.Key
-import eu.pmsoft.sam.definition.service.SamServiceDefinitionLoader
+import eu.pmsoft.sam.definition.service.{SamServiceDefinition, SamServiceDefinitionLoader}
 import eu.pmsoft.sam.definition.service.SamServiceDefinitionLoader.SamServiceDefinitionInterfacesLoader
 import eu.pmsoft.sam.definition.implementation.SamServiceImplementationDefinitionLoader.ContractAndModule
+import eu.pmsoft.sam.architecture.definition.SamArchitectureLoader.SamCategoryLoader
 
 
-object SamArchitectureDefinitionLoader {
+object SamModelBuilder {
+
+  def loadArchitectureDefinition(architectureDefinition: SamArchitectureDefinition) = {
+    val loader = new SamArchitectureDefinitionLoader
+    architectureDefinition.loadArchitectureDefinition(loader)
+    loader.build
+  }
 
   def loadServiceDefinition(serviceDefinition: ServiceDefinition): SamServiceObject = {
     val loader = new SamServiceLoader
@@ -25,26 +32,53 @@ object SamArchitectureDefinitionLoader {
 
 }
 
-object SamArchitectureBuilder {
+class SamArchitectureDefinitionLoader extends SamArchitectureLoader {
+  var categoryMap: Map[String, SamCategoryBuilder] = Map.empty
+  var accessMap: Map[String, Set[String]] = Map.empty
 
-  def serviceBuilder: SamServiceDefinitionBuilder = SamServiceDefinitionBuilder(SamServiceObject(ServiceKey(null), Set.empty))
-
-  def nodeConfiguration: SEEConfigurationGrammar = SEEConfigurationBuilder(SEEConfiguration(Set.empty, Set.empty))
-
-  def implementationBuilder: ServiceImplementationBuilder = {
-    ServiceImplementationBuilder(
-      ServiceImplementationObject(
-        ServiceImplementationKey(null),
-        ServiceKey(null),
-        Set.empty
-      ))
+  def accessMark(from: String, to: String) = {
+    accessMap.get(from) match {
+      case None => accessMap = accessMap updated(from, Set(to))
+      case Some(set) => accessMap = accessMap updated(from, set + to)
+    }
   }
 
+  private def createCategoryBuilder(id: String) = {
+    val builder = new SamCategoryBuilder(id, this)
+    categoryMap += id -> builder
+    builder
+  }
+
+  def createCategory(categoryName: String): SamCategoryLoader = {
+    categoryMap.getOrElse(categoryName, createCategoryBuilder(categoryName))
+  }
+
+  def build = SamArchitectureObject(categoryMap.values.map(_.category).toSet, accessMap)
+
+}
+
+class SamCategoryBuilder(val id: String, val architectureLoader: SamArchitectureDefinitionLoader) extends SamCategoryLoader {
+
+  var category: SamCategoryObject = SamCategoryObject(id, Set.empty)
+
+  def getCategoryId: String = id
+
+  def accessToCategory(accessibleCategory: SamCategoryLoader): SamCategoryLoader = {
+    architectureLoader.accessMark(id, accessibleCategory.getCategoryId)
+    this
+  }
+
+  def withService(serviceDefinition: SamServiceDefinition): SamCategoryLoader = {
+    val service = SamModelBuilder.loadServiceDefinition(serviceDefinition)
+    category = category.copy(services = category.services + service)
+    this
+  }
 }
 
 
 class SamServiceImplementationLoader extends SamServiceImplementationDefinitionLoader with SamServiceImplementationDefinitionLoader.ContractAndModule {
-  var expression: ServiceImplementationBuilder = SamArchitectureBuilder.implementationBuilder
+  var expression: ServiceImplementationBuilder = ServiceImplementationBuilder(ServiceImplementationObject(ServiceImplementationKey(null),ServiceKey(null),Set.empty))
+
 
   def withBindingsTo(userService: ServiceContract): ContractAndModule = {
     expression = expression.withBindingsTo(userService)
@@ -80,7 +114,7 @@ case class ServiceImplementationBuilder(implementation: ServiceImplementationObj
 
 class SamServiceLoader extends SamServiceDefinitionLoader with SamServiceDefinitionInterfacesLoader {
 
-  var expression: SamServiceDefinitionBuilder = SamArchitectureBuilder.serviceBuilder
+  var expression: SamServiceDefinitionBuilder = SamServiceDefinitionBuilder(SamServiceObject(ServiceKey(null), Set.empty))
 
   def definedIn(definitionClass: ServiceContract): SamServiceDefinitionInterfacesLoader = {
     expression = expression.definedIn(definitionClass)
@@ -114,16 +148,7 @@ case class SamServiceDefinitionBuilder(service: SamServiceObject) {
 }
 
 
-trait SEEConfigurationGrammar {
-  def withArchitecture(toAdd: SamArchitectureDefinition): SEEConfigurationGrammar
-
-  def withImplementation(toAdd: SamServiceImplementationPackageContract): SEEConfigurationGrammar
-
-  def build: SEEConfiguration
-
-}
-
-case class SEEConfigurationBuilder(config: SEEConfiguration) extends SEEConfigurationGrammar {
+case class SEEConfigurationBuilder(config: SEEConfiguration) {
 
   def withArchitecture(toAdd: SamArchitectureDefinition) = new SEEConfigurationBuilder(config.copy(architectures = config.architectures + toAdd))
 

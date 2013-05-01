@@ -13,8 +13,7 @@ import eu.pmsoft.sam.architecture.definition.SamArchitectureLoader.SamCategoryLo
  *
  * @author pawel
  */
-public abstract class AbstractSamArchitectureDefinition implements
-        SamArchitectureDefinition {
+public abstract class AbstractSamArchitectureDefinition implements SamArchitectureDefinition {
 
     private SamArchitectureLoader loaderRef;
 
