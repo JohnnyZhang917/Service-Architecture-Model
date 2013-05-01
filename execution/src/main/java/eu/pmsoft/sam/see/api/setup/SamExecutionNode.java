@@ -2,7 +2,6 @@ package eu.pmsoft.sam.see.api.setup;
 
 import eu.pmsoft.sam.architecture.model.ServiceKey;
 import eu.pmsoft.sam.see.api.model.*;
-import eu.pmsoft.sam.see.configuration.SEENodeConfiguration;
 
 import java.util.Map;
 import java.util.Set;
@@ -29,7 +28,7 @@ public interface SamExecutionNode {
      */
     public SamServiceInstanceTransaction getTransaction(STID url);
 
-    public void setupConfiguration(SEENodeConfiguration nodeConfiguration);
+//    public void setupConfiguration(SEENodeConfiguration nodeConfiguration);
 
     public Map<STID, ServiceKey> getServiceTransactionSetup();
 

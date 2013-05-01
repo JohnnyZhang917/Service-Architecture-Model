@@ -5,21 +5,19 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.inject.*;
-import eu.pmsoft.sam.architecture.model.SamService;
+import eu.pmsoft.sam.architecture.model.SamServiceDeprecated;
 import eu.pmsoft.sam.architecture.model.ServiceKey;
 import eu.pmsoft.sam.protocol.CanonicalProtocolRecordingModel;
 import eu.pmsoft.sam.protocol.CanonicalProtocolThreadExecutionContext;
 import eu.pmsoft.sam.protocol.freebinding.FreeVariableBindingBuilder;
 import eu.pmsoft.sam.see.api.infrastructure.SamArchitectureRegistry;
-import eu.pmsoft.sam.see.api.setup.SamExecutionNodeInternalApi;
 import eu.pmsoft.sam.see.api.infrastructure.SamServiceDiscovery;
-import eu.pmsoft.sam.see.api.infrastructure.SamServiceRegistry;
+import eu.pmsoft.sam.see.api.infrastructure.SamServiceRegistryDeprecated;
 import eu.pmsoft.sam.see.api.model.*;
+import eu.pmsoft.sam.see.api.setup.SamExecutionNodeInternalApi;
 import eu.pmsoft.sam.see.api.transaction.BindPointSIID;
 import eu.pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
 import eu.pmsoft.sam.see.api.transaction.SamInjectionModelVisitorAdapter;
-import eu.pmsoft.sam.see.configuration.SEENodeConfiguration;
-import eu.pmsoft.sam.see.configuration.SEEServiceSetupAction;
 import eu.pmsoft.sam.see.transport.SamTransportCommunicationContext;
 
 import java.util.*;
@@ -32,7 +30,7 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
     private final Map<STID, ServiceKey> transactionsType = Maps.newHashMap();
     private final CanonicalProtocolRecordingModel canonicalProtocol;
 
-    private final SamServiceRegistry samServiceRegistry;
+    private final SamServiceRegistryDeprecated samServiceRegistryDeprecated;
     private final SamArchitectureRegistry architectureRegistry;
 
     private final SamServiceDiscovery serviceDiscoveryRegistry;
@@ -43,9 +41,9 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
 
 
     @Inject
-    public SamExecutionNodeJVM(CanonicalProtocolRecordingModel canonicalProtocol, SamServiceRegistry samServiceRegistry, SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry, LocalSeeExecutionNodeModel localNodeExecutionModel) {
+    public SamExecutionNodeJVM(CanonicalProtocolRecordingModel canonicalProtocol, SamServiceRegistryDeprecated samServiceRegistryDeprecated, SamArchitectureRegistry architectureRegistry, SamServiceDiscovery serviceDiscoveryRegistry, LocalSeeExecutionNodeModel localNodeExecutionModel) {
         this.canonicalProtocol = canonicalProtocol;
-        this.samServiceRegistry = samServiceRegistry;
+        this.samServiceRegistryDeprecated = samServiceRegistryDeprecated;
         this.architectureRegistry = architectureRegistry;
         this.serviceDiscoveryRegistry = serviceDiscoveryRegistry;
 //        this.samExecutionApi = localNodeExecutionModel.newSamExecutionApi(this);
@@ -83,18 +81,18 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
         return siurl;
     }
 
-    @Override
-    public void setupConfiguration(SEENodeConfiguration nodeConfiguration) {
-        for (SEEServiceSetupAction setupAction : nodeConfiguration.setupActions) {
-            setupAction.setupService(this);
-        }
-    }
+//    @Override
+//    public void setupConfiguration(SEENodeConfiguration nodeConfiguration) {
+//        for (SEEServiceSetupAction setupAction : nodeConfiguration.setupActions) {
+//            setupAction.setupService(this);
+//        }
+//    }
 
     @Override
     public CanonicalProtocolThreadExecutionContext createTransactionExecutionContext(STID serviceTransactionDefinitionID) {
         Preconditions.checkNotNull(serviceTransactionDefinitionID);
         SamServiceInstanceTransaction transaction = getTransaction(serviceTransactionDefinitionID);
-        CanonicalProtocolThreadExecutionContext executionContext = canonicalProtocol.createExecutionContext(transaction,this);
+        CanonicalProtocolThreadExecutionContext executionContext = canonicalProtocol.createExecutionContext(transaction, this);
         protocolExecutionContext.put(serviceTransactionDefinitionID, executionContext.getContextUniqueID(), executionContext);
         return executionContext;
     }
@@ -128,7 +126,7 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
         SamServiceInstanceTransaction transaction = new SamServiceInjectionTransactionObject(configuration, transactionID);
         validateTransaction(transaction);
         transactions.put(transactionID, transaction);
-        transactionsType.put(transactionID,configuration.getProvidedService());
+        transactionsType.put(transactionID, configuration.getProvidedService());
         return transactionID;
     }
 
@@ -186,19 +184,19 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
 //        OperationContext operationContext = operationReportingFactory.openNestedContext();
         SamServiceInstanceObject instance = null;
 //        try {
-            Preconditions.checkArgument(key != null);
+        Preconditions.checkArgument(key != null);
 
-            SamServiceImplementation serviceImplementation = samServiceRegistry.getImplementation(key);
-            Preconditions.checkNotNull(serviceImplementation, "Service Implementation not found for key [%s]", key);
+        SamServiceImplementationDeprecated serviceImplementation = samServiceRegistryDeprecated.getImplementation(key);
+        Preconditions.checkNotNull(serviceImplementation, "Service Implementation not found for key [%s]", key);
 
-            SIID id = new SIID();
-            Injector injector = createServiceInstanceInjector(serviceImplementation);
-            SamService contractService = architectureRegistry.getService(serviceImplementation.getSpecificationKey());
-            ServiceMetadata finalMetadata = metadata == null ? new ServiceMetadata() : metadata;
-            instance = new SamServiceInstanceObject(key, id, injector, finalMetadata, contractService.getServiceContractAPI(),
-                    contractService.getServiceKey());
-            runningInstances.put(id, instance);
-            typeOfRunningInstance.put(key, id);
+        SIID id = new SIID();
+        Injector injector = createServiceInstanceInjector(serviceImplementation);
+        SamServiceDeprecated contractService = architectureRegistry.getService(serviceImplementation.getSpecificationKey());
+        ServiceMetadata finalMetadata = metadata == null ? new ServiceMetadata() : metadata;
+        instance = new SamServiceInstanceObject(key, id, injector, finalMetadata, contractService.getServiceContractAPI(),
+                contractService.getServiceKey());
+        runningInstances.put(id, instance);
+        typeOfRunningInstance.put(key, id);
 
 //        } catch (OperationRuntimeException operationError) {
 //            operationContext.getErrors().addError(operationError);
@@ -211,7 +209,7 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
         return instance;
     }
 
-    private Injector createServiceInstanceInjector(SamServiceImplementation serviceImplementation) {
+    private Injector createServiceInstanceInjector(SamServiceImplementationDeprecated serviceImplementation) {
 //        OperationContext operationContext = operationReportingFactory.openExistingContext();
         Class<? extends Module> implModule = serviceImplementation.getModule();
         Module implModuleInstance;
@@ -232,7 +230,7 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
         List<List<Key<?>>> injectedFreeVariableBinding = Lists.newLinkedList();
         for (ServiceKey externalServiceKey : orderedInjectServices) {
             List<Key<?>> serviceKeys = Lists.newArrayList();
-            SamService externalServiceSpec = architectureRegistry.getService(externalServiceKey);
+            SamServiceDeprecated externalServiceSpec = architectureRegistry.getService(externalServiceKey);
             Set<Key<?>> keys = externalServiceSpec.getServiceContractAPI();
             for (Key<?> serviceApi : keys) {
                 serviceKeys.add(serviceApi);
@@ -246,9 +244,9 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
 
     }
 
-    private void validateInjectorWithServiceContract(Injector implInjector, SamServiceImplementation serviceImplementation) {
+    private void validateInjectorWithServiceContract(Injector implInjector, SamServiceImplementationDeprecated serviceImplementation) {
 //        OperationContext operationContext = operationReportingFactory.openExistingContext();
-        SamService externalServiceSpec = architectureRegistry.getService(serviceImplementation.getSpecificationKey());
+        SamServiceDeprecated externalServiceSpec = architectureRegistry.getService(serviceImplementation.getSpecificationKey());
         Set<Key<?>> contract = externalServiceSpec.getServiceContractAPI();
         for (Key<?> key : contract) {
             if (implInjector.getExistingBinding(key) == null) {

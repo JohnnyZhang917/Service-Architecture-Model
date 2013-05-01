@@ -4,8 +4,7 @@ import com.google.inject.Key;
 
 import java.util.Set;
 
-@Deprecated
-public interface SamService {
+public interface SamServiceDeprecated {
 
     public ServiceKey getServiceKey();
 

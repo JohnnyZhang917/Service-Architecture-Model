@@ -6,12 +6,11 @@ import com.google.common.collect.Sets.SetView;
 import com.google.inject.Module;
 import eu.pmsoft.sam.architecture.model.ServiceKey;
 import eu.pmsoft.sam.definition.implementation.AbstractSamServiceImplementationDefinition;
-import eu.pmsoft.sam.definition.implementation.SamServiceImplementationDefinitionLoader;
 import eu.pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
 import eu.pmsoft.sam.definition.implementation.SamServicePackageLoader;
 import eu.pmsoft.sam.definition.service.SamServiceDefinition;
-import eu.pmsoft.sam.see.api.infrastructure.SamServiceRegistry;
-import eu.pmsoft.sam.see.api.model.SamServiceImplementation;
+import eu.pmsoft.sam.see.api.infrastructure.SamServiceRegistryDeprecated;
+import eu.pmsoft.sam.see.api.model.SamServiceImplementationDeprecated;
 import eu.pmsoft.sam.see.api.model.SamServiceImplementationKey;
 
 import java.util.List;
@@ -19,21 +18,21 @@ import java.util.Map;
 import java.util.Set;
 
 @Deprecated
-class SamServiceRegistryLocal implements SamServiceRegistry {
+class SamServiceRegistryDeprecatedLocal implements SamServiceRegistryDeprecated {
 
-    private final Map<SamServiceImplementationKey, ServiceImplementationObject> register = Maps.newHashMap();
+    private final Map<SamServiceImplementationKey, ServiceImplementationDeprecatedObject> register = Maps.newHashMap();
 
 
     @Override
     public void registerServiceImplementationPackage(SamServiceImplementationPackageContract definition) {
 //        OperationContext operationContext = operationReportingFactory.openNestedContext();
 //        try {
-            Map<SamServiceImplementationKey, ServiceImplementationObject> registerNew = null;
+            Map<SamServiceImplementationKey, ServiceImplementationDeprecatedObject> registerNew = null;
             SamServicePackageLoaderImpl reader = new SamServicePackageLoaderImpl();
             definition.loadContractPackage(reader);
-            Set<ServiceImplementationObject> implementations = reader.buildImplementations();
+            Set<ServiceImplementationDeprecatedObject> implementations = reader.buildImplementations();
             registerNew = Maps.newHashMapWithExpectedSize(implementations.size());
-            for (ServiceImplementationObject serviceImplementation : implementations) {
+            for (ServiceImplementationDeprecatedObject serviceImplementation : implementations) {
                 registerNew.put(serviceImplementation.getKey(), serviceImplementation);
             }
             SetView<SamServiceImplementationKey> alreadyExistingKeys = Sets.intersection(registerNew.keySet(), register.keySet());
@@ -50,7 +49,7 @@ class SamServiceRegistryLocal implements SamServiceRegistry {
     }
 
     @Override
-    public SamServiceImplementation getImplementation(SamServiceImplementationKey key) {
+    public SamServiceImplementationDeprecated getImplementation(SamServiceImplementationKey key) {
         return register.get(key);
     }
 
@@ -71,8 +70,8 @@ class SamServiceRegistryLocal implements SamServiceRegistry {
 
         }
 
-        public Set<ServiceImplementationObject> buildImplementations() {
-            ImmutableSet.Builder<ServiceImplementationObject> builder = ImmutableSet.builder();
+        public Set<ServiceImplementationDeprecatedObject> buildImplementations() {
+            ImmutableSet.Builder<ServiceImplementationDeprecatedObject> builder = ImmutableSet.builder();
 //            for (SamServiceImplementationLoaderImplementationDefinition definition : implementations) {
 //                builder.add(definition.build());
 //            }
@@ -98,7 +97,7 @@ class SamServiceRegistryLocal implements SamServiceRegistry {
 //                return internal;
 //            }
 
-            public ServiceImplementationObject build() {
+            public ServiceImplementationDeprecatedObject build() {
                 Preconditions.checkState(module != null);
                 ServiceKey contract = new ServiceKey(serviceDefinition);
                 ImmutableList.Builder<ServiceKey> binds = ImmutableList.builder();
@@ -106,7 +105,7 @@ class SamServiceRegistryLocal implements SamServiceRegistry {
                     binds.add(new ServiceKey(serviceBind));
                 }
                 SamServiceImplementationKey key = new SamServiceImplementationKey(module.getName());
-                return new ServiceImplementationObject(module, key, contract, binds.build());
+                return new ServiceImplementationDeprecatedObject(module, key, contract, binds.build());
             }
 
 //            private class InternalServiceImplementationDefinitionImplementation implements ContractAndModule,Contract {
@@ -134,15 +133,15 @@ class SamServiceRegistryLocal implements SamServiceRegistry {
 
     }
 
-    private static class ServiceImplementationObject implements SamServiceImplementation {
+    private static class ServiceImplementationDeprecatedObject implements SamServiceImplementationDeprecated {
 
         private final Class<? extends Module> module;
         private final SamServiceImplementationKey key;
         private final ServiceKey contract;
         private final ImmutableList<ServiceKey> binds;
 
-        ServiceImplementationObject(Class<? extends Module> module, SamServiceImplementationKey key, ServiceKey contract,
-                                    ImmutableList<ServiceKey> binds) {
+        ServiceImplementationDeprecatedObject(Class<? extends Module> module, SamServiceImplementationKey key, ServiceKey contract,
+                                              ImmutableList<ServiceKey> binds) {
             this.module = module;
             this.key = key;
             this.contract = contract;

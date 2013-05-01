@@ -1,7 +1,5 @@
 package eu.pmsoft.sam.see.api.infrastructure;
 
-import eu.pmsoft.sam.see.configuration.SEEConfiguration;
-
 public interface SamExecutionEnvironmentInfrastructure {
 
     public SamArchitectureManagement getArchitectureManager();
@@ -10,7 +8,7 @@ public interface SamExecutionEnvironmentInfrastructure {
 
     public SamServiceDiscovery getServiceDiscovery();
 
-    public SamServiceRegistry getServiceRegistry();
+    public SamServiceRegistryDeprecated getServiceRegistry();
 
-    public void setupInfrastructureConfiguration(SEEConfiguration configuration);
+//    public void setupInfrastructureConfiguration(SEEConfiguration configuration);
 }

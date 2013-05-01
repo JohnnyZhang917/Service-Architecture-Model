@@ -1,23 +1,5 @@
 package eu.pmsoft.sam.architecture.loader;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
-import com.google.inject.Key;
-import eu.pmsoft.sam.architecture.definition.SamArchitectureDefinition;
-import eu.pmsoft.sam.architecture.definition.SamArchitectureLoader;
-import eu.pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
-import eu.pmsoft.sam.architecture.model.SamArchitecture;
-import eu.pmsoft.sam.architecture.model.SamCategory;
-import eu.pmsoft.sam.architecture.model.SamService;
-import eu.pmsoft.sam.architecture.model.ServiceKey;
-import eu.pmsoft.sam.definition.service.SamServiceDefinition;
-import eu.pmsoft.sam.definition.service.SamServiceLoader;
-
-import java.lang.annotation.Annotation;
-import java.util.*;
-
 @Deprecated
 public class ArchitectureModelLoader {
 //        implements SamArchitectureLoader

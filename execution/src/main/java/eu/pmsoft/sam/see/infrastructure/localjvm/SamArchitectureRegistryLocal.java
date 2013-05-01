@@ -1,9 +1,8 @@
 package eu.pmsoft.sam.see.infrastructure.localjvm;
 
 import com.google.common.collect.Sets;
-import eu.pmsoft.exceptions.OperationRuntimeException;
 import eu.pmsoft.sam.architecture.model.SamArchitecture;
-import eu.pmsoft.sam.architecture.model.SamService;
+import eu.pmsoft.sam.architecture.model.SamServiceDeprecated;
 import eu.pmsoft.sam.architecture.model.ServiceKey;
 import eu.pmsoft.sam.see.api.infrastructure.SamArchitectureManagement;
 
@@ -21,9 +20,9 @@ public class SamArchitectureRegistryLocal implements SamArchitectureManagement {
     private final Set<SamArchitecture> architectures = Sets.newHashSet();
 
     @Override
-    public SamService getService(ServiceKey serviceKey) {
+    public SamServiceDeprecated getService(ServiceKey serviceKey) {
         for (SamArchitecture arch : architectures) {
-            SamService service = arch.getService(serviceKey);
+            SamServiceDeprecated service = arch.getService(serviceKey);
             if (service != null) {
                 return service;
             }

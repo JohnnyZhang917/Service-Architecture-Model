@@ -5,7 +5,7 @@ import com.google.inject.Provides;
 import eu.pmsoft.sam.see.api.infrastructure.SamArchitectureManagement;
 import eu.pmsoft.sam.see.api.infrastructure.SamArchitectureRegistry;
 import eu.pmsoft.sam.see.api.infrastructure.SamServiceDiscovery;
-import eu.pmsoft.sam.see.api.infrastructure.SamServiceRegistry;
+import eu.pmsoft.sam.see.api.infrastructure.SamServiceRegistryDeprecated;
 
 public class LocalSeeInfrastructureModule extends AbstractModule {
 
@@ -14,7 +14,7 @@ public class LocalSeeInfrastructureModule extends AbstractModule {
         binder().requireExplicitBindings();
         bind(SamArchitectureManagement.class).to(SamArchitectureRegistryLocal.class).asEagerSingleton();
         bind(SamServiceDiscovery.class).to(SamServiceDiscoveryLocal.class).asEagerSingleton();
-        bind(SamServiceRegistry.class).to(SamServiceRegistryLocal.class).asEagerSingleton();
+        bind(SamServiceRegistryDeprecated.class).to(SamServiceRegistryDeprecatedLocal.class).asEagerSingleton();
 
 //        expose(SamArchitectureRegistry.class);
 //        expose(SamArchitectureManagement.class);

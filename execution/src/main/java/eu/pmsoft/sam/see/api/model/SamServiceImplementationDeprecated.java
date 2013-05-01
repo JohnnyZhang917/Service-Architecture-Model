@@ -10,7 +10,7 @@ import java.util.List;
  *
  * @author pawel
  */
-public interface SamServiceImplementation {
+public interface SamServiceImplementationDeprecated {
 
     /**
      * Implementation injection configuration provided as a Guice module

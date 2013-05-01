@@ -1,18 +1,18 @@
 package eu.pmsoft.sam.see.api;
 
-import com.google.inject.*;
+import com.google.inject.Inject;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.Module;
 import eu.pmsoft.exceptions.OperationCheckedException;
 import eu.pmsoft.exceptions.OperationReportingModule;
 import eu.pmsoft.injectionUtils.logger.LoggerInjectorModule;
-import eu.pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
-import eu.pmsoft.sam.architecture.loader.ArchitectureModelLoader;
 import eu.pmsoft.sam.architecture.model.SamArchitecture;
 import eu.pmsoft.sam.architecture.model.ServiceKey;
 import eu.pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
 import eu.pmsoft.sam.protocol.CanonicalProtocolThreadExecutionContext;
 import eu.pmsoft.sam.protocol.TransactionController;
 import eu.pmsoft.sam.see.api.data.TestTransactionDefinition;
-import eu.pmsoft.sam.see.api.data.architecture.SeeTestArchitecture;
 import eu.pmsoft.sam.see.api.data.architecture.contract.TestInterfaceOne;
 import eu.pmsoft.sam.see.api.data.architecture.contract.TestInterfaceTwo0;
 import eu.pmsoft.sam.see.api.data.architecture.service.TestServiceOne;
@@ -23,7 +23,7 @@ import eu.pmsoft.sam.see.api.data.impl.TestServiceOneModule;
 import eu.pmsoft.sam.see.api.data.impl.TestServiceTwoModule;
 import eu.pmsoft.sam.see.api.data.impl.TestServiceZeroModule;
 import eu.pmsoft.sam.see.api.infrastructure.SamArchitectureManagement;
-import eu.pmsoft.sam.see.api.infrastructure.SamServiceRegistry;
+import eu.pmsoft.sam.see.api.infrastructure.SamServiceRegistryDeprecated;
 import eu.pmsoft.sam.see.api.model.*;
 import eu.pmsoft.sam.see.api.setup.SamExecutionNodeInternalApi;
 import eu.pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
@@ -51,7 +51,7 @@ public class TestServiceExecutionCreationByStep {
     @Inject
     private SamArchitectureManagement architectureManager;
     @Inject
-    private SamServiceRegistry samServiceRegistry;
+    private SamServiceRegistryDeprecated samServiceRegistryDeprecated;
     @Inject
     private SamExecutionNodeInternalApi executionNode;
 
@@ -75,10 +75,10 @@ public class TestServiceExecutionCreationByStep {
         });
     }
 
-    @DataProvider(name = "architecturesToSetup")
-    public Object[][] listOfArchitectures() throws IncorrectArchitectureDefinition {
-        return new Object[][]{{ArchitectureModelLoader.loadArchitectureModel(new SeeTestArchitecture())}};
-    }
+//    @DataProvider(name = "architecturesToSetup")
+//    public Object[][] listOfArchitectures() throws IncorrectArchitectureDefinition {
+//        return new Object[][]{{ArchitectureModelLoader.loadArchitectureModel(new SeeTestArchitecture())}};
+//    }
 
     @DataProvider(name = "implementationDeclarations")
     public Object[][] listOfImplementationDeclarations() {
@@ -100,12 +100,12 @@ public class TestServiceExecutionCreationByStep {
 
     @Test(dataProvider = "implementationDeclarations", groups = "architectureDefinition", dependsOnGroups = "architectureSetup")
     public void testRegistrationOfImplementationPackage(SamServiceImplementationPackageContract declaration) {
-        samServiceRegistry.registerServiceImplementationPackage(declaration);
+        samServiceRegistryDeprecated.registerServiceImplementationPackage(declaration);
     }
 
     @Test(dataProvider = "registeredImplementations", groups = "architectureLoadCheck", dependsOnGroups = "architectureDefinition")
     public void testLoadOfImplementations(SamServiceImplementationKey serviceKey) {
-        SamServiceImplementation registered = samServiceRegistry.getImplementation(serviceKey);
+        SamServiceImplementationDeprecated registered = samServiceRegistryDeprecated.getImplementation(serviceKey);
         assertNotNull(registered);
     }
 
@@ -156,13 +156,13 @@ public class TestServiceExecutionCreationByStep {
         assertEquals(serviceTwoTypeKey, transactionTwo.getProvidedService());
 
         STID siurlLocalZero = setupAndCheckTransactionRegistration(transactionZero);
-        STID siurlLocalOne = setupAndCheckTransactionRegistration( transactionOne);
-        STID siurlLocalTwo = setupAndCheckTransactionRegistration( transactionTwo);
+        STID siurlLocalOne = setupAndCheckTransactionRegistration(transactionOne);
+        STID siurlLocalTwo = setupAndCheckTransactionRegistration(transactionTwo);
 
         testInjectionTransactionExecutionForServiceOne(siurlLocalOne);
 
-        SIURL zeroURL =  executionNode.exposeInjectionConfiguration(siurlLocalZero);
-        SIURL oneURL =  executionNode.exposeInjectionConfiguration(siurlLocalOne);
+        SIURL zeroURL = executionNode.exposeInjectionConfiguration(siurlLocalZero);
+        SIURL oneURL = executionNode.exposeInjectionConfiguration(siurlLocalOne);
 
 
         SamInjectionConfiguration transactionTwoRemote = TestTransactionDefinition.createServiceTwoConfiguration(siidTwo, oneURL, zeroURL);

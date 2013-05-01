@@ -6,7 +6,7 @@ import java.util.Collection;
 @Deprecated
 public interface SamArchitecture {
 
-    Collection<SamService> getAllService();
+    Collection<SamServiceDeprecated> getAllService();
 
     Collection<SamCategory> getAllCategories();
 
@@ -14,6 +14,6 @@ public interface SamArchitecture {
 
     SamCategory getCategory(String categoryId);
 
-    SamService getService(ServiceKey serviceKey);
+    SamServiceDeprecated getService(ServiceKey serviceKey);
 
 }

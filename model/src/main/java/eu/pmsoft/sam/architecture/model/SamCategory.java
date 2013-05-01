@@ -9,5 +9,5 @@ public interface SamCategory {
 
     public Set<SamCategory> getInverseAccessibleCategories();
 
-    public Set<SamService> getDefinedServices();
+    public Set<SamServiceDeprecated> getDefinedServices();
 }
