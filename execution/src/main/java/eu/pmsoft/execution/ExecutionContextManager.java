@@ -2,8 +2,7 @@ package eu.pmsoft.execution;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
-import eu.pmsoft.sam.protocol.CanonicalProtocolThreadExecutionContext;
-import eu.pmsoft.sam.see.api.model.STID;
+import eu.pmsoft.see.api.model.STID;
 
 import javax.inject.Inject;
 import java.util.UUID;

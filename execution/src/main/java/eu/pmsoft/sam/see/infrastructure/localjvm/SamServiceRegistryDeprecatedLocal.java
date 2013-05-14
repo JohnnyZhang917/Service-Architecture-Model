@@ -4,14 +4,14 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.*;
 import com.google.common.collect.Sets.SetView;
 import com.google.inject.Module;
-import eu.pmsoft.sam.architecture.model.ServiceKey;
+import eu.pmsoft.sam.architecture.model.ServiceKeyDeprecated;
 import eu.pmsoft.sam.definition.implementation.AbstractSamServiceImplementationDefinition;
 import eu.pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
 import eu.pmsoft.sam.definition.implementation.SamServicePackageLoader;
 import eu.pmsoft.sam.definition.service.SamServiceDefinition;
-import eu.pmsoft.sam.see.api.infrastructure.SamServiceRegistryDeprecated;
-import eu.pmsoft.sam.see.api.model.SamServiceImplementationDeprecated;
-import eu.pmsoft.sam.see.api.model.SamServiceImplementationKey;
+import eu.pmsoft.see.api.infrastructure.SamServiceRegistryDeprecated;
+import eu.pmsoft.see.api.model.SamServiceImplementationDeprecated;
+import eu.pmsoft.see.api.model.SamServiceImplementationKey;
 
 import java.util.List;
 import java.util.Map;
@@ -99,10 +99,10 @@ class SamServiceRegistryDeprecatedLocal implements SamServiceRegistryDeprecated 
 
             public ServiceImplementationDeprecatedObject build() {
                 Preconditions.checkState(module != null);
-                ServiceKey contract = new ServiceKey(serviceDefinition);
-                ImmutableList.Builder<ServiceKey> binds = ImmutableList.builder();
+                ServiceKeyDeprecated contract = new ServiceKeyDeprecated(serviceDefinition);
+                ImmutableList.Builder<ServiceKeyDeprecated> binds = ImmutableList.builder();
                 for (Class<? extends SamServiceDefinition> serviceBind : bindings) {
-                    binds.add(new ServiceKey(serviceBind));
+                    binds.add(new ServiceKeyDeprecated(serviceBind));
                 }
                 SamServiceImplementationKey key = new SamServiceImplementationKey(module.getName());
                 return new ServiceImplementationDeprecatedObject(module, key, contract, binds.build());
@@ -137,11 +137,11 @@ class SamServiceRegistryDeprecatedLocal implements SamServiceRegistryDeprecated 
 
         private final Class<? extends Module> module;
         private final SamServiceImplementationKey key;
-        private final ServiceKey contract;
-        private final ImmutableList<ServiceKey> binds;
+        private final ServiceKeyDeprecated contract;
+        private final ImmutableList<ServiceKeyDeprecated> binds;
 
-        ServiceImplementationDeprecatedObject(Class<? extends Module> module, SamServiceImplementationKey key, ServiceKey contract,
-                                              ImmutableList<ServiceKey> binds) {
+        ServiceImplementationDeprecatedObject(Class<? extends Module> module, SamServiceImplementationKey key, ServiceKeyDeprecated contract,
+                                              ImmutableList<ServiceKeyDeprecated> binds) {
             this.module = module;
             this.key = key;
             this.contract = contract;
@@ -159,12 +159,12 @@ class SamServiceRegistryDeprecatedLocal implements SamServiceRegistryDeprecated 
         }
 
         @Override
-        public ServiceKey getSpecificationKey() {
+        public ServiceKeyDeprecated getSpecificationKey() {
             return contract;
         }
 
         @Override
-        public List<ServiceKey> getBindedServices() {
+        public List<ServiceKeyDeprecated> getBindedServices() {
             return binds;
         }
 

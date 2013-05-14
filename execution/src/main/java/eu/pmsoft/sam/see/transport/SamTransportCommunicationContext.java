@@ -1,7 +1,7 @@
 package eu.pmsoft.sam.see.transport;
 
-import eu.pmsoft.sam.see.api.model.SIURL;
-import eu.pmsoft.sam.see.api.model.STID;
+import eu.pmsoft.see.api.model.SIURL;
+import eu.pmsoft.see.api.model.STID;
 
 import java.net.URL;
 import java.util.List;

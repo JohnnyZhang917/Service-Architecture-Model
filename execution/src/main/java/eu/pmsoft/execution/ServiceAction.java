@@ -1,10 +1,7 @@
 package eu.pmsoft.execution;
 
 import com.google.inject.Key;
-import eu.pmsoft.sam.see.api.model.SIURL;
-import eu.pmsoft.sam.see.api.model.STID;
-
-import java.net.URL;
+import eu.pmsoft.see.api.model.STID;
 
 public abstract class ServiceAction<R, T> {
 

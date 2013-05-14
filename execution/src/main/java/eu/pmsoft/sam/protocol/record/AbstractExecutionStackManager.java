@@ -11,7 +11,7 @@ import eu.pmsoft.sam.protocol.transport.CanonicalMethodCall;
 import eu.pmsoft.sam.protocol.transport.CanonicalRequest;
 import eu.pmsoft.sam.protocol.transport.data.CanonicalProtocolRequestData;
 import eu.pmsoft.sam.protocol.transport.data.InstanceMergeVisitor;
-import eu.pmsoft.sam.see.api.model.ExecutionStrategy;
+import eu.pmsoft.see.api.model.ExecutionStrategy;
 import eu.pmsoft.sam.see.transport.SamTransportChannel;
 import org.slf4j.Logger;
 

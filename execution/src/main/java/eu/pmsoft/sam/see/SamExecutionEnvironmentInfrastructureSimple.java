@@ -1,7 +1,7 @@
 package eu.pmsoft.sam.see;
 
 import com.google.inject.Inject;
-import eu.pmsoft.sam.see.api.infrastructure.*;
+import eu.pmsoft.see.api.infrastructure.*;
 
 public class SamExecutionEnvironmentInfrastructureSimple implements SamExecutionEnvironmentInfrastructure {
     private final SamArchitectureManagement architectureManager;

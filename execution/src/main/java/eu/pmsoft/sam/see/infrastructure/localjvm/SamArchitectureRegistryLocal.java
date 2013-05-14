@@ -1,10 +1,10 @@
 package eu.pmsoft.sam.see.infrastructure.localjvm;
 
 import com.google.common.collect.Sets;
-import eu.pmsoft.sam.architecture.model.SamArchitecture;
+import eu.pmsoft.sam.architecture.model.SamArchitectureDeprecated;
 import eu.pmsoft.sam.architecture.model.SamServiceDeprecated;
-import eu.pmsoft.sam.architecture.model.ServiceKey;
-import eu.pmsoft.sam.see.api.infrastructure.SamArchitectureManagement;
+import eu.pmsoft.sam.architecture.model.ServiceKeyDeprecated;
+import eu.pmsoft.see.api.infrastructure.SamArchitectureManagement;
 
 import java.util.Set;
 
@@ -17,12 +17,12 @@ import java.util.Set;
  */
 public class SamArchitectureRegistryLocal implements SamArchitectureManagement {
 
-    private final Set<SamArchitecture> architectures = Sets.newHashSet();
+    private final Set<SamArchitectureDeprecated> architectures = Sets.newHashSet();
 
     @Override
-    public SamServiceDeprecated getService(ServiceKey serviceKey) {
-        for (SamArchitecture arch : architectures) {
-            SamServiceDeprecated service = arch.getService(serviceKey);
+    public SamServiceDeprecated getService(ServiceKeyDeprecated serviceKeyDeprecated) {
+        for (SamArchitectureDeprecated arch : architectures) {
+            SamServiceDeprecated service = arch.getService(serviceKeyDeprecated);
             if (service != null) {
                 return service;
             }
@@ -31,7 +31,7 @@ public class SamArchitectureRegistryLocal implements SamArchitectureManagement {
     }
 
     @Override
-    public void registerArchitecture(SamArchitecture architecture) {
+    public void registerArchitecture(SamArchitectureDeprecated architecture) {
         architectures.add(architecture);
     }
 

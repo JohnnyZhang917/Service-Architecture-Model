@@ -15,7 +15,7 @@ public class CanonicalProtocolModule extends AbstractModule {
                 .implement(CanonicalProtocolThreadExecutionContext.class, CanonicalProtocolThreadExecutionContextObject.class)
                 .implement(TransactionController.class, TransactionControllerImpl.class)
                 .build(InjectionFactoryRecordModel.class));
-        bind(CanonicalProtocolRecordingModel.class).to(CanonicalProtocolModel.class).asEagerSingleton();
+        bind(CanonicalProtocolRecordingModel.class).to(CanonicalProtocolModelDeprecated.class).asEagerSingleton();
 //        expose(CanonicalProtocolInfrastructure.class);
     }
 

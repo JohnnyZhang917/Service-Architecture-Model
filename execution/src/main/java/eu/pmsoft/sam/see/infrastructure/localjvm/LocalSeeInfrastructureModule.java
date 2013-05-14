@@ -2,10 +2,10 @@ package eu.pmsoft.sam.see.infrastructure.localjvm;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import eu.pmsoft.sam.see.api.infrastructure.SamArchitectureManagement;
-import eu.pmsoft.sam.see.api.infrastructure.SamArchitectureRegistry;
-import eu.pmsoft.sam.see.api.infrastructure.SamServiceDiscovery;
-import eu.pmsoft.sam.see.api.infrastructure.SamServiceRegistryDeprecated;
+import eu.pmsoft.see.api.infrastructure.SamArchitectureManagement;
+import eu.pmsoft.see.api.infrastructure.SamArchitectureRegistry;
+import eu.pmsoft.see.api.infrastructure.SamServiceDiscovery;
+import eu.pmsoft.see.api.infrastructure.SamServiceRegistryDeprecated;
 
 public class LocalSeeInfrastructureModule extends AbstractModule {
 

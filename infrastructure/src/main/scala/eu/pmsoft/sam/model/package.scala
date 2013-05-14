@@ -5,6 +5,7 @@ import eu.pmsoft.sam.definition.implementation.AbstractSamServiceImplementationD
 import com.google.inject.Module
 
 package object model {
+
   type ServiceImplementationDefinition = AbstractSamServiceImplementationDefinition[_ <: SamServiceDefinition]
 
   type ServiceDefinition = SamServiceDefinition

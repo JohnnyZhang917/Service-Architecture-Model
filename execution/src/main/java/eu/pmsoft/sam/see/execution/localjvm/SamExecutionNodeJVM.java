@@ -6,18 +6,18 @@ import com.google.common.collect.*;
 import com.google.common.collect.ImmutableSet.Builder;
 import com.google.inject.*;
 import eu.pmsoft.sam.architecture.model.SamServiceDeprecated;
-import eu.pmsoft.sam.architecture.model.ServiceKey;
+import eu.pmsoft.sam.architecture.model.ServiceKeyDeprecated;
 import eu.pmsoft.sam.protocol.CanonicalProtocolRecordingModel;
 import eu.pmsoft.sam.protocol.CanonicalProtocolThreadExecutionContext;
 import eu.pmsoft.sam.protocol.freebinding.FreeVariableBindingBuilder;
-import eu.pmsoft.sam.see.api.infrastructure.SamArchitectureRegistry;
-import eu.pmsoft.sam.see.api.infrastructure.SamServiceDiscovery;
-import eu.pmsoft.sam.see.api.infrastructure.SamServiceRegistryDeprecated;
-import eu.pmsoft.sam.see.api.model.*;
-import eu.pmsoft.sam.see.api.setup.SamExecutionNodeInternalApi;
-import eu.pmsoft.sam.see.api.transaction.BindPointSIID;
-import eu.pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
-import eu.pmsoft.sam.see.api.transaction.SamInjectionModelVisitorAdapter;
+import eu.pmsoft.see.api.infrastructure.SamArchitectureRegistry;
+import eu.pmsoft.see.api.infrastructure.SamServiceDiscovery;
+import eu.pmsoft.see.api.infrastructure.SamServiceRegistryDeprecated;
+import eu.pmsoft.see.api.model.*;
+import eu.pmsoft.see.api.setup.SamExecutionNodeInternalApi;
+import eu.pmsoft.see.api.transaction.BindPointSIID;
+import eu.pmsoft.see.api.transaction.SamInjectionConfiguration;
+import eu.pmsoft.see.api.transaction.SamInjectionModelVisitorAdapter;
 import eu.pmsoft.sam.see.transport.SamTransportCommunicationContext;
 
 import java.util.*;
@@ -27,7 +27,7 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
     private final Map<SIID, SamServiceInstanceObject> runningInstances = Maps.newHashMap();
     private final Multimap<SamServiceImplementationKey, SIID> typeOfRunningInstance = HashMultimap.create();
     private final Map<STID, SamServiceInstanceTransaction> transactions = Maps.newHashMap();
-    private final Map<STID, ServiceKey> transactionsType = Maps.newHashMap();
+    private final Map<STID, ServiceKeyDeprecated> transactionsType = Maps.newHashMap();
     private final CanonicalProtocolRecordingModel canonicalProtocol;
 
     private final SamServiceRegistryDeprecated samServiceRegistryDeprecated;
@@ -131,7 +131,7 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
     }
 
     @Override
-    public Map<STID, ServiceKey> getServiceTransactionSetup() {
+    public Map<STID, ServiceKeyDeprecated> getServiceTransactionSetup() {
         return ImmutableMap.copyOf(transactionsType);
     }
 
@@ -145,7 +145,7 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
                     errors.add("SIID " + bindPointSIID.getSiid() + " not found");
                 } else {
                     SamServiceInstanceObject samServiceInstanceObject = SamExecutionNodeJVM.this.runningInstances.get(bindPointSIID.getSiid());
-                    ServiceKey contract = bindPointSIID.getContract();
+                    ServiceKeyDeprecated contract = bindPointSIID.getContract();
                     if (!samServiceInstanceObject.getServiceKeyContract().equals(contract)) {
                         errors.add("SIID " + bindPointSIID.getSiid() + " have a different contract ");
                     }
@@ -225,12 +225,12 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
             throw new RuntimeException(e);
         }
 
-        List<ServiceKey> injectServices = serviceImplementation.getBindedServices();
-        ImmutableList<ServiceKey> orderedInjectServices = ServiceKey.orderAndRequireUnique(injectServices);
+        List<ServiceKeyDeprecated> injectServices = serviceImplementation.getBindedServices();
+        ImmutableList<ServiceKeyDeprecated> orderedInjectServices = ServiceKeyDeprecated.orderAndRequireUnique(injectServices);
         List<List<Key<?>>> injectedFreeVariableBinding = Lists.newLinkedList();
-        for (ServiceKey externalServiceKey : orderedInjectServices) {
+        for (ServiceKeyDeprecated externalServiceKeyDeprecated : orderedInjectServices) {
             List<Key<?>> serviceKeys = Lists.newArrayList();
-            SamServiceDeprecated externalServiceSpec = architectureRegistry.getService(externalServiceKey);
+            SamServiceDeprecated externalServiceSpec = architectureRegistry.getService(externalServiceKeyDeprecated);
             Set<Key<?>> keys = externalServiceSpec.getServiceContractAPI();
             for (Key<?> serviceApi : keys) {
                 serviceKeys.add(serviceApi);
@@ -262,18 +262,18 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
         private final Injector injector;
         private final ServiceMetadata metadata;
         private final ImmutableSet<Key<?>> contract;
-        private final ServiceKey serviceKey;
+        private final ServiceKeyDeprecated serviceKeyDeprecated;
         private final SamServiceImplementationKey implementationKey;
 
         SamServiceInstanceObject(SamServiceImplementationKey implementationKey, SIID id, Injector injector, ServiceMetadata metadata,
-                                 Set<Key<?>> contract, ServiceKey serviceKey) {
+                                 Set<Key<?>> contract, ServiceKeyDeprecated serviceKeyDeprecated) {
             super();
             this.implementationKey = implementationKey;
             this.id = id;
             this.injector = injector;
             this.metadata = metadata;
             this.contract = ImmutableSet.copyOf(contract);
-            this.serviceKey = serviceKey;
+            this.serviceKeyDeprecated = serviceKeyDeprecated;
         }
 
         @Override
@@ -302,8 +302,8 @@ public class SamExecutionNodeJVM implements SamExecutionNodeInternalApi {
         }
 
         @Override
-        public ServiceKey getServiceKeyContract() {
-            return serviceKey;
+        public ServiceKeyDeprecated getServiceKeyContract() {
+            return serviceKeyDeprecated;
         }
 
     }

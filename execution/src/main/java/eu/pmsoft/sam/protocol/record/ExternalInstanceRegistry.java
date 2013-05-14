@@ -1,6 +1,6 @@
 package eu.pmsoft.sam.protocol.record;
 
-import eu.pmsoft.sam.see.api.model.SIURL;
+import eu.pmsoft.see.api.model.SIURL;
 
 interface ExternalInstanceRegistry extends InstanceRegistry {
 

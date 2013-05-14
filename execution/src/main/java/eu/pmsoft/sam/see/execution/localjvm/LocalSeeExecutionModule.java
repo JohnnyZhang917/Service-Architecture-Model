@@ -4,8 +4,8 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import eu.pmsoft.execution.ThreadExecutionModule;
 import eu.pmsoft.sam.protocol.record.CanonicalProtocolModule;
-import eu.pmsoft.sam.see.api.setup.SamExecutionNode;
-import eu.pmsoft.sam.see.api.setup.SamExecutionNodeInternalApi;
+import eu.pmsoft.see.api.setup.SamExecutionNode;
+import eu.pmsoft.see.api.setup.SamExecutionNodeInternalApi;
 
 public class LocalSeeExecutionModule extends AbstractModule {
 

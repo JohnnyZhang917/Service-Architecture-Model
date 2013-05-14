@@ -1,7 +1,7 @@
 package eu.pmsoft.sam.protocol;
 
-import eu.pmsoft.sam.see.api.model.SamServiceInstanceTransaction;
-import eu.pmsoft.sam.see.api.setup.SamExecutionNodeInternalApi;
+import eu.pmsoft.see.api.model.SamServiceInstanceTransaction;
+import eu.pmsoft.see.api.setup.SamExecutionNodeInternalApi;
 
 import java.util.UUID;
 

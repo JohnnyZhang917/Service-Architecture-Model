@@ -1,7 +1,7 @@
 package eu.pmsoft.sam.model
 
 import eu.pmsoft.sam.architecture.definition.{SamArchitectureLoader, SamArchitectureDefinition}
-import eu.pmsoft.sam.definition.implementation.{SamServiceImplementationDefinitionLoader, SamServiceImplementationPackageContract}
+import eu.pmsoft.sam.definition.implementation.{SamServicePackageLoader, SamServiceImplementationDefinitionLoader, SamServiceImplementationPackageContract}
 import java.lang.annotation.Annotation
 import com.google.inject.Key
 import eu.pmsoft.sam.definition.service.{SamServiceDefinition, SamServiceDefinitionLoader}
@@ -12,22 +12,40 @@ import eu.pmsoft.sam.architecture.definition.SamArchitectureLoader.SamCategoryLo
 
 object SamModelBuilder {
 
-  def loadArchitectureDefinition(architectureDefinition: SamArchitectureDefinition) = {
+  def implementationKey(module: GuiceModule) = SamServiceImplementationKey(module)
+
+  def loadArchitectureDefinition(architectureDefinition: SamArchitectureDefinition): SamArchitecture = {
     val loader = new SamArchitectureDefinitionLoader
     architectureDefinition.loadArchitectureDefinition(loader)
     loader.build
   }
 
-  def loadServiceDefinition(serviceDefinition: ServiceDefinition): SamServiceObject = {
+  def loadServiceDefinition(serviceDefinition: ServiceDefinition): SamService = {
     val loader = new SamServiceLoader
     serviceDefinition.loadServiceDefinition(loader)
     loader.expression.build
   }
 
-  def loadImplementationPackage(implementationPackage: ServiceImplementationDefinition): ServiceImplementationObject = {
+  def loadImplementationPackage(implementationPackage: SamServiceImplementationPackageContract): Set[SamServiceImplementation] = {
+    val reader = new SamServicePackageDefinitionLoader
+    implementationPackage.loadContractPackage(reader)
+    reader.implementations.map(loadImplementationDefinition _)
+  }
+
+  def loadImplementationDefinition(implementationDefinition: ServiceImplementationDefinition): SamServiceImplementation = {
     val loader = new SamServiceImplementationLoader
-    implementationPackage.loadServiceImplementationDefinition(loader)
+    implementationDefinition.loadServiceImplementationDefinition(loader)
     loader.expression.build
+  }
+
+}
+
+class SamServicePackageDefinitionLoader extends SamServicePackageLoader {
+
+  var implementations: Set[ServiceImplementationDefinition] = Set.empty
+
+  def registerImplementation(serviceImplementationContract: ServiceImplementationDefinition) {
+    implementations = implementations + serviceImplementationContract
   }
 
 }
@@ -53,13 +71,13 @@ class SamArchitectureDefinitionLoader extends SamArchitectureLoader {
     categoryMap.getOrElse(categoryName, createCategoryBuilder(categoryName))
   }
 
-  def build = SamArchitectureObject(categoryMap.values.map(_.category).toSet, accessMap)
+  def build = SamArchitecture(categoryMap.values.map(_.category).toSet, accessMap)
 
 }
 
 class SamCategoryBuilder(val id: String, val architectureLoader: SamArchitectureDefinitionLoader) extends SamCategoryLoader {
 
-  var category: SamCategoryObject = SamCategoryObject(id, Set.empty)
+  var category: SamCategory = SamCategory(id, Set.empty)
 
   def getCategoryId: String = id
 
@@ -77,7 +95,7 @@ class SamCategoryBuilder(val id: String, val architectureLoader: SamArchitecture
 
 
 class SamServiceImplementationLoader extends SamServiceImplementationDefinitionLoader with SamServiceImplementationDefinitionLoader.ContractAndModule {
-  var expression: ServiceImplementationBuilder = ServiceImplementationBuilder(ServiceImplementationObject(ServiceImplementationKey(null),ServiceKey(null),Set.empty))
+  var expression: ServiceImplementationBuilder = ServiceImplementationBuilder(SamServiceImplementation(null, null, Set.empty))
 
 
   def withBindingsTo(userService: ServiceContract): ContractAndModule = {
@@ -91,19 +109,19 @@ class SamServiceImplementationLoader extends SamServiceImplementationDefinitionL
   }
 }
 
-case class ServiceImplementationBuilder(implementation: ServiceImplementationObject) {
+case class ServiceImplementationBuilder(implementation: SamServiceImplementation) {
   def withBindingsTo(userService: ServiceContract) = {
     ServiceImplementationBuilder(
       implementation.copy(
-        bindedServices = implementation.bindedServices + ServiceKey(userService)
+        bindServices = implementation.bindServices + SamServiceKey(userService)
       ))
   }
 
   def signature(contract: ServiceContract, serviceImplementationModule: GuiceModule) = {
     ServiceImplementationBuilder(
       implementation.copy(
-        key = ServiceImplementationKey(serviceImplementationModule),
-        contract = ServiceKey(contract)
+        implKey = SamServiceImplementationKey(serviceImplementationModule),
+        contract = SamServiceKey(contract)
       ))
   }
 
@@ -114,7 +132,7 @@ case class ServiceImplementationBuilder(implementation: ServiceImplementationObj
 
 class SamServiceLoader extends SamServiceDefinitionLoader with SamServiceDefinitionInterfacesLoader {
 
-  var expression: SamServiceDefinitionBuilder = SamServiceDefinitionBuilder(SamServiceObject(ServiceKey(null), Set.empty))
+  var expression: SamServiceDefinitionBuilder = SamServiceDefinitionBuilder(SamService(SamServiceKey(null), Set.empty))
 
   def definedIn(definitionClass: ServiceContract): SamServiceDefinitionInterfacesLoader = {
     expression = expression.definedIn(definitionClass)
@@ -134,17 +152,17 @@ class SamServiceLoader extends SamServiceDefinitionLoader with SamServiceDefinit
   }
 }
 
-case class SamServiceDefinitionBuilder(service: SamServiceObject) {
+case class SamServiceDefinitionBuilder(service: SamService) {
 
-  def definedIn(contract: ServiceContract) = SamServiceDefinitionBuilder(service.copy(id = ServiceKey(contract)))
+  def definedIn(contract: ServiceContract) = SamServiceDefinitionBuilder(service.copy(id = SamServiceKey(contract)))
 
   def withKey(interfaceReference: Class[_]): SamServiceDefinitionBuilder = withKey(Key.get(interfaceReference))
 
   def withKey(interfaceReference: Class[_], annotation: Annotation): SamServiceDefinitionBuilder = withKey(Key.get(interfaceReference, annotation))
 
-  def withKey(key: Key[_]): SamServiceDefinitionBuilder = SamServiceDefinitionBuilder(service.copy(contract = service.contract + key))
+  def withKey(key: Key[_]): SamServiceDefinitionBuilder = SamServiceDefinitionBuilder(service.copy(api = service.api + key))
 
-  def build: SamServiceObject = service
+  def build: SamService = service
 }
 
 

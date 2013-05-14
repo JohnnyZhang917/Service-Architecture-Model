@@ -2,8 +2,8 @@ package eu.pmsoft.sam.see;
 
 import com.google.inject.AbstractModule;
 import eu.pmsoft.injectionUtils.logger.LoggerInjectorModule;
-import eu.pmsoft.sam.see.api.SamExecutionEnvironment;
-import eu.pmsoft.sam.see.api.infrastructure.SamExecutionEnvironmentInfrastructure;
+import eu.pmsoft.see.api.SamExecutionEnvironment;
+import eu.pmsoft.see.api.infrastructure.SamExecutionEnvironmentInfrastructure;
 import eu.pmsoft.sam.see.execution.localjvm.LocalSeeExecutionModule;
 import eu.pmsoft.sam.see.infrastructure.localjvm.LocalSeeInfrastructureModule;
 import eu.pmsoft.sam.see.transport.netty.SamTransportNettyModule;

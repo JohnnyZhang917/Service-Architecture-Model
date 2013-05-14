@@ -5,8 +5,8 @@ import eu.pmsoft.sam.architecture.definition.SamArchitectureDefinition;
 import eu.pmsoft.sam.architecture.definition.SamArchitectureLoader.SamCategoryLoader;
 import eu.pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
 import eu.pmsoft.sam.definition.service.AbstractSamServiceDefinition;
+import eu.pmsoft.sam.model.SamArchitecture;
 import eu.pmsoft.sam.model.SamModelBuilder;
-import eu.pmsoft.sam.model.SamArchitectureObject;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
@@ -21,14 +21,14 @@ public class ArchitectureLoadingPositiveTest {
 
     @Test(dataProvider = "correctArchitecture")
     public void loadArchitecturesCorrectly(SamArchitectureDefinition definition) throws IncorrectArchitectureDefinition {
-        SamArchitectureObject architectureObject = SamModelBuilder.loadArchitectureDefinition(definition);
+        SamArchitecture architectureObject = SamModelBuilder.loadArchitectureDefinition(definition);
         assertNotNull(architectureObject);
         assertTrue(architectureObject.categories().size() > 0);
     }
 
     @Test(dataProvider = "correctArchitecture")
     public void loadArchitecturesCategories(SamArchitectureDefinition definition) throws IncorrectArchitectureDefinition {
-        SamArchitectureObject architectureObject = SamModelBuilder.loadArchitectureDefinition(definition);
+        SamArchitecture architectureObject = SamModelBuilder.loadArchitectureDefinition(definition);
         assertNotNull(architectureObject);
         String[] expected = {"one", "two", "three", "four"};
         String[] noExpected = {"oneNOT", "twoNOT", "threeNOT", "fourNOT"};

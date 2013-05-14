@@ -3,10 +3,10 @@ package eu.pmsoft.sam.see;
 import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 import com.google.inject.Provider;
-import eu.pmsoft.sam.see.api.SamExecutionEnvironment;
-import eu.pmsoft.sam.see.api.infrastructure.SamExecutionEnvironmentInfrastructure;
-import eu.pmsoft.sam.see.api.setup.SamExecutionNode;
-import eu.pmsoft.sam.see.api.setup.SamExecutionNodeInternalApi;
+import eu.pmsoft.see.api.SamExecutionEnvironment;
+import eu.pmsoft.see.api.infrastructure.SamExecutionEnvironmentInfrastructure;
+import eu.pmsoft.see.api.setup.SamExecutionNode;
+import eu.pmsoft.see.api.setup.SamExecutionNodeInternalApi;
 import eu.pmsoft.sam.see.transport.SamTransportCommunicationContext;
 import eu.pmsoft.sam.see.transport.SamTransportLayer;
 

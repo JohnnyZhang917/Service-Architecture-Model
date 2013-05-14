@@ -6,8 +6,6 @@ import com.google.inject.grapher.GrapherModule;
 import com.google.inject.grapher.InjectorGrapher;
 import com.google.inject.grapher.graphviz.GraphvizModule;
 import com.google.inject.grapher.graphviz.GraphvizRenderer;
-import eu.pmsoft.sam.see.SEEServer;
-import eu.pmsoft.sam.see.api.data.TestServiceExecutionEnvironmentConfiguration;
 
 import java.io.*;
 

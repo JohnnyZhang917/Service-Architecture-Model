@@ -24,7 +24,9 @@ public abstract class AbstractSamServiceImplementationDefinition<T extends SamSe
         }
     }
 
-    protected abstract void implementationDefinition();
+    protected void implementationDefinition(){
+
+    }
 
     protected final void withBindingsTo(Class<? extends SamServiceDefinition> userService) {
         definitionLoader.withBindingsTo(userService);

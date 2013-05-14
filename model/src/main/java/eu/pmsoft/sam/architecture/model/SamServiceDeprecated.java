@@ -6,7 +6,7 @@ import java.util.Set;
 
 public interface SamServiceDeprecated {
 
-    public ServiceKey getServiceKey();
+    public ServiceKeyDeprecated getServiceKey();
 
     public Set<Key<?>> getServiceContractAPI();
 

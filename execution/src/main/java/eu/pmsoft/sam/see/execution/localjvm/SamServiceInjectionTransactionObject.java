@@ -1,9 +1,9 @@
 package eu.pmsoft.sam.see.execution.localjvm;
 
-import eu.pmsoft.sam.see.api.model.STID;
-import eu.pmsoft.sam.see.api.model.SamServiceInstanceTransaction;
-import eu.pmsoft.sam.see.api.transaction.SamInjectionConfiguration;
-import eu.pmsoft.sam.see.api.transaction.SamInjectionModelVisitor;
+import eu.pmsoft.see.api.model.STID;
+import eu.pmsoft.see.api.model.SamServiceInstanceTransaction;
+import eu.pmsoft.see.api.transaction.SamInjectionConfiguration;
+import eu.pmsoft.see.api.transaction.SamInjectionModelVisitor;
 
 
 public class SamServiceInjectionTransactionObject implements SamServiceInstanceTransaction {

@@ -3,7 +3,6 @@ package eu.pmsoft.sam.protocol.record;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import eu.pmsoft.sam.see.api.model.ExecutionStrategy;
 import org.slf4j.LoggerFactory;
 
 class ClientExecutionStackManager extends AbstractExecutionStackManager {

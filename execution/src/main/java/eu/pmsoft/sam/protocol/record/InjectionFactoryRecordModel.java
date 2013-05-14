@@ -6,8 +6,7 @@ import com.google.inject.assistedinject.Assisted;
 import eu.pmsoft.sam.protocol.TransactionController;
 import eu.pmsoft.sam.protocol.freebinding.ExternalBindingController;
 import eu.pmsoft.sam.protocol.freebinding.ExternalInstanceProvider;
-import eu.pmsoft.sam.see.api.model.ExecutionStrategy;
-import eu.pmsoft.sam.see.api.model.SamServiceInstance;
+import eu.pmsoft.see.api.model.SamServiceInstance;
 
 import java.net.URL;
 import java.util.List;
@@ -22,9 +21,9 @@ interface InjectionFactoryRecordModel {
 
     InstanceProviderTransactionContext instanceProviderTransactionContext(List<InstanceProvider> transactionLevelProviders);
 
-    ClientRecordingInstanceRegistry clientRecordingInstanceRegistry(int slotNr);
+    ClientRecordingInstanceRegistryDeprecated clientRecordingInstanceRegistry(int slotNr);
 
-    ServerExecutionInstanceRegistry serverExecutionInstanceRegistry(SamServiceInstance serviceInstance);
+    ServerExecutionInstanceRegistryDeprecated serverExecutionInstanceRegistry(SamServiceInstance serviceInstance);
 
     ProviderExecutionStackManager providerExecutionStackManager(ImmutableList<InstanceRegistry> instanceRegistries);
 

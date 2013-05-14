@@ -6,7 +6,7 @@ package eu.pmsoft.execution;
 //import com.google.inject.name.Named;
 //import com.google.inject.name.Names;
 //import eu.pmsoft.injectionUtils.logger.LoggerInjectorModule;
-//import eu.pmsoft.sam.see.api.model.STID;
+//import eu.pmsoft.see.api.model.STID;
 //import eu.pmsoft.sam.see.configuration.SEEConfiguration;
 //import eu.pmsoft.sam.see.transport.SamTransportLayer;
 //import eu.pmsoft.sam.see.transport.ServiceEndpointBinding;

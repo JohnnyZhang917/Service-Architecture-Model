@@ -2,8 +2,8 @@ package eu.pmsoft.sam.see;
 
 import com.google.inject.Inject;
 import com.google.inject.Injector;
-import eu.pmsoft.sam.see.api.SamExecutionEnvironment;
-import eu.pmsoft.sam.see.api.setup.SamExecutionNode;
+import eu.pmsoft.see.api.SamExecutionEnvironment;
+import eu.pmsoft.see.api.setup.SamExecutionNode;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
