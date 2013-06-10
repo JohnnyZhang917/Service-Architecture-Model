@@ -61,7 +61,14 @@ public class SamTransportServerNetty implements SamTransportCommunicationContext
                     }
                 });
         //TODO async server start
-        serverBootstrap.bind().syncUninterruptibly();
+        ChannelFuture bind = serverBootstrap.bind();
+        bind.addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture channelFuture) throws Exception {
+
+            }
+        });
+        bind.syncUninterruptibly();
     }
 
     @Override

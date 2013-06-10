@@ -12,15 +12,17 @@ public class ExternalBindingSwitch<T> implements InvocationHandler {
 
     private final Key<T> key;
     private final int instanceReferenceNr;
+    private final int slotNr;
 
     @Inject
     private Provider<ExternalInstanceProvider> providerExternalInstanceProvider;
 
     @SuppressWarnings("unchecked")
-    public ExternalBindingSwitch(Key<T> key, int instanceReferenceNr) {
+    public ExternalBindingSwitch(Key<T> key, int instanceReferenceNr, int slotNr) {
         Class<? super T> mainClass = key.getTypeLiteral().getRawType();
-        recordReference = (T) Proxy.newProxyInstance(mainClass.getClassLoader(), new Class<?>[]{mainClass}, this);
+        this.recordReference = (T) Proxy.newProxyInstance(mainClass.getClassLoader(), new Class<?>[]{mainClass}, this);
         this.instanceReferenceNr = instanceReferenceNr;
+        this.slotNr = slotNr;
         this.key = key;
     }
 
@@ -37,7 +39,7 @@ public class ExternalBindingSwitch<T> implements InvocationHandler {
 
     public T getInternalInstance() {
         ExternalInstanceProvider externalProvider = providerExternalInstanceProvider.get();
-        T internalReference = externalProvider.getReference(key, instanceReferenceNr);
+        T internalReference = externalProvider.getReference(slotNr,key, instanceReferenceNr);
         return internalReference;
     }
 }

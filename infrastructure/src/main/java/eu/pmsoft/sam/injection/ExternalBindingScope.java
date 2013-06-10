@@ -24,10 +24,12 @@ class ExternalBindingScope implements Scope, ExternalBindingController {
         };
     }
 
-    public void bindRecordContext(ExternalInstanceProvider recordContext) {
-        perThreadServiceExecutionRecorder.set(recordContext);
+    @Override
+    public void bindRecordContext(DependenciesBindingContext context) {
+        perThreadServiceExecutionRecorder.set(context.getExternalInstanceProvider());
     }
 
+    @Override
     public void unBindRecordContext() {
         perThreadServiceExecutionRecorder.remove();
     }

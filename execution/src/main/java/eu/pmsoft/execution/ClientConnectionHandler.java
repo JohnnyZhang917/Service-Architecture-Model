@@ -9,10 +9,10 @@ import java.util.Map;
 
 class ClientConnectionHandler extends ChannelInboundMessageHandlerAdapter<ThreadMessage> {
 
-    private final Map<String, ThreadMessagePipe> pipeRoutingMap = Maps.newConcurrentMap();
+    private final Map<String, ThreadMessagePipeDeprecated> pipeRoutingMap = Maps.newConcurrentMap();
 
-    void bindPipe(String signature, ThreadMessagePipe pipe) {
-        ThreadMessagePipe previous = pipeRoutingMap.put(signature, pipe);
+    void bindPipe(String signature, ThreadMessagePipeDeprecated pipe) {
+        ThreadMessagePipeDeprecated previous = pipeRoutingMap.put(signature, pipe);
         assert previous == null;
     }
 
@@ -38,7 +38,7 @@ class ClientConnectionHandler extends ChannelInboundMessageHandlerAdapter<Thread
 
     private void routeMessage(ThreadMessage msg) {
         // TODO multiplex response on calls
-        ThreadMessagePipe clientPipe = pipeRoutingMap.get(msg.getSignature());
+        ThreadMessagePipeDeprecated clientPipe = pipeRoutingMap.get(msg.getSignature());
         Preconditions.checkNotNull(clientPipe);
         clientPipe.receiveMessage(msg);
     }

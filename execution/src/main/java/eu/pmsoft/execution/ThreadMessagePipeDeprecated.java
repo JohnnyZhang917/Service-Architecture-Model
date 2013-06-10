@@ -11,8 +11,7 @@ import java.net.URL;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-@Deprecated
-public final class ThreadMessagePipe {
+public final class ThreadMessagePipeDeprecated {
 
     private final ConcurrentLinkedQueue<ThreadMessage> messageInputQueue = new ConcurrentLinkedQueue<ThreadMessage>();
     private final Channel connection;
@@ -25,7 +24,7 @@ public final class ThreadMessagePipe {
     private Logger logger;
 
     @Inject
-    ThreadMessagePipe(@Assisted Channel connection, @Assisted String signature, @Nullable @Assisted UUID transactionID, @Nullable @Assisted URL address) {
+    ThreadMessagePipeDeprecated(@Assisted Channel connection, @Assisted String signature, @Nullable @Assisted UUID transactionID, @Nullable @Assisted URL address) {
         super();
         this.connection = connection;
         this.signature = signature;

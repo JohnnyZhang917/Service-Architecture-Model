@@ -1,12 +1,10 @@
 package eu.pmsoft.sam.model
 
 import com.google.inject.{PrivateModule, Guice, Injector, Key}
-import eu.pmsoft.sam.architecture.definition.SamArchitectureDefinition
-import eu.pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract
 import java.net.URL
 import eu.pmsoft.sam.see._
 import java.util.concurrent.atomic.AtomicInteger
-import eu.pmsoft.sam.injection.{FreeBindingInjectionUtil, ExternalInstanceProvider, ExternalBindingController}
+import eu.pmsoft.sam.injection.{DependenciesBindingContext, FreeBindingInjectionUtil, ExternalInstanceProvider, ExternalBindingController}
 import scala.Some
 
 sealed abstract class ArchitectureModel
@@ -28,49 +26,59 @@ case class SamArchitecture(
 
 case class SamServiceImplementation(implKey: SamServiceImplementationKey,
                                     contract: SamServiceKey,
-                                    bindServices: Set[SamServiceKey]
+                                    bindServices: Seq[SamServiceKey]
                                      ) extends ArchitectureModel
 
-object SIID {
+object ServiceInstanceID {
   private val counter: AtomicInteger = new AtomicInteger(0)
 
-  def apply() = new SIID(counter.addAndGet(1))
+  def apply() = new ServiceInstanceID(counter.addAndGet(1))
 }
 
-class SIID(val id: Int)
+class ServiceInstanceID(val id: Int)
 
-object STID {
+object ServiceConfigurationID {
   private val counter: AtomicInteger = new AtomicInteger(0)
 
-  def apply() = new STID(counter.addAndGet(1))
+  def apply() = new ServiceConfigurationID(counter.addAndGet(1))
 }
 
-class STID(val id: Int)
+class ServiceConfigurationID(val id: Int)
 
-object SIURL {
-  def apply(url: URL) = new SIURL(url)
+object ServiceTransactionID {
+  private val counter: AtomicInteger = new AtomicInteger(0)
+
+  def apply() = new ServiceTransactionID(counter.addAndGet(1))
 }
 
-class SIURL(val url: URL)
+class ServiceTransactionID(val id: Int)
 
-case class SamServiceInstance(instanceId: SIID, implementation: SamServiceImplementation, injector: Injector)
+object ServiceInstanceURL {
+  def apply(url: URL) = new ServiceInstanceURL(url)
+}
 
-sealed abstract class InjectionElement(val contract: SamService)
+class ServiceInstanceURL(val url: URL)
 
-case class ExternalServiceBind(override val contract: SamService, url: SIURL) extends InjectionElement(contract)
+case class SamServiceInstance(instanceId: ServiceInstanceID, implementation: SamServiceImplementation, injector: Injector)
 
-case class InstanceServiceBind(override val contract: SamService, binding: Set[InjectionElement], headInstance: SamServiceInstance) extends InjectionElement(contract)
+case class InjectionConfiguration(configurationRoot: InjectionConfigurationElement, configurationId: ServiceConfigurationID = ServiceConfigurationID())
 
-object InjectionTransactionBuilder {
-  def singleInstanceBind(registry: SamArchitectureManagement, instance: SamServiceInstance): InjectionElement = {
+sealed abstract class InjectionConfigurationElement(val contract: SamService)
+
+case class ExternalServiceBind(override val contract: SamService, url: ServiceInstanceURL) extends InjectionConfigurationElement(contract)
+
+case class InstanceServiceBind(override val contract: SamService, binding: Seq[InjectionConfigurationElement], headInstance: SamServiceInstance) extends InjectionConfigurationElement(contract)
+
+object InjectionConfigurationBuilder {
+  def singleInstanceBind(registry: SamArchitectureManagementApi, instance: SamServiceInstance): InjectionConfigurationElement = {
     require(instance.implementation.bindServices.isEmpty)
     val service = registry.getService(instance.implementation.contract)
-    InstanceServiceBind(service, Set.empty, instance)
+    InstanceServiceBind(service, Seq.empty, instance)
   }
 
-  def externalServiceBind(contract: SamService, url: SIURL): InjectionElement = ExternalServiceBind(contract, url)
+  def externalServiceBind(contract: SamService, url: ServiceInstanceURL): InjectionConfigurationElement = ExternalServiceBind(contract, url)
 
-  def complexInstanceBind(registry: SamArchitectureManagement, instance: SamServiceInstance, bindings: Array[InjectionElement]): InjectionElement = {
+  def complexInstanceBind(registry: SamArchitectureManagementApi, instance: SamServiceInstance, bindings: Array[InjectionConfigurationElement]): InjectionConfigurationElement = {
     val requiredBindings = instance.implementation.bindServices
     val serviceMatches = requiredBindings map {
       registry.getService _
@@ -80,76 +88,97 @@ object InjectionTransactionBuilder {
     require(serviceMatches.filter(_._2.isEmpty).isEmpty)
 
     val service = registry.getService(instance.implementation.contract)
-    InstanceServiceBind(service, bindings.toSet, instance)
+    InstanceServiceBind(service, bindings, instance)
   }
 
 }
 
+trait InjectionTransactionContext {
+  def instanceProvider(externalBind: ExternalServiceBind ): InstanceProvider
+
+  def instanceProvider(injector: Injector): InstanceProvider
+
+  def dependenciesBindContextCreator(bindings: Seq[InstanceProvider]): DependenciesBindingContext
+}
+
+//trait InjectionTransactionContextBuilder {
+//  def create(externalBind: Seq[ExternalServiceBind]): InjectionTransactionContext
+//}
+
 object InjectionTransaction {
-  def apply(injectionConfiguration: InjectionElement): InjectionTransaction = {
-    val headInjector = glueInjector(injectionConfiguration)
-    require(headInjector.isDefined)
-    val context = TransactionRecordContext(getExternalBind(injectionConfiguration))
-    val rootNode = createNode(context, injectionConfiguration)
-    new InjectionTransaction(headInjector.get, rootNode)
+//  def apply(
+//             injectionConfiguration: InjectionConfigurationElement,
+//             contextBuilder: InjectionTransactionContextBuilder): InjectionTransaction = {
+//    val headInjector = glueInjector(injectionConfiguration)
+//    require(headInjector.isDefined)
+//    val context = contextBuilder.create(getExternalBind(injectionConfiguration))
+//    val rootNode = createNode(context,injectionConfiguration)
+//    new InjectionTransaction(headInjector.get, rootNode)
+//  }
+
+  def createNode(context: InjectionTransactionContext, injectionConfiguration: InjectionConfigurationElement): InjectionTransactionNode = {
+    injectionConfiguration match {
+      case b@ExternalServiceBind(contract, url) => {
+        InjectionTransactionNode(b,
+          context.instanceProvider(b),
+          Seq.empty,
+          context.dependenciesBindContextCreator _,
+          None)
+      }
+      case i@InstanceServiceBind(contract, binding, head) => {
+        val controller = head.injector.getInstance(classOf[ExternalBindingController])
+        InjectionTransactionNode(i,
+          context.instanceProvider(head.injector),
+          binding.map(b => createNode(context, b)),
+          context.dependenciesBindContextCreator _,
+          Some(controller))
+      }
+    }
   }
 
-  private def glueInjector(injectionConfiguration: InjectionElement): Option[Injector] = {
+  def glueInjector(injectionConfiguration: InjectionConfigurationElement): Option[Injector] = {
     injectionConfiguration match {
       case b@ExternalServiceBind(contract, url) => {
         None
       }
       case i@InstanceServiceBind(contract, binding, head) => {
-       val glueModule = new PrivateModule(){
+        val glueModule = new PrivateModule() {
           def configure() {
             val b = binder()
             b.requireExplicitBindings()
-            contract.api.foreach( k => {
-              FreeBindingInjectionUtil.createGlueBinding(b,k,head.injector)
+            contract.api.foreach(k => {
+              FreeBindingInjectionUtil.createGlueBinding(b, k, head.injector)
               b.expose(k)
             })
           }
         }
-       Some( Guice.createInjector(glueModule))
+        Some(Guice.createInjector(glueModule))
       }
     }
   }
 
-  private def getExternalBind(injectionConfiguration: InjectionElement): Set[ExternalServiceBind] = {
+  def getExternalBind(injectionConfiguration: InjectionConfigurationElement): Seq[ExternalServiceBind] = {
     injectionConfiguration match {
       case b@ExternalServiceBind(contract, url) => {
-        Set(b)
+        Seq(b)
       }
       case i@InstanceServiceBind(contract, binding, head) => {
-        binding.flatMap(getExternalBind _)
+        binding.toSeq.flatMap(getExternalBind _)
       }
     }
   }
 
-  private def createNode(context: TransactionRecordContext, injectionConfiguration: InjectionElement): InjectionTransactionNode = {
-    injectionConfiguration match {
-      case b@ExternalServiceBind(contract, url) => {
-        InjectionTransactionNode(b, context.get(b), Set.empty, None)
-      }
-      case i@InstanceServiceBind(contract, binding, head) => {
-        val controller = head.injector.getInstance(classOf[ExternalBindingController])
-        InjectionTransactionNode(i, new DirectServiceInstanceProvider(head.injector), binding.map(b => createNode(context, b)), Some(controller))
-      }
-    }
-  }
+
 }
 
 
-case class InjectionTransactionNode(configurationElement: InjectionElement,
+case class InjectionTransactionNode(configurationElement: InjectionConfigurationElement,
                                     instanceProvider: InstanceProvider,
-                                    serviceBinding: Set[InjectionTransactionNode],
+                                    serviceBinding: Seq[InjectionTransactionNode],
+                                    externalInstanceProviderCreator: Seq[InstanceProvider] => DependenciesBindingContext,
                                     controller: Option[ExternalBindingController]) {
 
-  private lazy val serviceBind: ExternalInstanceProvider = {
-    val instanceAndApiKeys: Set[(Set[Key[_]], MemoizedInstanceProvider)] = serviceBinding.map(s => (s.configurationElement.contract.api, new MemoizedInstanceProvider(s.instanceProvider)))
-    val contractMap: Map[Key[_], MemoizedInstanceProvider] = instanceAndApiKeys.flatMap(keysetToTarget => keysetToTarget._1.map(key => key -> keysetToTarget._2)).toMap
-    new InstanceProviderTransactionContext(contractMap)
-  }
+  private lazy val serviceBind: DependenciesBindingContext = externalInstanceProviderCreator(serviceBinding.map(_.instanceProvider))
 
   def bindTransaction: Unit = {
     serviceBinding foreach (_.bindTransaction)
@@ -162,11 +191,9 @@ case class InjectionTransactionNode(configurationElement: InjectionElement,
   }
 }
 
-class InjectionTransaction(val transactionInjector: Injector,val rootNode: InjectionTransactionNode, val tid: STID = STID())
+class InjectionTransaction(val transactionInjector: Injector, val rootNode: InjectionTransactionNode, val tid: ServiceTransactionID = ServiceTransactionID())
 
 
-case class SEEConfiguration(
-                             architectures: Set[SamArchitectureDefinition],
-                             implementations: Set[SamServiceImplementationPackageContract])
 
-case class SEENodeConfiguration()
+
+

@@ -4,14 +4,14 @@ import com.google.inject.*;
 
 public class FreeBindingInjectionUtil {
 
-    public final static <T> void createIntermediateProvider(PrivateBinder binder, final Key<T> key) {
+    public final static <T> void createIntermediateProvider(PrivateBinder binder, final Key<T> key, final int slotNr) {
         Provider<T> provider = new Provider<T>() {
             @Inject
             private Injector injector;
             private volatile int instanceNr = 0;
 
             public T get() {
-                ExternalBindingSwitch<T> intermediate = new ExternalBindingSwitch<T>(key, instanceNr++);
+                ExternalBindingSwitch<T> intermediate = new ExternalBindingSwitch<T>(key, instanceNr++, slotNr);
                 injector.injectMembers(intermediate);
                 return intermediate.getReferenceObject();
             }

@@ -95,7 +95,7 @@ class SamCategoryBuilder(val id: String, val architectureLoader: SamArchitecture
 
 
 class SamServiceImplementationLoader extends SamServiceImplementationDefinitionLoader with SamServiceImplementationDefinitionLoader.ContractAndModule {
-  var expression: ServiceImplementationBuilder = ServiceImplementationBuilder(SamServiceImplementation(null, null, Set.empty))
+  var expression: ServiceImplementationBuilder = ServiceImplementationBuilder(SamServiceImplementation(null, null, Seq.empty))
 
 
   def withBindingsTo(userService: ServiceContract): ContractAndModule = {
@@ -113,7 +113,7 @@ case class ServiceImplementationBuilder(implementation: SamServiceImplementation
   def withBindingsTo(userService: ServiceContract) = {
     ServiceImplementationBuilder(
       implementation.copy(
-        bindServices = implementation.bindServices + SamServiceKey(userService)
+        bindServices =  SamServiceKey(userService) +: implementation.bindServices
       ))
   }
 
@@ -166,12 +166,3 @@ case class SamServiceDefinitionBuilder(service: SamService) {
 }
 
 
-case class SEEConfigurationBuilder(config: SEEConfiguration) {
-
-  def withArchitecture(toAdd: SamArchitectureDefinition) = new SEEConfigurationBuilder(config.copy(architectures = config.architectures + toAdd))
-
-  def withImplementation(toAdd: SamServiceImplementationPackageContract) = new SEEConfigurationBuilder(config.copy(implementations = config.implementations + toAdd))
-
-  def build = config
-
-}

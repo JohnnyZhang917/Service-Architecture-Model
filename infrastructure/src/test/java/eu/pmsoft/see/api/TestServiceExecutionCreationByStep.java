@@ -3,8 +3,6 @@ package eu.pmsoft.see.api;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
-import eu.pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition;
-import eu.pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract;
 import eu.pmsoft.sam.model.*;
 import eu.pmsoft.sam.see.*;
 import eu.pmsoft.see.api.data.architecture.SeeTestArchitecture;
@@ -14,6 +12,8 @@ import eu.pmsoft.see.api.data.impl.TestImplementationDeclaration;
 import eu.pmsoft.see.api.data.impl.TestServiceOneModule;
 import eu.pmsoft.see.api.data.impl.TestServiceTwoModule;
 import eu.pmsoft.see.api.data.impl.TestServiceZeroModule;
+import org.testng.IModuleFactory;
+import org.testng.ITestContext;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
@@ -23,46 +23,29 @@ import javax.inject.Inject;
 
 import static org.testng.Assert.*;
 
-@Guice(modules = {ServiceExecutionEnvironmentModule.class})
+@Guice(moduleFactory = TestServiceExecutionCreationByStep.TestEnvironmentApiJavaFactory.class)
 public class TestServiceExecutionCreationByStep {
 
-    @Inject
-    private SamArchitectureManagement architectureManager;
-    @Inject
-    private SamServiceRegistry samServiceRegistry;
-    @Inject
-    private SamExecutionNode executionNode;
-//
-//    @BeforeMethod
-//    public void setUp() throws Exception {
-//        executionNode.bindToServer(new SamTransportCommunicationContext() {
-//            @Override
-//            public SIURL liftServiceTransaction(STID stid) {
-//                try {
-//                    return SIURL.fromUrlString("http://localhost:8080/anyURl/" + stid.toString());
-//                } catch (MalformedURLException e) {
-//                    throw new RuntimeException(e);
-//                }
-//            }
-//
-//            @Override
-//            public List<SamTransportChannel> createClientConnectionChannels(UUID transactionID, List<URL> endpointAddressList) {
-//                return null;
-//            }
-//
-//        });
-//    }
-
-    @DataProvider(name = "architecturesToSetup")
-    public Object[][] listOfArchitectures() throws IncorrectArchitectureDefinition {
-        return new Object[][]{{SamModelBuilder.loadArchitectureDefinition(new SeeTestArchitecture())}};
+    public static class TestEnvironmentApiJavaFactory implements IModuleFactory {
+        @Override
+        public Module createModule(ITestContext context, Class<?> testClass) {
+            Integer anyPort = 4000;
+            SEEConfiguration seeConfiguration = ServiceExecutionEnvironment.configurationBuilder(anyPort)
+                    .withArchitecture(new SeeTestArchitecture())
+                    .withImplementation(new TestImplementationDeclaration()).build();
+            ServiceExecutionEnvironment environment = ServiceExecutionEnvironment.apply(seeConfiguration);
+            return environment.javaApiModule();
+        }
     }
 
-    //
-    @DataProvider(name = "implementationDeclarations")
-    public Object[][] listOfImplementationDeclarations() {
-        return new Object[][]{{new TestImplementationDeclaration()}};
-    }
+    @Inject
+    private SamArchitectureManagementApi architectureManager;
+    @Inject
+    private SamServiceRegistryApi samServiceRegistryApi;
+    @Inject
+    private SamExecutionNodeApi executionNode;
+    @Inject
+    private SamInjectionTransactionApi transactionApi;
 
     @DataProvider(name = "registeredImplementations")
     public Object[][] listOfProvidedImplementationKeys() {
@@ -73,25 +56,14 @@ public class TestServiceExecutionCreationByStep {
         };
     }
 
-    @Test(dataProvider = "architecturesToSetup", groups = "architectureSetup")
-    public void testLoadOfArchitectureInformation(SamArchitecture architecture) {
-        architectureManager.registerArchitecture(architecture);
-    }
-
-    @Test(dataProvider = "implementationDeclarations", groups = "architectureDefinition", dependsOnGroups = "architectureSetup")
-    public void testRegistrationOfImplementationPackage(SamServiceImplementationPackageContract implementationPackage) {
-        Set<SamServiceImplementation> serviceImplementationObjectSet = SamModelBuilder.loadImplementationPackage(implementationPackage);
-        samServiceRegistry.registerImplementations(serviceImplementationObjectSet);
-    }
-
-    @Test(dataProvider = "registeredImplementations", groups = "architectureLoadCheck", dependsOnGroups = "architectureDefinition")
+    @Test(dataProvider = "registeredImplementations", groups = "architectureLoadCheck" )
     public void testLoadOfImplementations(Class<? extends Module> serviceKey) {
         SamServiceImplementationKey implementationKey = SamModelBuilder.implementationKey(serviceKey);
-        SamServiceImplementation registered = samServiceRegistry.getImplementation(implementationKey);
+        SamServiceImplementation registered = samServiceRegistryApi.getImplementation(implementationKey);
         assertNotNull(registered);
     }
 
-    @Test(dataProvider = "registeredImplementations", groups = "architectureLoadCheck", dependsOnGroups = "architectureDefinition")
+    @Test(dataProvider = "registeredImplementations", groups = "architectureLoadCheck" )
     public void testServiceInstanceCreation(Class<? extends Module> implementationModule)  {
         SamServiceImplementationKey key = SamModelBuilder.implementationKey(implementationModule);
         SamServiceInstance serviceInstance = executionNode.createServiceInstance(key);
@@ -106,10 +78,10 @@ public class TestServiceExecutionCreationByStep {
 
     private SamServiceInstance getUniqueServiceInstance(Class<? extends Module> implementationModule) {
         SamServiceImplementationKey serviceKey = SamModelBuilder.implementationKey(implementationModule);
-        Set<SIID> serviceInstances = executionNode.getServiceInstances(serviceKey);
+        Set<ServiceInstanceID> serviceInstances = executionNode.getServiceInstances(serviceKey);
 
         assertEquals(1, serviceInstances.size(), "1 instance of Service expected");
-        SIID id = serviceInstances.iterator().next();
+        ServiceInstanceID id = serviceInstances.iterator().next();
         return executionNode.getInstance(id);
     }
 
@@ -121,55 +93,55 @@ public class TestServiceExecutionCreationByStep {
         SamServiceInstance one = getUniqueServiceInstance(TestServiceOneModule.class);
         SamServiceInstance two = getUniqueServiceInstance(TestServiceTwoModule.class);
 
-        InjectionElement elementZero = InjectionTransactionBuilder.singleInstanceBind(architectureManager, zero);
+        InjectionConfigurationElement elementZero = InjectionConfigurationBuilder.singleInstanceBind(architectureManager, zero);
         assertNotNull(elementZero);
         assertEquals(zero.implementation().contract(), elementZero.contract().id());
 
-        InjectionElement elementOne = InjectionTransactionBuilder.singleInstanceBind(architectureManager, one);
+        InjectionConfigurationElement elementOne = InjectionConfigurationBuilder.singleInstanceBind(architectureManager, one);
         assertNotNull(elementOne);
         assertEquals(one.implementation().contract(), elementOne.contract().id());
 
-        InjectionElement[] bindings = {elementOne,elementZero};
-        InjectionElement elementTwo = InjectionTransactionBuilder.complexInstanceBind(architectureManager, two, bindings);
+        InjectionConfigurationElement[] bindings = {elementOne,elementZero};
+        InjectionConfigurationElement elementTwo = InjectionConfigurationBuilder.complexInstanceBind(architectureManager, two, bindings);
         assertNotNull(elementTwo);
         assertEquals(two.implementation().contract(), elementTwo.contract().id());
 
 
-        STID transactionZero = setupAndCheckTransactionRegistration(elementZero);
-        STID transactionOne = setupAndCheckTransactionRegistration(elementOne);
-        STID transactionTwo = setupAndCheckTransactionRegistration(elementTwo);
+        ServiceConfigurationID transactionZero = setupAndCheckTransactionRegistration(elementZero);
+        ServiceConfigurationID transactionOne = setupAndCheckTransactionRegistration(elementOne);
+        ServiceConfigurationID transactionTwo = setupAndCheckTransactionRegistration(elementTwo);
 
 
         testInjectionTransactionExecutionForServiceOne(transactionOne);
 //
-        SIURL zeroURL = executionNode.liftServiceTransaction(transactionZero);
-        SIURL oneURL = executionNode.liftServiceTransaction(transactionOne);
+        ServiceInstanceURL zeroURL = transactionApi.liftServiceConfiguration(transactionZero);
+        ServiceInstanceURL oneURL = transactionApi.liftServiceConfiguration(transactionOne);
 
         SamService serviceOne = architectureManager.getService(one.implementation().contract());
-        InjectionElement externalOne = InjectionTransactionBuilder.externalServiceBind(serviceOne, oneURL);
+        InjectionConfigurationElement externalOne = InjectionConfigurationBuilder.externalServiceBind(serviceOne, oneURL);
 
         SamService serviceZero = architectureManager.getService(zero.implementation().contract());
-        InjectionElement externalZero = InjectionTransactionBuilder.externalServiceBind(serviceZero, zeroURL);
+        InjectionConfigurationElement externalZero = InjectionConfigurationBuilder.externalServiceBind(serviceZero, zeroURL);
 
-        InjectionElement[] externalBindings = {externalZero,externalOne};
-        InjectionElement elementTwoRemote = InjectionTransactionBuilder.complexInstanceBind(architectureManager, two, externalBindings);
+        InjectionConfigurationElement[] externalBindings = {externalZero,externalOne};
+        InjectionConfigurationElement elementTwoRemote = InjectionConfigurationBuilder.complexInstanceBind(architectureManager, two, externalBindings);
         assertNotNull(elementTwoRemote);
         assertEquals(two.implementation().contract(), elementTwoRemote.contract().id());
 
-        STID siurlRemoteTwo = setupAndCheckTransactionRegistration(elementTwoRemote);
+        ServiceConfigurationID siurlRemoteTwo = setupAndCheckTransactionRegistration(elementTwoRemote);
 
         testInjectionTransactionExecutionForServiceTwo(siurlRemoteTwo);
     }
 
-    private STID setupAndCheckTransactionRegistration(InjectionElement element) {
-        STID stid = executionNode.setupInjectionTransaction(element);
-        InjectionTransaction transactionRegistered = executionNode.getTransaction(stid);
+    private ServiceConfigurationID setupAndCheckTransactionRegistration(InjectionConfigurationElement element) {
+        ServiceConfigurationID serviceConfigurationID = executionNode.registerInjectionConfiguration(element);
+        InjectionTransaction transactionRegistered = transactionApi.getTransaction(serviceConfigurationID);
         assertNotNull(transactionRegistered);
-        return stid;
+        return serviceConfigurationID;
     }
 
-    public void testInjectionTransactionExecutionForServiceOne(STID transactionOne){
-        InjectionTransaction transaction = executionNode.getTransaction(transactionOne);
+    public void testInjectionTransactionExecutionForServiceOne(ServiceConfigurationID transactionOne){
+        InjectionTransaction transaction = transactionApi.getTransaction(transactionOne);
 
         Key<TestInterfaceOne> interfaceOneKey = Key.get(TestInterfaceOne.class);
         Injector injector = transaction.transactionInjector();
@@ -181,10 +153,10 @@ public class TestServiceExecutionCreationByStep {
 
     }
 
-    public void testInjectionTransactionExecutionForServiceTwo(STID transactionURL) {
+    public void testInjectionTransactionExecutionForServiceTwo(ServiceConfigurationID transactionURL) {
         Key<TestInterfaceOne> interfaceOneKey = Key.get(TestInterfaceOne.class);
         Key<TestInterfaceTwo0> interfaceTwoKey = Key.get(TestInterfaceTwo0.class);
-        InjectionTransaction transaction = executionNode.getTransaction(transactionURL);
+        InjectionTransaction transaction = transactionApi.getTransaction(transactionURL);
         Injector injector = transaction.transactionInjector();
 
         assertNotNull(injector);

@@ -19,7 +19,7 @@ class SamTransportServerConnectionHandler extends ChannelInboundMessageHandlerAd
     }
 
     @Override
-    protected void messageReceived(ChannelHandlerContext ctx, ThreadMessage msg) throws Exception {
+    public void messageReceived(ChannelHandlerContext ctx, ThreadMessage msg) throws Exception {
         System.out.println("server handler get data");
 //        ctx.write(msg).addListener(new ChannelFutureListener() {
 //            @Override

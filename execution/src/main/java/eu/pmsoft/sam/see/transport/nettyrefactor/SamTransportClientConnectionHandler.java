@@ -21,7 +21,7 @@ class SamTransportClientConnectionHandler extends ChannelInboundMessageHandlerAd
 
 
     @Override
-    protected void messageReceived(ChannelHandlerContext ctx, ThreadMessage msg) throws Exception {
+    public void messageReceived(ChannelHandlerContext ctx, ThreadMessage msg) throws Exception {
         System.out.println("client handler get data");
 //        ctx.write(msg);
 //        throw new RuntimeException("TODO");

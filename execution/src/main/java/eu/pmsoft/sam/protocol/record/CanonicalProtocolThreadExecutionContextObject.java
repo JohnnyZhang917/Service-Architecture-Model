@@ -5,7 +5,6 @@ import com.google.inject.Inject;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.assistedinject.Assisted;
-import eu.pmsoft.execution.ThreadMessagePipe;
 import eu.pmsoft.sam.protocol.CanonicalProtocolThreadExecutionContext;
 import eu.pmsoft.sam.protocol.TransactionController;
 

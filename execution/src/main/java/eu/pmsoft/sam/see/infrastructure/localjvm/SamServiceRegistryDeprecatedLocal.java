@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-@Deprecated
 class SamServiceRegistryDeprecatedLocal implements SamServiceRegistryDeprecated {
 
     private final Map<SamServiceImplementationKey, ServiceImplementationDeprecatedObject> register = Maps.newHashMap();

@@ -6,6 +6,7 @@ import eu.pmsoft.see.api.data.architecture.contract.TestInterfaceOne;
 import eu.pmsoft.see.api.data.architecture.contract.TestInterfaceTwo0;
 import eu.pmsoft.see.api.data.architecture.contract.TestInterfaceTwo1;
 import eu.pmsoft.see.api.data.architecture.contract.TestInterfaceZero;
+import org.testng.Assert;
 
 public class TestServiceTwoModule extends AbstractModule {
 
@@ -25,7 +26,8 @@ public class TestServiceTwoModule extends AbstractModule {
 
         @Override
         public boolean runTest() {
-            serviceZero.ping("ping");
+            String pingReturn = serviceZero.ping("ping");
+            Assert.assertNotNull(pingReturn);
             return serviceOne.runTest();
         }
 
