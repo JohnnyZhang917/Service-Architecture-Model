@@ -3,8 +3,8 @@ package eu.pmsoft.sam.see
 import org.scalatest.Assertions
 import org.testng.annotations.Test
 import eu.pmsoft.see.api.data.architecture.SeeTestArchitecture
-import eu.pmsoft.see.api.data.impl.{TestServiceOneModule, TestServiceTwoModule, TestServiceZeroModule, TestImplementationDeclaration}
-import eu.pmsoft.sam.model.{InjectionConfigurationBuilder, SamModelBuilder}
+import eu.pmsoft.see.api.data.impl._
+import eu.pmsoft.sam.model._
 import eu.pmsoft.see.api.data.architecture.contract.{TestInterfaceTwo0, TestInterfaceOne}
 import com.google.inject.Key
 
@@ -67,18 +67,18 @@ class ServiceExecutionEnvironmentTest extends Assertions {
     }
 
     val transactionOne = bindTransactions(1)
-    val apiRef = transactionOne.transactionInjector.getExistingBinding(Key.get(classOf[TestInterfaceOne])).getProvider.get()
+    val apiRef = transactionOne.getTransactionInjector.getExistingBinding(Key.get(classOf[TestInterfaceOne])).getProvider.get()
     assert(apiRef.runTest())
 
     val complexTransactionTwo = bindTransactions(2)
     val apiTwoInterface = Key.get(classOf[TestInterfaceTwo0])
-    assert(complexTransactionTwo.transactionInjector.getExistingBinding(Key.get(classOf[TestInterfaceOne])) == null)
-    assert(complexTransactionTwo.transactionInjector.getExistingBinding(apiTwoInterface) != null)
+    assert(complexTransactionTwo.getTransactionInjector.getExistingBinding(Key.get(classOf[TestInterfaceOne])) == null)
+    assert(complexTransactionTwo.getTransactionInjector.getExistingBinding(apiTwoInterface) != null)
 
-    complexTransactionTwo.rootNode.bindTransaction
-    val apiTwoRef = complexTransactionTwo.transactionInjector.getInstance(apiTwoInterface)
+    complexTransactionTwo.bindTransaction
+    val apiTwoRef = complexTransactionTwo.getTransactionInjector.getInstance(apiTwoInterface)
     assert(apiTwoRef.runTest())
-    complexTransactionTwo.rootNode.unbindTransaction
+    complexTransactionTwo.unBindTransaction
 
 
 
@@ -94,10 +94,10 @@ class ServiceExecutionEnvironmentTest extends Assertions {
     val complexTransactionTwoExternal = env.transactionApi.getTransaction(externalConfigId)
 
     // direct use of the transaction injector
-    complexTransactionTwoExternal.rootNode.bindTransaction
-    val apiTwoRefExternal = complexTransactionTwoExternal.transactionInjector.getInstance(apiTwoInterface)
+    complexTransactionTwoExternal.bindTransaction
+    val apiTwoRefExternal = complexTransactionTwoExternal.getTransactionInjector.getInstance(apiTwoInterface)
     assert(apiTwoRefExternal.runTest())
-    complexTransactionTwoExternal.rootNode.unbindTransaction
+    complexTransactionTwoExternal.unBindTransaction
 
 
   }

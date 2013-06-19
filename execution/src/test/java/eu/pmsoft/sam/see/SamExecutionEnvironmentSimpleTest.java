@@ -15,36 +15,36 @@ import static org.testng.AssertJUnit.assertNotNull;
 
 public class SamExecutionEnvironmentSimpleTest {
 
-    @Inject
-    private SamExecutionEnvironment samExecutionEnvironment;
-
-
-    @BeforeMethod
-    public void setUp() throws Exception {
-        Injector injector = com.google.inject.Guice.createInjector(new SamExecutionModuleSimpleModuleTest());
-        injector.injectMembers(this);
-
-    }
-
-    @Test
-    public void testInfrastructureCreation() {
-        assertNotNull(samExecutionEnvironment.getInfrastructureApi());
-        assertNotNull(samExecutionEnvironment.createExecutionNode(anyPort()));
-    }
-
-    static AtomicInteger portCounter = new AtomicInteger(3333);
-
-    private static int anyPort() {
-        return portCounter.addAndGet(1);
-    }
-
-    @Test
-    public void testNodeNotDuplicated() {
-        int samePort = anyPort();
-        SamExecutionNode callOne = samExecutionEnvironment.createExecutionNode(samePort);
-        SamExecutionNode callTwo = samExecutionEnvironment.createExecutionNode(samePort);
-        assertEquals(callOne, callTwo);
-    }
+//    @Inject
+//    private SamExecutionEnvironment samExecutionEnvironment;
+//
+//
+//    @BeforeMethod
+//    public void setUp() throws Exception {
+//        Injector injector = com.google.inject.Guice.createInjector(new SamExecutionModuleSimpleModuleTest());
+//        injector.injectMembers(this);
+//
+//    }
+//
+//    @Test
+//    public void testInfrastructureCreation() {
+//        assertNotNull(samExecutionEnvironment.getInfrastructureApi());
+//        assertNotNull(samExecutionEnvironment.createExecutionNode(anyPort()));
+//    }
+//
+//    static AtomicInteger portCounter = new AtomicInteger(3333);
+//
+//    private static int anyPort() {
+//        return portCounter.addAndGet(1);
+//    }
+//
+//    @Test
+//    public void testNodeNotDuplicated() {
+//        int samePort = anyPort();
+//        SamExecutionNode callOne = samExecutionEnvironment.createExecutionNode(samePort);
+//        SamExecutionNode callTwo = samExecutionEnvironment.createExecutionNode(samePort);
+//        assertEquals(callOne, callTwo);
+//    }
 
 //    @Test
 //    public void testInfrastructureConfigurationEmpty() {

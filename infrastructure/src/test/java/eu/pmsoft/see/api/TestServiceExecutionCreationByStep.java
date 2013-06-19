@@ -135,16 +135,16 @@ public class TestServiceExecutionCreationByStep {
 
     private ServiceConfigurationID setupAndCheckTransactionRegistration(InjectionConfigurationElement element) {
         ServiceConfigurationID serviceConfigurationID = executionNode.registerInjectionConfiguration(element);
-        InjectionTransaction transactionRegistered = transactionApi.getTransaction(serviceConfigurationID);
+        InjectionTransactionAccessApi transactionRegistered = transactionApi.getTransaction(serviceConfigurationID);
         assertNotNull(transactionRegistered);
         return serviceConfigurationID;
     }
 
     public void testInjectionTransactionExecutionForServiceOne(ServiceConfigurationID transactionOne){
-        InjectionTransaction transaction = transactionApi.getTransaction(transactionOne);
+        InjectionTransactionAccessApi transaction = transactionApi.getTransaction(transactionOne);
 
         Key<TestInterfaceOne> interfaceOneKey = Key.get(TestInterfaceOne.class);
-        Injector injector = transaction.transactionInjector();
+        Injector injector = transaction.getTransactionInjector();
         assertNotNull(injector);
         assertNotNull(injector.getExistingBinding(interfaceOneKey));
         // no transaction controller because this is a single local instance
@@ -156,17 +156,17 @@ public class TestServiceExecutionCreationByStep {
     public void testInjectionTransactionExecutionForServiceTwo(ServiceConfigurationID transactionURL) {
         Key<TestInterfaceOne> interfaceOneKey = Key.get(TestInterfaceOne.class);
         Key<TestInterfaceTwo0> interfaceTwoKey = Key.get(TestInterfaceTwo0.class);
-        InjectionTransaction transaction = transactionApi.getTransaction(transactionURL);
-        Injector injector = transaction.transactionInjector();
+        InjectionTransactionAccessApi transaction = transactionApi.getTransaction(transactionURL);
+        Injector injector = transaction.getTransactionInjector();
 
         assertNotNull(injector);
         assertNotNull(injector.getExistingBinding(interfaceTwoKey));
         assertNull(injector.getExistingBinding(interfaceOneKey));
 
-        transaction.rootNode().bindTransaction();
+        transaction.bindTransaction();
         TestInterfaceTwo0 instanceTwo = injector.getInstance(interfaceTwoKey);
         assertTrue(instanceTwo.runTest());
-        transaction.rootNode().unbindTransaction();
+        transaction.unBindTransaction();
     }
 
 }

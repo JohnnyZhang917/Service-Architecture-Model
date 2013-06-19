@@ -3,68 +3,151 @@ package eu.pmsoft.sam.see
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import io.netty.channel._
 import java.net.InetSocketAddress
-import io.netty.bootstrap.ServerBootstrap
-import io.netty.channel.nio.NioEventLoopGroup
-import io.netty.channel.socket.nio.NioServerSocketChannel
-import io.netty.channel.socket.SocketChannel
-import io.netty.handler.logging.{LogLevel, LoggingHandler}
-import io.netty.handler.timeout.{ReadTimeoutHandler, WriteTimeoutHandler}
-import io.netty.handler.codec.serialization.{ClassResolvers, ObjectDecoder, ObjectEncoder}
 import org.slf4j.LoggerFactory
-import eu.pmsoft.sam.model.{ExternalServiceBind, ServiceConfigurationID, ServiceInstanceURL}
-import scala.collection.mutable
+import eu.pmsoft.sam.model._
+import java.util.concurrent.{TimeUnit, BlockingQueue, LinkedBlockingQueue}
+import scala.util.{Failure, Success}
 
 object CanonicalTransportLayer {
 
   def apply(port: Int) = new CanonicalTransportServer(port)
 }
 
+case class CanonicalProtocolMessage(instances: Seq[CanonicalProtocolInstance], calls: Seq[CanonicalProtocolMethodCall], closeHomotopy: Boolean)
+
 trait SlotExecutionPipe {
-  def sendProtocolExecution(message: CanonicalProtocolMessage): Future[CanonicalProtocolMessage]
+  def openPipe(): ExecutionPipe
 }
+
+trait ExecutionPipe {
+  val logger = LoggerFactory.getLogger(this.getClass)
+  private val queue = new LinkedBlockingQueue[ThreadMessage]()
+
+  def transport(message: ThreadMessage): Future[ThreadMessage]
+
+  def waitResponse: ThreadMessage = queue.take()
+
+  def pollResponse: Option[ThreadMessage] = Option(queue.poll())
+
+  def sendMessage(message: ThreadMessage): Unit = {
+    val fres = transport(message)
+    fres onComplete {
+      case Success(res) => {
+        logger.debug("message success {}", res)
+        queue.add(res)
+      }
+      case Failure(t) => {
+        logger.debug("message failure {}", t)
+        queue.add(ThreadMessage(None, Some(t)))
+      }
+    }
+  }
+}
+
+private trait TransportAbstraction {
+  def send(message: ThreadMessage): Future[Unit]
+
+  def receive(): Future[ThreadMessage]
+}
+
+
+//trait SlotExecutionOpenPipe {
+//  def executeCanonicalProtocolCall(message: CanonicalProtocolMessage): Future[CanonicalProtocolMessage]
+//}
 
 
 private[see] class CanonicalTransportServer(val port: Int) {
   val logger = LoggerFactory.getLogger(this.getClass)
   val serverAddress = new InetSocketAddress(port)
-//  val serverBootstrap = new ServerBootstrap()
-//
-//  serverBootstrap.group(new NioEventLoopGroup(), new NioEventLoopGroup())
-//    .channel(classOf[NioServerSocketChannel])
-//    .localAddress(serverAddress)
-//    .childHandler(new ChannelInitializer[SocketChannel]() {
-//    def initChannel(ch: SocketChannel) {
-//      ch.pipeline().addLast(new LoggingHandler(LogLevel.TRACE)).addLast(new WriteTimeoutHandler(3000)).addLast(new ReadTimeoutHandler(3000))
-//        .addLast(new ObjectEncoder(), new ObjectDecoder(ClassResolvers.cacheDisabled(null)), new ServerHandler());
-//    }
-//  })
-//
-//  val binding = serverBootstrap.bind()
-//
-//  binding.addListener(new ChannelFutureListener() {
-//    def operationComplete(p1: ChannelFuture) {
-//      logger.debug("server bind finished")
-//    }
-//  })
+  //  val serverBootstrap = new ServerBootstrap()
+  //
+  //  serverBootstrap.group(new NioEventLoopGroup(), new NioEventLoopGroup())
+  //    .channel(classOf[NioServerSocketChannel])
+  //    .localAddress(serverAddress)
+  //    .childHandler(new ChannelInitializer[SocketChannel]() {
+  //    def initChannel(ch: SocketChannel) {
+  //      ch.pipeline().addLast(new LoggingHandler(LogLevel.TRACE)).addLast(new WriteTimeoutHandler(3000)).addLast(new ReadTimeoutHandler(3000))
+  //        .addLast(new ObjectEncoder(), new ObjectDecoder(ClassResolvers.cacheDisabled(null)), new ServerHandler());
+  //    }
+  //  })
+  //
+  //  val binding = serverBootstrap.bind()
+  //
+  //  binding.addListener(new ChannelFutureListener() {
+  //    def operationComplete(p1: ChannelFuture) {
+  //      logger.debug("server bind finished")
+  //    }
+  //  })
 
 }
 
 private class TMPSlotExecutionPipe extends SlotExecutionPipe {
   def sendProtocolExecution(message: CanonicalProtocolMessage): Future[CanonicalProtocolMessage] = ???
+
+  def openPipe(): ExecutionPipe = new FakePipe
 }
 
-private class DirectExecutionPipe(val executor : CanonicalProtocolExecutor ) extends SlotExecutionPipe {
+private class DirectExecutionPipe(val transaction: InjectionTransactionContext) extends SlotExecutionPipe with ExecutionPipe {
+  val executionThread = ThreadExecutionModel.openTransactionThread(transaction)
+  val localTransportFake = new LocalJVMSingleMessageTransport
 
-  def sendProtocolExecution(message: CanonicalProtocolMessage): Future[CanonicalProtocolMessage] = {
-    Future {
-      executor.execute(message)
+  def openPipe(): ExecutionPipe = this
+
+  def transport(message: ThreadMessage): Future[ThreadMessage] = {
+    val calculation = localTransportFake.clientView.send(message).flatMap {
+      _ => localTransportFake.providerView.receive()
+    }.map{
+      rootMessage => executionThread.executeCanonicalProtocolMessage(rootMessage, localTransportFake.providerView)
+    }.flatMap{
+      rootResponse => localTransportFake.providerView.send(rootResponse)
+    }.flatMap{
+      _ => localTransportFake.clientView.receive()
     }
+
+    calculation
   }
 
 }
 
+private class FakePipe extends ExecutionPipe {
+  def transport(message: ThreadMessage): Future[ThreadMessage] = ???
+}
+
+private class TransportPipe(absTrans: TransportAbstraction) extends ExecutionPipe {
+  def transport(message: ThreadMessage): Future[ThreadMessage] = {
+    val sended = absTrans.send(message)
+    sended.flatMap {
+      ok => absTrans.receive()
+    }
+  }
+}
+
+private class LocalJVMSingleMessageTransport {
+  private val clientToProvider: BlockingQueue[ThreadMessage] = new LinkedBlockingQueue[ThreadMessage](1)
+  private val providerToClient: BlockingQueue[ThreadMessage] = new LinkedBlockingQueue[ThreadMessage](1)
+
+  val clientView: TransportAbstraction = new TransportAbstraction() {
+    def send(message: ThreadMessage): Future[Unit] = Future {
+      clientToProvider.add(message)
+    }
+
+    def receive(): Future[ThreadMessage] = Future {
+      providerToClient.take()
+    }
+  }
+
+  val providerView: TransportAbstraction = new TransportAbstraction() {
+    def send(message: ThreadMessage): Future[Unit] = Future {
+      providerToClient.add(message)
+    }
+
+    def receive(): Future[ThreadMessage] = Future {
+      clientToProvider.take()
+    }
+  }
+
+}
 
 
 //case class CanonicalProtocolMessageSerialization(data: Array[Byte])

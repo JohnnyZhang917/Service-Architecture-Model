@@ -4,8 +4,13 @@ import com.google.inject.{PrivateModule, Guice, Injector, Key}
 import java.net.URL
 import eu.pmsoft.sam.see._
 import java.util.concurrent.atomic.AtomicInteger
-import eu.pmsoft.sam.injection.{DependenciesBindingContext, FreeBindingInjectionUtil, ExternalInstanceProvider, ExternalBindingController}
+import eu.pmsoft.sam.injection.{DependenciesBindingContext, FreeBindingInjectionUtil, ExternalBindingController}
 import scala.Some
+import eu.pmsoft.sam.architecture.definition.SamArchitectureDefinition
+import eu.pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract
+
+
+
 
 sealed abstract class ArchitectureModel
 
@@ -53,15 +58,16 @@ object ServiceTransactionID {
 
 class ServiceTransactionID(val id: Int)
 
-object ServiceInstanceURL {
-  def apply(url: URL) = new ServiceInstanceURL(url)
-}
-
-class ServiceInstanceURL(val url: URL)
+case class ServiceInstanceURL(val url: URL)
 
 case class SamServiceInstance(instanceId: ServiceInstanceID, implementation: SamServiceImplementation, injector: Injector)
 
 case class InjectionConfiguration(configurationRoot: InjectionConfigurationElement, configurationId: ServiceConfigurationID = ServiceConfigurationID())
+
+
+
+
+
 
 sealed abstract class InjectionConfigurationElement(val contract: SamService)
 
@@ -94,27 +100,14 @@ object InjectionConfigurationBuilder {
 }
 
 trait InjectionTransactionContext {
-  def instanceProvider(externalBind: ExternalServiceBind ): InstanceProvider
+  def instanceProvider(externalBind: ExternalServiceBind): InstanceProvider
 
   def instanceProvider(injector: Injector): InstanceProvider
 
   def dependenciesBindContextCreator(bindings: Seq[InstanceProvider]): DependenciesBindingContext
 }
 
-//trait InjectionTransactionContextBuilder {
-//  def create(externalBind: Seq[ExternalServiceBind]): InjectionTransactionContext
-//}
-
 object InjectionTransaction {
-//  def apply(
-//             injectionConfiguration: InjectionConfigurationElement,
-//             contextBuilder: InjectionTransactionContextBuilder): InjectionTransaction = {
-//    val headInjector = glueInjector(injectionConfiguration)
-//    require(headInjector.isDefined)
-//    val context = contextBuilder.create(getExternalBind(injectionConfiguration))
-//    val rootNode = createNode(context,injectionConfiguration)
-//    new InjectionTransaction(headInjector.get, rootNode)
-//  }
 
   def createNode(context: InjectionTransactionContext, injectionConfiguration: InjectionConfigurationElement): InjectionTransactionNode = {
     injectionConfiguration match {
@@ -171,7 +164,6 @@ object InjectionTransaction {
 
 }
 
-
 case class InjectionTransactionNode(configurationElement: InjectionConfigurationElement,
                                     instanceProvider: InstanceProvider,
                                     serviceBinding: Seq[InjectionTransactionNode],
@@ -180,13 +172,13 @@ case class InjectionTransactionNode(configurationElement: InjectionConfiguration
 
   private lazy val serviceBind: DependenciesBindingContext = externalInstanceProviderCreator(serviceBinding.map(_.instanceProvider))
 
-  def bindTransaction: Unit = {
-    serviceBinding foreach (_.bindTransaction)
+  def bindSwitchingScope: Unit = {
+    serviceBinding foreach (_.bindSwitchingScope)
     controller.map(_.bindRecordContext(serviceBind))
   }
 
-  def unbindTransaction: Unit = {
-    serviceBinding foreach (_.unbindTransaction)
+  def unbindSwitchingScope: Unit = {
+    serviceBinding foreach (_.unbindSwitchingScope)
     controller.map(_.unBindRecordContext())
   }
 }

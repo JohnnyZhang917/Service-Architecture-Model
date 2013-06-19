@@ -10,7 +10,29 @@ import eu.pmsoft.sam.definition.implementation.SamServiceImplementationDefinitio
 import eu.pmsoft.sam.architecture.definition.SamArchitectureLoader.SamCategoryLoader
 
 
+
+case class SEEConfiguration(
+                             architectures: Set[SamArchitectureDefinition],
+                             implementations: Set[SamServiceImplementationPackageContract],
+                             port: Int)
+
+case class SEEConfigurationBuilder(config: SEEConfiguration) {
+
+  def withArchitecture(toAdd: SamArchitectureDefinition) = new SEEConfigurationBuilder(config.copy(architectures = config.architectures + toAdd))
+
+  def withImplementation(toAdd: SamServiceImplementationPackageContract) = new SEEConfigurationBuilder(config.copy(implementations = config.implementations + toAdd))
+
+  def build = config
+
+}
+
+
+
+
+
 object SamModelBuilder {
+
+
 
   def implementationKey(module: GuiceModule) = SamServiceImplementationKey(module)
 

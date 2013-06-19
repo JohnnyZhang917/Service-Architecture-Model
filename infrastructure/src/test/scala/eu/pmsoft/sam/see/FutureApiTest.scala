@@ -6,9 +6,9 @@ import ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import org.testng.annotations.Test
 import org.testng.Assert
+import java.util.concurrent.{LinkedBlockingQueue, LinkedBlockingDeque, BlockingQueue}
 
 class FutureApiTest {
-
 
 
   @Test
@@ -34,9 +34,9 @@ class FutureApiTest {
       }
     }
 
-    val r = Await.result(three,0 nanos)
+    val r = Await.result(three, 0 nanos)
     System.out.println(r)
-    Assert.assertEquals(3,r)
+    Assert.assertEquals(3, r)
   }
 
   @Test
@@ -61,31 +61,51 @@ class FutureApiTest {
       o + t
     }
 
-    val r = Await.result(three,50 millis)
+    val r = Await.result(three, 50 millis)
     System.out.println(r)
-    Assert.assertEquals(3,r)
+    Assert.assertEquals(3, r)
   }
 
   @Test
   def testFutureCallsForSequence() {
 
     val three = for {
-      o <- Future {println("init one"); Thread.sleep(30); println("calculate one"); 1 }
-      t <- Future {println("init two"); Thread.sleep(10); println("calculate two"); 2 }
+      o <- Future {
+        println("init one");
+        Thread.sleep(30);
+        println("calculate one");
+        1
+      }
+      t <- Future {
+        println("init two");
+        Thread.sleep(10);
+        println("calculate two");
+        2
+      }
     } yield {
       println("calculate three")
       o + t
     }
 
-    val r = Await.result(three,50 millis)
+    val r = Await.result(three, 50 millis)
     System.out.println(r)
-    Assert.assertEquals(3,r)
+    Assert.assertEquals(3, r)
   }
 
   @Test
   def testFutureFlatMap() {
-    val f1 = Future {println("init one"); Thread.sleep(20); println("calculate one"); 1 }
-    val f2 = Future {println("init two"); Thread.sleep(10); println("calculate two"); 2 }
+    val f1 = Future {
+      println("init one");
+      Thread.sleep(20);
+      println("calculate one");
+      1
+    }
+    val f2 = Future {
+      println("init two");
+      Thread.sleep(10);
+      println("calculate two");
+      2
+    }
     val f3 = f1 flatMap {
       one => {
         println("f1 flatMap")
@@ -98,16 +118,26 @@ class FutureApiTest {
         }
       }
     }
-    val r = Await.result(f3,50 millis)
+    val r = Await.result(f3, 50 millis)
     System.out.println(r)
-    Assert.assertEquals(3,r)
+    Assert.assertEquals(3, r)
 
   }
 
   @Test
   def testFutureFlatMapOnFor() {
-    val f1 = Future {println("init one"); Thread.sleep(20); println("calculate one"); 1 }
-    val f2 = Future {println("init two"); Thread.sleep(10); println("calculate two"); 2 }
+    val f1 = Future {
+      println("init one");
+      Thread.sleep(20);
+      println("calculate one");
+      1
+    }
+    val f2 = Future {
+      println("init two");
+      Thread.sleep(10);
+      println("calculate two");
+      2
+    }
 
     f1.foreach {
       one => {
@@ -120,17 +150,49 @@ class FutureApiTest {
     } yield one + two
 
     f1.flatMap {
-    one => {
-      f2.map {
-        two => two + one
+      one => {
+        f2.map {
+          two => two + one
+        }
       }
     }
-    }
 
 
-    val r = Await.result(f3,50 millis)
+    val r = Await.result(f3, 50 millis)
     System.out.println(r)
-    Assert.assertEquals(3,r)
+    Assert.assertEquals(3, r)
 
   }
+
+
+  @Test
+  def testRecursiveCalculation() {
+
+    val p = Promise[Int]()
+    val f = p.future
+    CalculationMore(5)
+    Future {
+      recursiveCalculation(CalculationMore(5), p)
+    }
+
+    val r = Await.result(f, 50 millis)
+    println(r)
+
+    Assert.assertEquals(0, r)
+
+  }
+
+  case class CalculationMore(deep: Int)
+
+  def recursiveCalculation(data: CalculationMore, p: Promise[Int]) {
+    println("Make calculation for " + data)
+    if (data.deep > 0) {
+      Future {
+        recursiveCalculation(CalculationMore(data.deep - 1), p)
+      }
+    } else {
+      p success 0
+    }
+  }
+
 }
