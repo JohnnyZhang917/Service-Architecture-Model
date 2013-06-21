@@ -13,8 +13,11 @@ import eu.pmsoft.see.api.data.impl.store.TestStoreServiceModule
 import eu.pmsoft.see.api.data.architecture.contract.store.StoreServiceContract
 import eu.pmsoft.see.api.data.architecture.contract.courier.CourierServiceContract
 import eu.pmsoft.see.api.data.architecture.contract.shopping.ShoppingStoreWithCourierInteraction
+import org.slf4j.LoggerFactory
 
 class ServiceExecutionEnvironmentTest extends Assertions {
+
+  val logger = LoggerFactory.getLogger(this.getClass)
 
   @Test def builderApi() {
     val anyPort = 3000
@@ -180,6 +183,7 @@ class ServiceExecutionEnvironmentTest extends Assertions {
 
     // direct use of the transaction injector
 //    for ( i <- 0 to 3 ) {
+      logger.debug("init shopping transaction")
       complexTransactionTwoExternal.bindTransaction
       val shoppingApi = complexTransactionTwoExternal.getTransactionInjector.getInstance(Key.get(classOf[ShoppingStoreWithCourierInteraction]))
       assert(shoppingApi.makeShoping() != null)

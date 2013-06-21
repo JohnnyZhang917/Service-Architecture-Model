@@ -21,6 +21,14 @@ object CanonicalProtocol {
     }
   }
 
+  def isFilledInstance(instance: CanonicalProtocolInstance) = {
+    instance match {
+      case ClientFilledDataInstance(instanceNr, key, data) => true
+      case ServerFilledDataInstance(instanceNr, key, data) => true
+      case _ => false
+    }
+  }
+
   def isServerInstance(instance: CanonicalProtocolInstance) = !isClientInstance(instance)
 
 }

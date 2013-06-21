@@ -6,7 +6,7 @@ import scala.concurrent.Future
 import java.net.InetSocketAddress
 import org.slf4j.LoggerFactory
 import eu.pmsoft.sam.model._
-import java.util.concurrent.{BlockingQueue, LinkedBlockingQueue}
+import java.util.concurrent.{TimeUnit, BlockingQueue, LinkedBlockingQueue}
 import scala.util.{Failure, Success}
 
 object CanonicalTransportLayer {
@@ -58,12 +58,6 @@ private trait TransportAbstraction {
 
   def receive(): Future[ThreadMessage]
 }
-
-
-//trait SlotExecutionOpenPipe {
-//  def executeCanonicalProtocolCall(message: CanonicalProtocolMessage): Future[CanonicalProtocolMessage]
-//}
-
 
 private[see] class CanonicalTransportServer(val port: Int) {
   val logger = LoggerFactory.getLogger(this.getClass)
@@ -132,19 +126,6 @@ private class DirectExecutionPipe(val transaction: InjectionTransactionContext) 
 
   }
 
-}
-
-private class FakePipe extends ExecutionPipe {
-  def transport(message: ThreadMessage): Future[ThreadMessage] = ???
-}
-
-private class TransportPipe(absTrans: TransportAbstraction) extends ExecutionPipe {
-  def transport(message: ThreadMessage): Future[ThreadMessage] = {
-    val sended = absTrans.send(message)
-    sended.flatMap {
-      ok => absTrans.receive()
-    }
-  }
 }
 
 private class LocalJVMSingleMessageTransport {
