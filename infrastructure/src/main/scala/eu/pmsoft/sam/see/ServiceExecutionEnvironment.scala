@@ -45,7 +45,6 @@ class ServiceExecutionEnvironment(val configuration: SEEConfiguration) {
 
 }
 
-
 private class SamArchitectureManagement(val status: ServiceExecutionEnvironmentStatus) extends SamArchitectureManagementApi {
 
   def getService(key: SamServiceKey) = status.serviceByKey(key)
@@ -104,7 +103,7 @@ private object FreeBindingBuilder {
       def configure() {
         val b = binder()
         b.requireExplicitBindings()
-        contracts.view.zipWithIndex.foreach {
+        contracts.zipWithIndex.foreach {
           case (service, slotNr) => service.foreach {
             key => FreeBindingInjectionUtil.createIntermediateProvider(b, key, slotNr)
           }
@@ -178,10 +177,15 @@ private class SamInjectionTransaction(
   val logger = LoggerFactory.getLogger(this.getClass)
 
   private def createExecutionContext(tid: ServiceConfigurationID): InjectionTransactionContext = {
-    logger.trace("createExecutionContext {}", tid)
     val config = status.getConfigurations(tid)
-    val contextBuilder = CanonicalRecordingLayer(createExternalServiceConnections _)
-    contextBuilder.createContext(config.configurationRoot)
+    val contextBuilder = CanonicalRecordingLayer(createExternalServiceConnections _, createLoopBackEndpoint _ )
+    val context = contextBuilder.createContext(config.configurationRoot)
+    logger.trace("created context for configuration {}", config.configurationRoot)
+    context
+  }
+
+  private def createLoopBackEndpoint() : LoopBackExecutionPipe = {
+    new TMPSlotExecutionPipe()
   }
 
   def createUrl(configurationId: ServiceConfigurationID): ServiceInstanceURL = {
@@ -191,13 +195,15 @@ private class SamInjectionTransaction(
 
   def createExternalServiceConnections(endpoints: Seq[ExternalServiceBind]): Seq[SlotExecutionPipe] = {
     val localConfig = status.getExposedServiceConfigurations
-    endpoints.map {
+    logger.debug("bind service {}",endpoints)
+    val pipes = endpoints.map {
       case ExternalServiceBind(_, url) if localConfig.contains(url) => {
         val context = createExecutionContext(localConfig(url))
         new DirectExecutionPipe(context)
       }
       case _ => new TMPSlotExecutionPipe
     }
+    pipes
   }
 
   def liftServiceConfiguration(configurationId: ServiceConfigurationID): ServiceInstanceURL = status.exposeServiceConfiguration(configurationId, createUrl)

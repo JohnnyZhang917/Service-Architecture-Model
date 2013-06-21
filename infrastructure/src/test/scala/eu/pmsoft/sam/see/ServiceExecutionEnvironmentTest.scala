@@ -7,6 +7,12 @@ import eu.pmsoft.see.api.data.impl._
 import eu.pmsoft.sam.model._
 import eu.pmsoft.see.api.data.architecture.contract.{TestInterfaceTwo0, TestInterfaceOne}
 import com.google.inject.Key
+import eu.pmsoft.see.api.data.impl.shopping.TestShoppingModule
+import eu.pmsoft.see.api.data.impl.courier.TestCourierServiceModule
+import eu.pmsoft.see.api.data.impl.store.TestStoreServiceModule
+import eu.pmsoft.see.api.data.architecture.contract.store.StoreServiceContract
+import eu.pmsoft.see.api.data.architecture.contract.courier.CourierServiceContract
+import eu.pmsoft.see.api.data.architecture.contract.shopping.ShoppingStoreWithCourierInteraction
 
 class ServiceExecutionEnvironmentTest extends Assertions {
 
@@ -17,8 +23,9 @@ class ServiceExecutionEnvironmentTest extends Assertions {
     assert(expected == result)
   }
 
-  @Test def EnvironmentCreation() {
-    val anyPort = 3001
+
+  @Test def simpleExecutionLocalTest() {
+    val anyPort = 3002
     val builder = ServiceExecutionEnvironment.configurationBuilder(anyPort)
     val config = builder.withArchitecture(new SeeTestArchitecture())
       .withImplementation(new TestImplementationDeclaration()).build
@@ -94,11 +101,90 @@ class ServiceExecutionEnvironmentTest extends Assertions {
     val complexTransactionTwoExternal = env.transactionApi.getTransaction(externalConfigId)
 
     // direct use of the transaction injector
-    complexTransactionTwoExternal.bindTransaction
-    val apiTwoRefExternal = complexTransactionTwoExternal.getTransactionInjector.getInstance(apiTwoInterface)
-    assert(apiTwoRefExternal.runTest())
-    complexTransactionTwoExternal.unBindTransaction
+    // Simple call
+    for ( i <- 0 to 3 ) {
+      complexTransactionTwoExternal.bindTransaction
+      val apiTwoRefExternal = complexTransactionTwoExternal.getTransactionInjector.getInstance(apiTwoInterface)
+      assert(apiTwoRefExternal.runTest())
+      complexTransactionTwoExternal.unBindTransaction
+    }
 
+  }
+
+  @Test def shoppingScenarioExecutionLocalTest() {
+    val anyPort = 3001
+    val builder = ServiceExecutionEnvironment.configurationBuilder(anyPort)
+    val config = builder.withArchitecture(new SeeTestArchitecture())
+      .withImplementation(new TestImplementationDeclaration()).build
+
+    val env = ServiceExecutionEnvironment(config)
+
+    val expectedImplementation = Seq(
+      classOf[TestStoreServiceModule],
+      classOf[TestCourierServiceModule],
+      classOf[TestShoppingModule]
+    )
+    val implKeys = expectedImplementation.map(SamModelBuilder.implementationKey _)
+    assert(
+      implKeys.map {
+        env.serviceRegistry.getImplementation _
+      } forall {
+        _ != null
+      }
+    )
+
+    val serviceInstance = implKeys map {
+      env.executionNode.createServiceInstance _
+    }
+    assert(
+      serviceInstance.map {
+        _.implementation.implKey
+      } zip implKeys forall {
+        case (instanceKey, implementationKey) => instanceKey == implementationKey
+      }
+    )
+
+    val storeService = serviceInstance(0)
+    val courierService = serviceInstance(1)
+    val shoppingService = serviceInstance(2)
+    val storeInstance = InjectionConfigurationBuilder.singleInstanceBind(env.architectureManager, storeService)
+    val courierInstance = InjectionConfigurationBuilder.singleInstanceBind(env.architectureManager, courierService)
+    val shoppingInstance = InjectionConfigurationBuilder.complexInstanceBind(env.architectureManager, shoppingService,
+      Array(storeInstance, courierInstance)
+    )
+    val bindConfigElements = Seq(storeInstance, courierInstance, shoppingInstance)
+    val bindConfigurationIDs = bindConfigElements.map {
+      env.executionNode.registerInjectionConfiguration _
+    }
+    val bindTransactions = bindConfigurationIDs map {
+      env.transactionApi.getTransaction _
+    }
+
+    val storeTransaction = bindTransactions(0)
+    val storeApi = storeTransaction.getTransactionInjector.getExistingBinding(Key.get(classOf[StoreServiceContract]))
+    assert(storeApi != null)
+
+    val courierTransaction = bindTransactions(1)
+    assert(courierTransaction.getTransactionInjector.getExistingBinding(Key.get(classOf[CourierServiceContract])) != null)
+
+    val toUseAsExternalConfigurationElements = bindConfigElements.take(2)
+    val toUseAsExternalConfiguration = bindConfigurationIDs.take(2)
+    val externalConfigElements = toUseAsExternalConfigurationElements zip toUseAsExternalConfiguration map {
+      case (element,config) => (element.contract , env.transactionApi.liftServiceConfiguration(config))
+    } map {
+      case (contract,url) => InjectionConfigurationBuilder.externalServiceBind(contract,url)
+    }
+    val externalConfig = InjectionConfigurationBuilder.complexInstanceBind(env.architectureManager,shoppingService,externalConfigElements.toArray)
+    val externalConfigId = env.executionNode.registerInjectionConfiguration(externalConfig)
+    val complexTransactionTwoExternal = env.transactionApi.getTransaction(externalConfigId)
+
+    // direct use of the transaction injector
+//    for ( i <- 0 to 3 ) {
+      complexTransactionTwoExternal.bindTransaction
+      val shoppingApi = complexTransactionTwoExternal.getTransactionInjector.getInstance(Key.get(classOf[ShoppingStoreWithCourierInteraction]))
+      assert(shoppingApi.makeShoping() != null)
+      complexTransactionTwoExternal.unBindTransaction
+//    }
 
   }
 

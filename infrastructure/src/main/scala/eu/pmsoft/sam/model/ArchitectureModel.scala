@@ -94,7 +94,8 @@ object InjectionConfigurationBuilder {
     require(serviceMatches.filter(_._2.isEmpty).isEmpty)
 
     val service = registry.getService(instance.implementation.contract)
-    InstanceServiceBind(service, bindings, instance)
+    val orderedBinding = serviceMatches.map( _._2.get )
+    InstanceServiceBind(service, orderedBinding, instance)
   }
 
 }

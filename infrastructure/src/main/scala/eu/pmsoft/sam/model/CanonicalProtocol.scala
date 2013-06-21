@@ -4,6 +4,24 @@ import com.google.inject.Key
 import java.lang.reflect.Method
 
 object CanonicalProtocol {
+  def isClientInstance(instance: CanonicalProtocolInstance): Boolean = {
+    instance match {
+      case ClientBindingKeyInstance(instanceNr, key) => true
+      case ClientReturnBindingKeyInstance(instanceNr, key) => true
+      case ClientExternalInstanceBinding(instanceNr, key) => true
+      case ClientPendingDataInstance(instanceNr, key) => true
+      case ClientFilledDataInstance(instanceNr, key, data) => true
+      case ClientDataInstance(instanceNr, key, data) => true
+      case ServerBindingKeyInstance(instanceNr, key) => false
+      case ServerReturnBindingKeyInstance(instanceNr, key) => false
+      case ServerExternalInstanceBinding(instanceNr, key) => false
+      case ServerPendingDataInstance(instanceNr, key) => false
+      case ServerFilledDataInstance(instanceNr, key, data) => false
+      case ServerDataInstance(instanceNr, key, data) => false
+    }
+  }
+
+  def isServerInstance(instance: CanonicalProtocolInstance) = !isClientInstance(instance)
 
 }
 
@@ -19,17 +37,30 @@ case class ReflectionDataMethodCall(override val instance: CanonicalProtocolInst
 
 abstract sealed class CanonicalProtocolInstance(val instanceNr: Int, val key: Key[_])
 
-case class BindingKeyInstance(override val instanceNr: Int, override val key: Key[_]) extends CanonicalProtocolInstance(instanceNr, key)
 
-case class ReturnBindingKeyInstance(override val instanceNr: Int, override val key: Key[_]) extends CanonicalProtocolInstance(instanceNr, key)
+case class ClientBindingKeyInstance(override val instanceNr: Int, override val key: Key[_]) extends CanonicalProtocolInstance(instanceNr, key)
 
-case class ExternalInstanceBinding(override val instanceNr: Int, override val key: Key[_]) extends CanonicalProtocolInstance(instanceNr, key)
+case class ClientReturnBindingKeyInstance(override val instanceNr: Int, override val key: Key[_]) extends CanonicalProtocolInstance(instanceNr, key)
 
-case class PendingDataInstance(override val instanceNr: Int, override val key: Key[_]) extends CanonicalProtocolInstance(instanceNr, key)
+case class ClientExternalInstanceBinding(override val instanceNr: Int, override val key: Key[_]) extends CanonicalProtocolInstance(instanceNr, key)
 
-case class FilledDataInstance(override val instanceNr: Int, override val key: Key[_], data: java.io.Serializable) extends CanonicalProtocolInstance(instanceNr, key)
+case class ClientPendingDataInstance(override val instanceNr: Int, override val key: Key[_]) extends CanonicalProtocolInstance(instanceNr, key)
 
-case class DataInstance(override val instanceNr: Int, override val key: Key[_], data: java.io.Serializable) extends CanonicalProtocolInstance(instanceNr, key)
+case class ClientFilledDataInstance(override val instanceNr: Int, override val key: Key[_], data: java.io.Serializable) extends CanonicalProtocolInstance(instanceNr, key)
+
+case class ClientDataInstance(override val instanceNr: Int, override val key: Key[_], data: java.io.Serializable) extends CanonicalProtocolInstance(instanceNr, key)
+
+case class ServerBindingKeyInstance(override val instanceNr: Int, override val key: Key[_]) extends CanonicalProtocolInstance(instanceNr, key)
+
+case class ServerReturnBindingKeyInstance(override val instanceNr: Int, override val key: Key[_]) extends CanonicalProtocolInstance(instanceNr, key)
+
+case class ServerExternalInstanceBinding(override val instanceNr: Int, override val key: Key[_]) extends CanonicalProtocolInstance(instanceNr, key)
+
+case class ServerPendingDataInstance(override val instanceNr: Int, override val key: Key[_]) extends CanonicalProtocolInstance(instanceNr, key)
+
+case class ServerFilledDataInstance(override val instanceNr: Int, override val key: Key[_], data: java.io.Serializable) extends CanonicalProtocolInstance(instanceNr, key)
+
+case class ServerDataInstance(override val instanceNr: Int, override val key: Key[_], data: java.io.Serializable) extends CanonicalProtocolInstance(instanceNr, key)
 
 
 sealed class CanonicalProtocolMethodCall(

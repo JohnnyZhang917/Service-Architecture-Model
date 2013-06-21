@@ -6,11 +6,10 @@ import scala.concurrent.Future
 import java.net.InetSocketAddress
 import org.slf4j.LoggerFactory
 import eu.pmsoft.sam.model._
-import java.util.concurrent.{TimeUnit, BlockingQueue, LinkedBlockingQueue}
+import java.util.concurrent.{BlockingQueue, LinkedBlockingQueue}
 import scala.util.{Failure, Success}
 
 object CanonicalTransportLayer {
-
   def apply(port: Int) = new CanonicalTransportServer(port)
 }
 
@@ -18,6 +17,11 @@ case class CanonicalProtocolMessage(instances: Seq[CanonicalProtocolInstance], c
 
 trait SlotExecutionPipe {
   def openPipe(): ExecutionPipe
+}
+
+trait LoopBackExecutionPipe extends SlotExecutionPipe {
+  def bindTransportContext(context : TransportAbstraction)
+  def unbindTransportContext()
 }
 
 trait ExecutionPipe {
@@ -43,6 +47,10 @@ trait ExecutionPipe {
       }
     }
   }
+}
+
+class DisabledExecutionPipe extends ExecutionPipe {
+  def transport(message: ThreadMessage): Future[ThreadMessage] = throw new IllegalAccessException()
 }
 
 private trait TransportAbstraction {
@@ -82,10 +90,28 @@ private[see] class CanonicalTransportServer(val port: Int) {
 
 }
 
-private class TMPSlotExecutionPipe extends SlotExecutionPipe {
-  def sendProtocolExecution(message: CanonicalProtocolMessage): Future[CanonicalProtocolMessage] = ???
+private class TMPSlotExecutionPipe extends LoopBackExecutionPipe with ExecutionPipe {
 
-  def openPipe(): ExecutionPipe = new FakePipe
+  val transportRef : ThreadLocal[TransportAbstraction] = new ThreadLocal[TransportAbstraction]()
+
+  def bindTransportContext(context: TransportAbstraction) {
+    transportRef.set(context)
+  }
+
+  def unbindTransportContext() {
+    transportRef.remove()
+  }
+
+  def openPipe(): ExecutionPipe = this
+
+  def transport(message: ThreadMessage): Future[ThreadMessage] = {
+    val transport = transportRef.get()
+    val sended = transport.send(message)
+    sended.flatMap {
+      ok => transport.receive()
+    }
+
+  }
 }
 
 private class DirectExecutionPipe(val transaction: InjectionTransactionContext) extends SlotExecutionPipe with ExecutionPipe {
@@ -95,17 +121,15 @@ private class DirectExecutionPipe(val transaction: InjectionTransactionContext) 
   def openPipe(): ExecutionPipe = this
 
   def transport(message: ThreadMessage): Future[ThreadMessage] = {
-    val calculation = localTransportFake.clientView.send(message).flatMap {
+
+    localTransportFake.clientView.send(message).flatMap {
       _ => localTransportFake.providerView.receive()
-    }.map{
+    }.flatMap {
       rootMessage => executionThread.executeCanonicalProtocolMessage(rootMessage, localTransportFake.providerView)
-    }.flatMap{
-      rootResponse => localTransportFake.providerView.send(rootResponse)
-    }.flatMap{
-      _ => localTransportFake.clientView.receive()
     }
 
-    calculation
+    localTransportFake.clientView.receive()
+
   }
 
 }

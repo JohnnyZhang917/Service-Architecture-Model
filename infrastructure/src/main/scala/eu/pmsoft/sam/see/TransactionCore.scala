@@ -15,40 +15,54 @@ private case class InstanceExecutionData(instance: CanonicalProtocolInstance, re
 private abstract sealed class InstanceRegistryOperation
 
 private case class AddInstance(data: InstanceExecutionData) extends InstanceRegistryOperation
-private case class UpdateInstance(data: InstanceExecutionData) extends InstanceRegistryOperation
-private case class UpdateTransferMark(mark : Int) extends InstanceRegistryOperation
 
-private case class InstanceRegistrySlotStatus(instances: Vector[InstanceExecutionData] = Vector(), transferMark: Int = 0) {
-  def updated(operation : InstanceRegistryOperation) : InstanceRegistrySlotStatus = operation match {
+private case class UpdateInstance(data: InstanceExecutionData) extends InstanceRegistryOperation
+
+private case class UpdateTransferMark(mark: Int) extends InstanceRegistryOperation
+
+private case class UpdateMergeMark(mark: Int) extends InstanceRegistryOperation
+
+private case class InstanceRegistrySlotStatus(instances: Vector[InstanceExecutionData] = Vector(),
+                                              transferMark: Int = 0,
+                                              mergeMark: Int = 0) {
+  def updated(operation: InstanceRegistryOperation): InstanceRegistrySlotStatus = operation match {
     case AddInstance(data) => this.copy(instances = this.instances :+ data)
-    case UpdateInstance(data) => this.copy(instances = this.instances.updated(data.instance.instanceNr,data))
-    case UpdateTransferMark(mark) => this.copy( transferMark = mark)
+    case UpdateInstance(data) => this.copy(instances = this.instances.updated(data.instance.instanceNr, data))
+    case UpdateTransferMark(mark) => this.copy(transferMark = mark)
+    case UpdateMergeMark(mark) => this.copy(mergeMark = mark)
   }
 }
 
-private case class InstanceRegistryStatus(slots : Vector[InstanceRegistrySlotStatus]) {
+private case class InstanceRegistryStatus(slots: Vector[InstanceRegistrySlotStatus]) {
 
-  def updated(operation : InstanceRegistryOperation)(slotNr: Int) : InstanceRegistryStatus = this.copy(slots = this.slots.updated(slotNr,this.slots(slotNr).updated(operation)))
+  def updated(operation: InstanceRegistryOperation)(slotNr: Int): InstanceRegistryStatus = this.copy(slots = this.slots.updated(slotNr, this.slots(slotNr).updated(operation)))
 
-  def updated(operations : Iterable[InstanceRegistryOperation])(slotNr : Int): InstanceRegistryStatus = (this /: operations)( (status,operation) => status.updated(operation)(slotNr))
+  def updated(operations: Iterable[InstanceRegistryOperation])(slotNr: Int): InstanceRegistryStatus = (this /: operations)((status, operation) => status.updated(operation)(slotNr))
 
 }
-
 
 
 private class InjectionTransactionRecordManager(val injectionConfiguration: InjectionConfigurationElement, transportProvider: Seq[ExternalServiceBind] => Seq[SlotExecutionPipe]) extends TransactionStatusFlow with InstanceRegistry {
   private val logger = LoggerFactory.getLogger(this.getClass)
   private val externalBind = InjectionTransaction.getExternalBind(injectionConfiguration)
   val nrOfSlots = externalBind.size
-  val externalInstanceProviders: Map[ExternalServiceBind, InstanceProvider] = externalBind.view.zipWithIndex.map {
-    case (b, i) => b -> new ExternalRecorderInstanceProvider(new SlotRecordEmbroider(i, this))
+  val externalInstanceProviders: Map[ExternalServiceBind, InstanceProvider] = externalBind.zipWithIndex.map {
+    case (b, i) => {
+      val instanceCreator = new SlotRecordEmbroider(i, new ClientCanonicalInstanceCreationSchema({
+        () => nextInstanceNr(i)
+      }), this)
+      logger.debug("bind {} to {}", i, b)
+      b -> new ExternalRecorderInstanceProvider(instanceCreator)
+    }
   }.toMap
 
   private var transactionRecordStatus: InstanceRegistryStatus = InstanceRegistryStatus(Range(0, nrOfSlots).map(i => InstanceRegistrySlotStatus()).toVector)
 
+  def nextInstanceNr(slotNr: Int): Int = transactionRecordStatus.slots(slotNr).instances.size
+
   val externalExecutionManager = new ExecutionStackManager(transportProvider(externalBind).map(_.openPipe()).toVector, this)
 
-  def recordCall(slotNr: Int, call: CanonicalProtocolMethodCall) = {
+  def recordCall(slotNr: Int, call: CanonicalProtocolMethodCall) {
     externalExecutionManager.pushMethodCall(ProtocolMethodCall(slotNr, call))
     call match {
       case _: ReturnMethodCall => externalExecutionManager.flushExecution
@@ -57,6 +71,7 @@ private class InjectionTransactionRecordManager(val injectionConfiguration: Inje
   }
 
   def bind(slotNr: Int, instance: CanonicalProtocolInstance, ref: AnyRef) {
+    logger.debug("on slot {} bind instance {} ", slotNr, instance)
     val operation = AddInstance(InstanceExecutionData(instance, ref))
     transactionRecordStatus = transactionRecordStatus.updated(operation)(slotNr)
   }
@@ -65,63 +80,83 @@ private class InjectionTransactionRecordManager(val injectionConfiguration: Inje
   def getInstanceReferenceToTransfer(slotNr: Int): Seq[CanonicalProtocolInstance] = {
     val startPosition = transactionRecordStatus.slots(slotNr).transferMark
     val slotInstance = transactionRecordStatus.slots(slotNr).instances.drop(startPosition).map(_.instance)
-    val toSend = slotInstance.takeWhile(_ match {
-      case _: BindingKeyInstance => true
-      case _: ReturnBindingKeyInstance => true
-      case _: ExternalInstanceBinding => true
-      case _: PendingDataInstance => true
-      case _: FilledDataInstance => true
-      case _: DataInstance => true
-    })
+    val toSend = slotInstance.filter( CanonicalProtocol.isClientInstance _)
     transactionRecordStatus = transactionRecordStatus.updated(UpdateTransferMark(startPosition + toSend.size))(slotNr)
-    toSend.toSeq
+    val total = toSend ++ getInstancetoMerge(slotNr)
+    total
   }
 
+  def getInstancetoMerge(slotNr: Int): Seq[CanonicalProtocolInstance] = {
+    val startPosition = transactionRecordStatus.slots(slotNr).mergeMark
+    val slotInstance = transactionRecordStatus.slots(slotNr).instances.drop(startPosition).map(_.instance)
+    val merged = slotInstance.takeWhile(_ match {
+      case _: ServerPendingDataInstance => false
+      case _ => true
+    })
+    transactionRecordStatus = transactionRecordStatus.updated(UpdateMergeMark(startPosition + merged.size))(slotNr)
+    merged.filter(_ match {
+      case _: ServerFilledDataInstance => true
+      case _ => false
+    }).toSeq
+  }
+
+
   def mergeInstances(slotNr: Int, instances: Seq[CanonicalProtocolInstance]) {
-    val instanceRef: Seq[InstanceExecutionData] = instances.map {
+    logger.debug("merge of instances on record context {}", instances)
+
+    val updateOperations = instances.map {
       _ match {
-        case i@BindingKeyInstance(nr, key) => InstanceExecutionData(i, ???)
-        case i@ReturnBindingKeyInstance(nr, key) => InstanceExecutionData(i, ???)
-        case i@ExternalInstanceBinding(nr, key) => InstanceExecutionData(i, ???)
-        case i@PendingDataInstance(nr, key) => InstanceExecutionData(i, ???)
-        case i@FilledDataInstance(nr, key, data) => {
+        case i@ServerBindingKeyInstance(instanceNr, key) => ???
+        case i@ServerReturnBindingKeyInstance(instanceNr, key) => ???
+        case i@ServerExternalInstanceBinding(instanceNr, key) => ???
+        case i@ServerPendingDataInstance(instanceNr, key) => AddInstance(InstanceExecutionData(i, null))
+        case i@ServerFilledDataInstance(instanceNr, key, data) => ???
+        case i@ServerDataInstance(instanceNr, key, data) => AddInstance(InstanceExecutionData(i, data.asInstanceOf[AnyRef]))
+        case i@ClientFilledDataInstance(instanceNr, key, data) => {
           val projection = data.asInstanceOf[AnyRef]
-          val delayed = transactionRecordStatus.slots(slotNr).instances(nr).ref.asInstanceOf[PromiseCanonicalProtocolInstanceRef[_]]
+          val delayed = transactionRecordStatus.slots(slotNr).instances(instanceNr).ref.asInstanceOf[PromiseCanonicalProtocolInstanceRef[_]]
           delayed.promise success projection
-          InstanceExecutionData(i,projection)
+          UpdateInstance(InstanceExecutionData(i, projection))
         }
-        case i@DataInstance(nr, key, data) => InstanceExecutionData(i, ???)
+        case _ => ???
       }
     }
-    val updateOperations = instanceRef.map( UpdateInstance(_))
+//    val updateOperations = instanceRef.map(UpdateInstance(_))
     transactionRecordStatus = transactionRecordStatus.updated(updateOperations)(slotNr)
   }
 
 
   def saveReturnValue(slotNr: Int, instanceNr: Int, returnValue: AnyRef) {
-    ???
+    val currentInstance = transactionRecordStatus.slots(slotNr).instances(instanceNr)
+    val updated = currentInstance.instance match {
+      case ServerPendingDataInstance(nr, key) => currentInstance.copy(instance = ServerFilledDataInstance(nr, key, returnValue.asInstanceOf[java.io.Serializable]))
+      case _ => ???
+    }
+    val operation = UpdateInstance(updated)
+    transactionRecordStatus = transactionRecordStatus.updated(operation)(slotNr)
+
   }
 
-  def getInstanceRef(slotNr: Int,instanceNr: Int): AnyRef = {
+  def getInstanceRef(slotNr: Int, instanceNr: Int): AnyRef = {
     transactionRecordStatus.slots(slotNr).instances(instanceNr).ref
   }
 
-  def getInstancetoMerge(slotNr: Int): Seq[CanonicalProtocolInstance] = ???
+
 }
 
 case class ThreadMessage(data: Option[CanonicalRequest], exception: Option[Throwable] = None)
 
 trait InstanceRegistry {
 
-  def saveReturnValue(slotNr : Int ,instanceNr: Int, returnValue : AnyRef)
+  def saveReturnValue(slotNr: Int, instanceNr: Int, returnValue: AnyRef)
 
-  def getInstanceRef(slotNr: Int,instanceNr: Int): AnyRef
+  def getInstanceRef(slotNr: Int, instanceNr: Int): AnyRef
 
   def getInstanceReferenceToTransfer(slotNr: Int): Seq[CanonicalProtocolInstance]
 
   def mergeInstances(slotNr: Int, instances: Seq[CanonicalProtocolInstance])
 
-  def getInstancetoMerge(slotNr: Int): Seq[CanonicalProtocolInstance]
+//  def getInstancetoMerge(slotNr: Int): Seq[CanonicalProtocolInstance]
 }
 
 
@@ -154,7 +189,8 @@ private class ExecutionStackManager(val pipes: Vector[ExecutionPipe], val instan
     val executionStackCall = getCurrentStack
     val expectedExecutionMark = executionStackCall.recordMark
     while (executionStackCall.executionMark < expectedExecutionMark) {
-      logger.trace("force execution. CurrentMark/Expected [{},{}]", executionStackCall.executionMark, expectedExecutionMark)
+      logger.trace("Enter force execution on slot {}", executionStackCall.waitingSlotNr)
+      logger.trace("force execution. CurrentMark/Expected [{},{}] on slot {}", executionStackCall.executionMark, expectedExecutionMark)
       pushProtocolExecution(true, executionStackCall)
     }
     logger.trace("flush execution done")
@@ -166,19 +202,25 @@ private class ExecutionStackManager(val pipes: Vector[ExecutionPipe], val instan
     calls foreach {
       call => {
         logger.debug("execution call {}", call)
-        val instanceRef: AnyRef = instanceRegistry.getInstanceRef(slotNr,call.instanceNr)
-        val argumentsRefs: Array[AnyRef] = call.arguments.map( instanceRegistry.getInstanceRef(slotNr, _ ) )
+        val instanceRef: AnyRef = instanceRegistry.getInstanceRef(slotNr, call.instanceNr)
+        val argumentsRefs: Array[AnyRef] = call.arguments.map(instanceRegistry.getInstanceRef(slotNr, _))
 
-        val method = instanceRef.getClass.getInterfaces.flatMap(_.getMethods).find(_.hashCode() == call.methodSignature).getOrElse(???)
+        val method = instanceRef.getClass.getInterfaces.flatMap(_.getMethods).find(_.hashCode() == call.methodSignature).getOrElse({
+          logger.error("Missing method for signature {} on type {}", instanceRef.getClass, call.methodSignature)
+          ???
+        })
         try {
           val resultValue = argumentsRefs.size match {
             case 0 => method.invoke(instanceRef)
             case _ => method.invoke(instanceRef, argumentsRefs: _*)
           }
           call.returnInstance.map(
-            instanceRegistry.saveReturnValue(slotNr,_,resultValue)
+            instanceRegistry.saveReturnValue(slotNr, _, resultValue)
           )
         } catch {
+          case e: IllegalArgumentException => {
+            logger.error("Ilegal argument {}", e)
+          }
           case e: Exception => e.printStackTrace()
         }
       }
@@ -214,7 +256,7 @@ private class ExecutionStackManager(val pipes: Vector[ExecutionPipe], val instan
                   executeCalls(currentStack.waitingSlotNr, data.calls)
                   unBindStack
                 }
-                val finishData = CanonicalRequest(instanceRegistry.getInstancetoMerge(currentStack.waitingSlotNr), Seq(), true)
+                val finishData = CanonicalRequest(instanceRegistry.getInstanceReferenceToTransfer(currentStack.waitingSlotNr), Seq(), true)
                 val finishMessage = ThreadMessage(Some(finishData))
                 pipe.sendMessage(finishMessage)
               }
@@ -224,6 +266,7 @@ private class ExecutionStackManager(val pipes: Vector[ExecutionPipe], val instan
     } else {
       val request = currentStack.createStackRequest
       val pipe = getPipe(currentStack.waitingSlotNr)
+      logger.trace("sending message to pipe {}", currentStack.waitingSlotNr)
       pipe.sendMessage(ThreadMessage(Some(request)))
       assert(currentStack.waitingStatus)
     }
@@ -243,8 +286,8 @@ private trait StackOfStack {
   }
 
   def unBindStack {
-    logger.trace("Stack Execution POP")
     assert(!threadExecutionStack.isEmpty)
+    logger.trace("Stack Execution POP from {}", threadExecutionStack.head.slotReference)
     assert(threadExecutionStack.head.serviceCallStack.isEmpty)
     threadExecutionStack = threadExecutionStack.tail
   }

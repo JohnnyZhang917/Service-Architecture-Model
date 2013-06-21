@@ -8,7 +8,6 @@ import scala.AnyRef
 import eu.pmsoft.sam.model.ExternalServiceBind
 import scala.concurrent._
 import scala.concurrent.duration._
-import java.util.concurrent.atomic.AtomicInteger
 import scala.annotation.tailrec
 import com.google.inject.{Injector, Key}
 import eu.pmsoft.sam.injection.{ExternalInstanceProvider, DependenciesBindingContext, ExternalBindingSwitch}
@@ -18,7 +17,7 @@ import org.slf4j.LoggerFactory
 
 object CanonicalRecordingLayer {
 
-  def apply(transportProvider: Seq[ExternalServiceBind] => Seq[SlotExecutionPipe]) = new CanonicalRecordingLayer(transportProvider)
+  def apply(transportProvider: Seq[ExternalServiceBind] => Seq[SlotExecutionPipe], returnLoopPipe: () => LoopBackExecutionPipe) = new CanonicalRecordingLayer(transportProvider, returnLoopPipe)
 
 }
 
@@ -41,23 +40,25 @@ trait RecordEmbroider {
 }
 
 
-class CanonicalRecordingLayer(transportProvider: Seq[ExternalServiceBind] => Seq[SlotExecutionPipe]) {
+class CanonicalRecordingLayer(transportProvider: Seq[ExternalServiceBind] => Seq[SlotExecutionPipe], returnLoopPipe: () => LoopBackExecutionPipe) {
 
   def createContext(injectionConfiguration: InjectionConfigurationElement) = {
-    new InjectionTransactionContext(injectionConfiguration, transportProvider: Seq[ExternalServiceBind] => Seq[SlotExecutionPipe])
+    new InjectionTransactionContext(injectionConfiguration, transportProvider, returnLoopPipe)
   }
 
 }
 
 
-class InjectionTransactionContext(injectionConfiguration: InjectionConfigurationElement, transportProvider: Seq[ExternalServiceBind] => Seq[SlotExecutionPipe]) extends InjectionTransactionAccessApi {
+class InjectionTransactionContext(injectionConfiguration: InjectionConfigurationElement,
+                                  transportProvider: Seq[ExternalServiceBind] => Seq[SlotExecutionPipe],
+                                  returnLoopPipe: () => LoopBackExecutionPipe) extends InjectionTransactionAccessApi {
 
   private val recorder = new InjectionTransactionRecordManager(injectionConfiguration, transportProvider)
   val logger = LoggerFactory.getLogger(this.getClass)
 
   private val headInjector = InjectionTransaction.glueInjector(recorder.injectionConfiguration)
   require(headInjector.isDefined)
-  private val executor = new TransactionExecutionManager(headInjector.get)
+  private val executor = new TransactionExecutionManager(headInjector.get, returnLoopPipe())
 
   private val transaction: InjectionTransaction = {
     val rootNode = InjectionTransaction.createNode(new InjectionTransactionWrappingContext(recorder.externalInstanceProviders), recorder.injectionConfiguration)
@@ -68,24 +69,26 @@ class InjectionTransactionContext(injectionConfiguration: InjectionConfiguration
 
   def bindTransaction {
     recorder.externalExecutionManager.bindTransaction
+    executor.executionManager.bindTransaction
     transaction.rootNode.bindSwitchingScope
   }
 
   def unBindTransaction {
     transaction.rootNode.unbindSwitchingScope
+    executor.executionManager.unbindTransaction
     recorder.externalExecutionManager.unbindTransaction
   }
 
   def protocolExecution(message: ThreadMessage, clientTransport: TransportAbstraction): ThreadMessage = {
+    executor.returnLoopPipe.bindTransportContext(clientTransport)
     message.data.map {
       proto => {
         executor.mergeInstances(0, proto.instances)
         executor.executionManager.executeCalls(0, proto.calls)
-
       }
     }
 
-    val finishData = CanonicalRequest(executor.getInstancetoMerge(0), Seq(), true)
+    val finishData = CanonicalRequest(executor.getInstanceReferenceToTransfer(0), Seq(), true)
     val res = ThreadMessage(Some(finishData))
     logger.debug("response {}", res)
     res
@@ -93,38 +96,74 @@ class InjectionTransactionContext(injectionConfiguration: InjectionConfiguration
   }
 }
 
-private class TransactionExecutionManager(headInjector: Injector) extends InstanceRegistry {
+private class TransactionExecutionManager(headInjector: Injector, val returnLoopPipe: LoopBackExecutionPipe) extends TransactionStatusFlow with InstanceRegistry {
+  private val logger = LoggerFactory.getLogger(this.getClass)
   private var transactionStatus: InstanceRegistryStatus = InstanceRegistryStatus(Vector(InstanceRegistrySlotStatus()))
 
-  val executionManager = new ExecutionStackManager(Vector(), this)
+  val returnLoopInstanceProvider: RecordEmbroider = new SlotRecordEmbroider(0, new ServerCanonicalInstanceCreationSchema( { () => nextInstanceNr(0)}), this)
+
+  def nextInstanceNr(slotNr: Int): Int = transactionStatus.slots(slotNr).instances.size
+
+  val executionManager = new ExecutionStackManager(Vector(returnLoopPipe.openPipe()), this)
+
+  def recordCall(slotNr: Int, call: CanonicalProtocolMethodCall) {
+    executionManager.pushMethodCall(ProtocolMethodCall(slotNr, call))
+    call match {
+      case _: ReturnMethodCall => executionManager.flushExecution
+      case _ =>
+    }
+  }
+
+  def bind(slotNr: Int, instance: CanonicalProtocolInstance, ref: AnyRef) {
+    logger.debug("on slot {} bind instance {} ", slotNr, instance)
+    val operation = AddInstance(InstanceExecutionData(instance, ref))
+    transactionStatus = transactionStatus.updated(operation)(0)
+
+  }
 
   def getInstanceReferenceToTransfer(slotNr: Int): Seq[CanonicalProtocolInstance] = {
     val startPosition = transactionStatus.slots(slotNr).transferMark
     val slotInstance = transactionStatus.slots(slotNr).instances.drop(startPosition).map(_.instance)
-    val toSend = slotInstance.takeWhile(_ match {
-      case _: BindingKeyInstance => true
-      case _: ReturnBindingKeyInstance => true
-      case _: ExternalInstanceBinding => true
-      case _: PendingDataInstance => true
-      case _: FilledDataInstance => true
-      case _: DataInstance => true
+    val toSend = slotInstance.filter( CanonicalProtocol.isServerInstance _ )
+    transactionStatus = transactionStatus.updated(UpdateTransferMark(startPosition + slotInstance.size))(slotNr)
+    val total = toSend ++ getInstancetoMerge(slotNr)
+    total
+  }
+  def getInstancetoMerge(slotNr: Int): Seq[CanonicalProtocolInstance] = {
+    val startPosition = transactionStatus.slots(slotNr).mergeMark
+    val slotInstance = transactionStatus.slots(slotNr).instances.drop(startPosition).map(_.instance)
+    val merged = slotInstance.takeWhile(_ match {
+      case _: ClientPendingDataInstance => false
+      case _ => true
     })
-    transactionStatus = transactionStatus.updated(UpdateTransferMark(startPosition + toSend.size))(slotNr)
-    toSend.toSeq
+    transactionStatus = transactionStatus.updated(UpdateMergeMark(startPosition + merged.size))(slotNr)
+    merged.filter(_ match {
+      case _: ClientFilledDataInstance => true
+      case _ => false
+    }).toSeq
   }
 
   def mergeInstances(slotNr: Int, instances: Seq[CanonicalProtocolInstance]) {
-    val instanceRef: Seq[InstanceExecutionData] = instances.map {
+    logger.debug("merge instances {}", instances)
+    val updateOperations = instances.map {
       _ match {
-        case i@BindingKeyInstance(nr, key) => InstanceExecutionData(i, headInjector.getInstance(key).asInstanceOf[AnyRef])
-        case i@ReturnBindingKeyInstance(nr, key) => InstanceExecutionData(i, null)
-        case i@ExternalInstanceBinding(nr, key) => InstanceExecutionData(i, ???)
-        case i@PendingDataInstance(nr, key) => InstanceExecutionData(i, null)
-        case i@FilledDataInstance(nr, key, data) => ???
-        case i@DataInstance(nr, key, data) => InstanceExecutionData(i, data.asInstanceOf[AnyRef])
+        case i@ClientBindingKeyInstance(nr, key) => AddInstance(InstanceExecutionData(i, headInjector.getInstance(key).asInstanceOf[AnyRef]))
+        case i@ClientReturnBindingKeyInstance(nr, key) => AddInstance(InstanceExecutionData(i, null))
+        case i@ClientExternalInstanceBinding(nr, key) => AddInstance(InstanceExecutionData(i, new CanonicalProtocolRecorderRef[AnyRef](i, returnLoopInstanceProvider).getInstance))
+        case i@ClientPendingDataInstance(nr, key) => AddInstance(InstanceExecutionData(i, null))
+        case i@ClientFilledDataInstance(nr, key, data) => throw new IllegalStateException()
+        case i@ClientDataInstance(nr, key, data) => AddInstance(InstanceExecutionData(i, data.asInstanceOf[AnyRef]))
+        case i@ServerFilledDataInstance(instanceNr, key, data) => {
+          val projection = data.asInstanceOf[AnyRef]
+          val delayed = transactionStatus.slots(slotNr).instances(instanceNr).ref.asInstanceOf[PromiseCanonicalProtocolInstanceRef[_]]
+          delayed.promise success projection
+          UpdateInstance(InstanceExecutionData(i, projection))
+        }
+
+        case _ => throw new IllegalStateException()
       }
     }
-    val updateOperations = instanceRef.map(AddInstance(_))
+//    val updateOperations = instanceRef.map(AddInstance(_))
     transactionStatus = transactionStatus.updated(updateOperations)(slotNr)
   }
 
@@ -132,8 +171,8 @@ private class TransactionExecutionManager(headInjector: Injector) extends Instan
   def saveReturnValue(slotNr: Int, instanceNr: Int, returnValue: AnyRef) {
     val currentInstance = transactionStatus.slots(slotNr).instances(instanceNr)
     val updated = currentInstance.instance match {
-      case PendingDataInstance(nr, key) => currentInstance.copy(instance = FilledDataInstance(nr, key, returnValue.asInstanceOf[java.io.Serializable]))
-      case ReturnBindingKeyInstance(nr, key) => currentInstance.copy(ref = returnValue)
+      case ClientPendingDataInstance(nr, key) => currentInstance.copy(instance = ClientFilledDataInstance(nr, key, returnValue.asInstanceOf[java.io.Serializable]))
+      case ClientReturnBindingKeyInstance(nr, key) => currentInstance.copy(ref = returnValue)
       case _ => ???
     }
     val operation = UpdateInstance(updated)
@@ -144,20 +183,7 @@ private class TransactionExecutionManager(headInjector: Injector) extends Instan
     transactionStatus.slots(slotNr).instances(instanceNr).ref
   }
 
-  def getInstancetoMerge(slotNr: Int): Seq[CanonicalProtocolInstance] = {
-    val startPosition = transactionStatus.slots(slotNr).transferMark
-    val slotInstance = transactionStatus.slots(slotNr).instances.drop(startPosition).map(_.instance)
-    val toSend = slotInstance.filter(_ match {
-      case _: BindingKeyInstance => false
-      case _: ReturnBindingKeyInstance => true
-      case _: ExternalInstanceBinding => ???
-      case _: PendingDataInstance => false
-      case _: FilledDataInstance => true
-      case _: DataInstance => false
-    })
-    transactionStatus = transactionStatus.updated(UpdateTransferMark(startPosition + toSend.size))(slotNr)
-    toSend.toSeq
-  }
+
 }
 
 
@@ -165,25 +191,75 @@ trait TransactionStatusFlow {
   def recordCall(slotNr: Int, call: CanonicalProtocolMethodCall): Unit
 
   def bind(slotNr: Int, instance: CanonicalProtocolInstance, ref: AnyRef): Unit
+
 }
 
-private class SlotRecordEmbroider(slotNr: Int, transactionFlow: TransactionStatusFlow) extends RecordEmbroider {
-  private val instanceCounter = new AtomicInteger(0)
+trait CanonicalInstanceCreationSchema {
 
-  private def nextInstanceNr = instanceCounter.getAndAdd(1)
+  def keyBinding(key: Key[_]): CanonicalProtocolInstance
+
+  def externalBinding(key: Key[_]): CanonicalProtocolInstance
+
+  def dataBinding(key: Key[_], ref: java.io.Serializable ): CanonicalProtocolInstance
+
+  def returnBind(key: Key[_]): CanonicalProtocolInstance
+
+  def pendingBind(key: Key[_]): CanonicalProtocolInstance
+
+}
+
+class ClientCanonicalInstanceCreationSchema(val next :  () => Int  ) extends CanonicalInstanceCreationSchema{
+
+  def keyBinding(key: Key[_]): CanonicalProtocolInstance = ClientBindingKeyInstance(next(),key)
+
+  def externalBinding(key: Key[_]): CanonicalProtocolInstance = ClientExternalInstanceBinding(next(),key)
+
+  def dataBinding(key: Key[_], ref: java.io.Serializable): CanonicalProtocolInstance = ClientDataInstance(next(),key,ref)
+
+  def returnBind(key: Key[_]): CanonicalProtocolInstance = ClientReturnBindingKeyInstance(next(),key)
+
+  def pendingBind(key: Key[_]): CanonicalProtocolInstance = ClientPendingDataInstance(next(),key)
+}
+
+class ServerCanonicalInstanceCreationSchema(val next :  () => Int  ) extends CanonicalInstanceCreationSchema{
+
+
+  def keyBinding(key: Key[_]): CanonicalProtocolInstance = ServerBindingKeyInstance(next(),key)
+
+  def externalBinding(key: Key[_]): CanonicalProtocolInstance = ServerExternalInstanceBinding(next(),key)
+
+  def dataBinding(key: Key[_], ref: java.io.Serializable): CanonicalProtocolInstance = ServerDataInstance(next(),key,ref)
+
+  def returnBind(key: Key[_]): CanonicalProtocolInstance = ServerReturnBindingKeyInstance(next(),key)
+
+  def pendingBind(key: Key[_]): CanonicalProtocolInstance = ServerPendingDataInstance(next(),key)
+}
+
+
+private class SlotRecordEmbroider(val slotNr: Int,
+                                  val creationSchema: CanonicalInstanceCreationSchema,
+                                  val transactionFlow: TransactionStatusFlow) extends RecordEmbroider {
+  private val logger = LoggerFactory.getLogger(this.getClass)
+
 
   @tailrec
   private def extractInternalInstanceNumber(argType: Class[_], argument: AnyRef): Int = {
     argument match {
       case null => ???
+      case proxy: java.lang.reflect.Proxy => extractInternalInstanceNumber(argType, java.lang.reflect.Proxy.getInvocationHandler(proxy))
+      case proxy: ExternalBindingSwitch[_] => extractInternalInstanceNumber(argType, proxy.getInternalInstance.asInstanceOf[AnyRef])
+      case recorder: CanonicalProtocolRecorderRef[_] if recorder.embroider == this => recorder.instance.instanceNr
+      case recorder: CanonicalProtocolRecorderRef[_] => {
+        val instance = creationSchema.externalBinding(Key.get(argType))
+        transactionFlow.bind(slotNr, instance, recorder.getInstance.asInstanceOf[AnyRef])
+        instance.instanceNr
+
+      }
       case serializable: java.io.Serializable => {
-        val instance = DataInstance(nextInstanceNr, Key.get(argType), serializable)
+        val instance = creationSchema.dataBinding(Key.get(argType), serializable)
         transactionFlow.bind(slotNr, instance, serializable)
         instance.instanceNr
       }
-      case recorder: CanonicalProtocolRecorderRef[_] if recorder.embroider == this => recorder.instance.instanceNr
-      case recorder: CanonicalProtocolRecorderRef[_] => ???
-      case proxy: ExternalBindingSwitch[_] => extractInternalInstanceNumber(argType, proxy.getInternalInstance.asInstanceOf[AnyRef])
       case _ => throw new RuntimeException("can not handle this argument type")
     }
   }
@@ -207,15 +283,15 @@ private class SlotRecordEmbroider(slotNr: Int, transactionFlow: TransactionStatu
         ref
       }
       case ReflectionInterfaceMethodCall(instance, method, args, returnType) => {
-        val binding = ReturnBindingKeyInstance(nextInstanceNr, Key.get(returnType))
+        val binding = creationSchema.returnBind(Key.get(returnType))
         val ref = new CanonicalProtocolRecorderRef[AnyRef](binding, this)
-        transactionFlow.bind(slotNr, binding, ref)
+        transactionFlow.bind(slotNr, binding, ref.getInstance.asInstanceOf[AnyRef])
         val ccall = InterfaceMethodCall(instance.instanceNr, method, argsNr, binding.instanceNr)
         transactionFlow.recordCall(slotNr, ccall)
         ref
       }
       case ReflectionDataMethodCall(instance, method, args, returnType) => {
-        val pending = PendingDataInstance(nextInstanceNr, Key.get(returnType))
+        val pending = creationSchema.pendingBind(Key.get(returnType))
         val ref = new PromiseCanonicalProtocolInstanceRef()
         transactionFlow.bind(slotNr, pending, ref)
         val ccall = ReturnMethodCall(instance.instanceNr, method, argsNr, pending.instanceNr)
@@ -226,9 +302,10 @@ private class SlotRecordEmbroider(slotNr: Int, transactionFlow: TransactionStatu
   }
 
   def key[T](bindingKey: Key[T]): CanonicalProtocolInstanceRef[T] = {
-    val canonicalInstance = BindingKeyInstance(nextInstanceNr, bindingKey)
+    logger.trace("create bind key on slot {} for key {}", slotNr, bindingKey)
+    val canonicalInstance = creationSchema.keyBinding(bindingKey)
     val ref = new CanonicalProtocolRecorderRef[T](canonicalInstance, this)
-    transactionFlow.bind(slotNr, canonicalInstance, ref)
+    transactionFlow.bind(slotNr, canonicalInstance, ref.getInstance.asInstanceOf[AnyRef])
     ref
   }
 }

@@ -22,11 +22,11 @@ class TransactionThreadStatus(context: InjectionTransactionContext) {
     }
   }
 
-  def executeCanonicalProtocolMessage(rootMessage: ThreadMessage, clientTransport: TransportAbstraction): ThreadMessage = {
+  def executeCanonicalProtocolMessage(rootMessage: ThreadMessage, clientTransport: TransportAbstraction): Future[Unit] = {
     context.bindTransaction
     val rootResponse = context.protocolExecution(rootMessage, clientTransport)
     context.unBindTransaction
-    rootResponse
+    clientTransport.send(rootResponse)
   }
 
 }
