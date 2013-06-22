@@ -27,12 +27,12 @@ private class InjectionTransactionRecordManager(val injectionConfiguration: Inje
 
   def nextInstanceNr(slotNr: Int): Int = transactionRecordStatus.slots(slotNr).instances.size
 
-  val externalExecutionManager = new ExecutionStackManager(transportProvider(externalBind).map(_.openPipe()).toVector, this)
+  val recordingExecutionManager = new ExecutionStackManager(transportProvider(externalBind).map(_.openPipe()).toVector, this)
 
   def recordCall(slotNr: Int, call: CanonicalProtocolMethodCall) {
-    externalExecutionManager.pushMethodCall(ProtocolMethodCall(slotNr, call))
+    recordingExecutionManager.pushMethodCall(ProtocolMethodCall(slotNr, call))
     call match {
-      case _: ReturnMethodCall => externalExecutionManager.flushExecution
+      case _: ReturnMethodCall => recordingExecutionManager.flushExecution
       case _ =>
     }
   }

@@ -67,8 +67,10 @@ class InjectionTransactionContext(injectionConfiguration: InjectionConfiguration
 
   def getTransactionInjector: Injector = transaction.transactionInjector
 
-  def bindTransaction {
-    recorder.externalExecutionManager.bindTransaction
+  def bindTransaction(clientTransport: Option[TransportAbstraction]) {
+    logger.debug("bind on transaction {}",transaction.rootNode.configurationElement.contract)
+    clientTransport.map( executor.returnLoopPipe.bindTransportContext( _ ) )
+    recorder.recordingExecutionManager.bindTransaction
     executor.executionManager.bindTransaction
     transaction.rootNode.bindSwitchingScope
   }
@@ -76,11 +78,12 @@ class InjectionTransactionContext(injectionConfiguration: InjectionConfiguration
   def unBindTransaction {
     transaction.rootNode.unbindSwitchingScope
     executor.executionManager.unbindTransaction
-    recorder.externalExecutionManager.unbindTransaction
+    recorder.recordingExecutionManager.unbindTransaction
+    executor.returnLoopPipe.unbindTransportContext()
   }
 
-  def protocolExecution(message: ThreadMessage, clientTransport: TransportAbstraction): ThreadMessage = {
-    executor.returnLoopPipe.bindTransportContext(clientTransport)
+  def protocolExecution(message: ThreadMessage): ThreadMessage = {
+
     message.data.map {
       proto => {
         executor.mergeInstances(0, proto.instances)

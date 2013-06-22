@@ -96,7 +96,6 @@
     <modules>
         <module>coreapi</module>
         <module>model</module>
-        <module>execution</module>
         <module>infrastructure</module>
     </modules>
 

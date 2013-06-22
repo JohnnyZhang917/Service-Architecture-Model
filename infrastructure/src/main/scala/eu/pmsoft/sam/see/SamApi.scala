@@ -10,7 +10,7 @@ import eu.pmsoft.sam.model.SamServiceImplementation
 import eu.pmsoft.sam.execution.ServiceAction
 import scala.concurrent.Future
 
-class SamApi {
+object SamApi {
 
 }
 
@@ -41,7 +41,7 @@ trait InjectionTransactionAccessApi {
 
   def getTransactionInjector : Injector
 
-  def bindTransaction: Unit
+  def bindTransaction(clientTransport: Option[TransportAbstraction]): Unit
 
   def unBindTransaction: Unit
 

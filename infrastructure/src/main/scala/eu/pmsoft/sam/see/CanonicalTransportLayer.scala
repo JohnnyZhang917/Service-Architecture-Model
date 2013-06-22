@@ -48,16 +48,14 @@ trait ExecutionPipe {
     }
   }
 }
-
-class DisabledExecutionPipe extends ExecutionPipe {
-  def transport(message: ThreadMessage): Future[ThreadMessage] = throw new IllegalAccessException()
-}
-
 private trait TransportAbstraction {
   def send(message: ThreadMessage): Future[Unit]
 
   def receive(): Future[ThreadMessage]
 }
+
+
+
 
 private[see] class CanonicalTransportServer(val port: Int) {
   val logger = LoggerFactory.getLogger(this.getClass)
@@ -82,6 +80,21 @@ private[see] class CanonicalTransportServer(val port: Int) {
   //    }
   //  })
 
+
+  def openPipe(url :  ServiceInstanceURL) : TransportAbstraction = {
+    ???
+  }
+}
+
+private class ExternalInstanceExecutionPipe(val slotPipe: TransportAbstraction) extends SlotExecutionPipe with ExecutionPipe  {
+
+  def openPipe(): ExecutionPipe = this
+
+  def transport(message: ThreadMessage): Future[ThreadMessage] = {
+    slotPipe.send(message).flatMap {
+      ok => slotPipe.receive()
+    }
+  }
 }
 
 private class TMPSlotExecutionPipe extends LoopBackExecutionPipe with ExecutionPipe {
@@ -89,22 +102,23 @@ private class TMPSlotExecutionPipe extends LoopBackExecutionPipe with ExecutionP
   val transportRef : ThreadLocal[TransportAbstraction] = new ThreadLocal[TransportAbstraction]()
 
   def bindTransportContext(context: TransportAbstraction) {
+    logger.debug("bind transport to pipe")
     transportRef.set(context)
   }
 
   def unbindTransportContext() {
+    logger.debug("unbind transport to pipe")
     transportRef.remove()
   }
 
   def openPipe(): ExecutionPipe = this
 
   def transport(message: ThreadMessage): Future[ThreadMessage] = {
+    assert( transportRef.get() != null )
     val transport = transportRef.get()
-    val sended = transport.send(message)
-    sended.flatMap {
+    transport.send(message).flatMap {
       ok => transport.receive()
     }
-
   }
 }
 
@@ -115,14 +129,20 @@ private class DirectExecutionPipe(val transaction: InjectionTransactionContext) 
   def openPipe(): ExecutionPipe = this
 
   def transport(message: ThreadMessage): Future[ThreadMessage] = {
+     logger.debug("send")
+    val sendOk = localTransportFake.clientView.send(message)
 
-    localTransportFake.clientView.send(message).flatMap {
-      _ => localTransportFake.providerView.receive()
-    }.flatMap {
-      rootMessage => executionThread.executeCanonicalProtocolMessage(rootMessage, localTransportFake.providerView)
+    if(! message.data.get.closeThread ){
+      logger.debug("execute")
+      executionThread.executeCanonicalProtocolMessage(localTransportFake.providerView)
     }
 
-    localTransportFake.clientView.receive()
+    sendOk.flatMap {
+      ok => {
+        logger.debug("sendOk, wait")
+        localTransportFake.clientView.receive()
+      }
+    }
 
   }
 

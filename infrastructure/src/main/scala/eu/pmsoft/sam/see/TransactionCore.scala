@@ -3,7 +3,7 @@ package eu.pmsoft.sam.see
 import eu.pmsoft.sam.model._
 import org.slf4j.LoggerFactory
 
-class TransactionCore {
+object TransactionCore {
 
 }
 
@@ -125,14 +125,17 @@ private class ExecutionStackManager(val pipes: Vector[ExecutionPipe], val instan
 
   def pushProtocolExecution(forceWait: Boolean, currentStack: MethodExecutionStack) {
     if (currentStack.waitingStatus) {
+      logger.trace("waiting step")
       val pipe = getPipe(currentStack.waitingSlotNr)
       val response = if (forceWait) {
         Some(pipe.waitResponse)
       } else {
         pipe.pollResponse
       }
+
       response.map {
         res =>
+          logger.trace("waiting done")
           res.exception.map(throw _)
           res.data match {
             case None => {
@@ -154,12 +157,14 @@ private class ExecutionStackManager(val pipes: Vector[ExecutionPipe], val instan
                 }
                 val finishData = CanonicalRequest(instanceRegistry.getInstanceReferenceToTransfer(currentStack.waitingSlotNr), Seq(), true)
                 val finishMessage = ThreadMessage(Some(finishData))
+                logger.trace("sending finish message to slot {}",currentStack.waitingSlotNr)
                 pipe.sendMessage(finishMessage)
               }
             }
           }
       }
     } else {
+      logger.trace("execution step")
       val request = currentStack.createStackRequest
       val pipe = getPipe(currentStack.waitingSlotNr)
       logger.trace("sending message to pipe {} = {}", currentStack.waitingSlotNr, request)

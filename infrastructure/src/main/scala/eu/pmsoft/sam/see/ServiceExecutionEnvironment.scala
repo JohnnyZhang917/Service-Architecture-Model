@@ -201,7 +201,7 @@ private class SamInjectionTransaction(
         val context = createExecutionContext(localConfig(url))
         new DirectExecutionPipe(context)
       }
-      case _ => new TMPSlotExecutionPipe
+      case ExternalServiceBind(_, url) => new ExternalInstanceExecutionPipe(server.openPipe(url))
     }
     pipes
   }

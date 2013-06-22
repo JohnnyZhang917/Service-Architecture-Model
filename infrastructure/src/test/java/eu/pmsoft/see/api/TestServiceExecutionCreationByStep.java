@@ -17,6 +17,9 @@ import org.testng.ITestContext;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
+import scala.None$;
+import scala.Option;
+import scala.Option$;
 import scala.collection.immutable.Set;
 
 import javax.inject.Inject;
@@ -163,7 +166,7 @@ public class TestServiceExecutionCreationByStep {
         assertNotNull(injector.getExistingBinding(interfaceTwoKey));
         assertNull(injector.getExistingBinding(interfaceOneKey));
 
-        transaction.bindTransaction();
+        transaction.bindTransaction(Option.<TransportAbstraction>empty());
         TestInterfaceTwo0 instanceTwo = injector.getInstance(interfaceTwoKey);
         assertTrue(instanceTwo.runTest());
         transaction.unBindTransaction();
