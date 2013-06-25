@@ -176,7 +176,7 @@ private class SlotRecordEmbroider(val slotNr: Int,
 
     call match {
       case ReflectionVoidMethodCall(instance, method, args) => {
-        val ccall = VoidMethodCall(instance.instanceNr, method, argsNr)
+        val ccall = VoidMethodCall(instance.instanceNr, method.hashCode(), argsNr)
         val ref = VoidCanonicalProtocolInstanceRef
         transactionFlow.recordCall(slotNr, ccall)
         ref
@@ -185,7 +185,7 @@ private class SlotRecordEmbroider(val slotNr: Int,
         val binding = creationSchema.returnBind(Key.get(returnType))
         val ref = new CanonicalProtocolRecorderRef[AnyRef](binding, this)
         transactionFlow.bind(slotNr, binding, ref.getInstance.asInstanceOf[AnyRef])
-        val ccall = InterfaceMethodCall(instance.instanceNr, method, argsNr, binding.instanceNr)
+        val ccall = InterfaceMethodCall(instance.instanceNr, method.hashCode(), argsNr, binding.instanceNr)
         transactionFlow.recordCall(slotNr, ccall)
         ref
       }
@@ -193,7 +193,7 @@ private class SlotRecordEmbroider(val slotNr: Int,
         val pending = creationSchema.pendingBind(Key.get(returnType))
         val ref = new PromiseCanonicalProtocolInstanceRef()
         transactionFlow.bind(slotNr, pending, ref)
-        val ccall = ReturnMethodCall(instance.instanceNr, method, argsNr, pending.instanceNr)
+        val ccall = ReturnMethodCall(instance.instanceNr, method.hashCode(), argsNr, pending.instanceNr)
         transactionFlow.recordCall(slotNr, ccall)
         ref
       }

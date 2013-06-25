@@ -8,10 +8,32 @@ import org.slf4j.LoggerFactory
 import eu.pmsoft.sam.model._
 import java.util.concurrent.{TimeUnit, BlockingQueue, LinkedBlockingQueue}
 import scala.util.{Failure, Success}
+import eu.pmsoft.sam.see.netty.{NettyTransport, Result}
 
 object CanonicalTransportLayer {
   def apply(port: Int) = new CanonicalTransportServer(port)
 }
+
+trait CanonicalProtocolCommunicationApi {
+
+  def getEnvironmentConnection( host : String, port : Int ) : EnvironmentConnection
+}
+
+trait EnvironmentConnection {
+
+  def ping: Future[Result]
+
+  def protocolAction(message : ThreadMessage) : Future[ThreadMessage]
+}
+
+
+
+private trait TransportAbstraction {
+  def send(message: ThreadMessage): Future[Unit]
+
+  def receive(): Future[ThreadMessage]
+}
+
 
 case class CanonicalProtocolMessage(instances: Seq[CanonicalProtocolInstance], calls: Seq[CanonicalProtocolMethodCall], closeHomotopy: Boolean)
 
@@ -48,11 +70,6 @@ trait ExecutionPipe {
     }
   }
 }
-private trait TransportAbstraction {
-  def send(message: ThreadMessage): Future[Unit]
-
-  def receive(): Future[ThreadMessage]
-}
 
 
 
@@ -60,40 +77,24 @@ private trait TransportAbstraction {
 private[see] class CanonicalTransportServer(val port: Int) {
   val logger = LoggerFactory.getLogger(this.getClass)
   val serverAddress = new InetSocketAddress(port)
-  //  val serverBootstrap = new ServerBootstrap()
-  //
-  //  serverBootstrap.group(new NioEventLoopGroup(), new NioEventLoopGroup())
-  //    .channel(classOf[NioServerSocketChannel])
-  //    .localAddress(serverAddress)
-  //    .childHandler(new ChannelInitializer[SocketChannel]() {
-  //    def initChannel(ch: SocketChannel) {
-  //      ch.pipeline().addLast(new LoggingHandler(LogLevel.TRACE)).addLast(new WriteTimeoutHandler(3000)).addLast(new ReadTimeoutHandler(3000))
-  //        .addLast(new ObjectEncoder(), new ObjectDecoder(ClassResolvers.cacheDisabled(null)), new ServerHandler());
-  //    }
-  //  })
-  //
-  //  val binding = serverBootstrap.bind()
-  //
-  //  binding.addListener(new ChannelFutureListener() {
-  //    def operationComplete(p1: ChannelFuture) {
-  //      logger.debug("server bind finished")
-  //    }
-  //  })
+  val environmentServer = NettyTransport.createNettyServer(serverAddress)
 
+  val transportApi = NettyTransport.api()
 
-  def openPipe(url :  ServiceInstanceURL) : TransportAbstraction = {
-    ???
+  def getExecutionPipe(url :  ServiceInstanceURL) : SlotExecutionPipe = {
+    new ExternalTransportPipeImplementation(transportApi.getEnvironmentConnection(url.url.getHost, url.url.getPort))
   }
 }
 
-private class ExternalInstanceExecutionPipe(val slotPipe: TransportAbstraction) extends SlotExecutionPipe with ExecutionPipe  {
+
+private class ExternalTransportPipeImplementation( connection : EnvironmentConnection ) extends SlotExecutionPipe with ExecutionPipe {
 
   def openPipe(): ExecutionPipe = this
 
   def transport(message: ThreadMessage): Future[ThreadMessage] = {
-    slotPipe.send(message).flatMap {
-      ok => slotPipe.receive()
-    }
+    // TODO transactionID????
+    logger.debug("rooting sending message {}", message)
+    connection.protocolAction(message)
   }
 }
 
@@ -173,20 +174,3 @@ private class LocalJVMSingleMessageTransport {
   }
 
 }
-
-
-//case class CanonicalProtocolMessageSerialization(data: Array[Byte])
-//
-//
-//private class ServerHandler extends ChannelInboundMessageHandlerAdapter[CanonicalProtocolMessageSerialization] {
-//
-//  val logger = LoggerFactory.getLogger(this.getClass)
-//
-//  logger.debug("server handler init!!!")
-//
-//  def messageReceived(ctx: ChannelHandlerContext, message: CanonicalProtocolMessageSerialization) {
-//    logger.debug("message {}", message)
-//  }
-//
-//}
-//

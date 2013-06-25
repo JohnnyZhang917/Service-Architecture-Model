@@ -37,15 +37,6 @@ trait SamExecutionNodeApi {
 
 }
 
-trait InjectionTransactionAccessApi {
-
-  def getTransactionInjector : Injector
-
-  def bindTransaction(clientTransport: Option[TransportAbstraction]): Unit
-
-  def unBindTransaction: Unit
-
-}
 
 trait SamInjectionTransactionApi {
 
@@ -56,4 +47,19 @@ trait SamInjectionTransactionApi {
   def executeServiceAction[R,T](configurationId: ServiceConfigurationID, action : ServiceAction[R,T]) : Future[R]
 
 }
+
+trait InjectionTransactionAccessApi {
+
+  def getTransactionInjector : Injector
+
+  def bindTransaction(clientTransport: Option[TransportAbstraction]): Unit
+
+  def unBindTransaction: Unit
+
+}
+
+trait ExternalTransactionApi {
+
+}
+
 

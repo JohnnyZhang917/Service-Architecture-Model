@@ -1,5 +1,6 @@
 package eu.pmsoft.see.api.data.impl;
 
+import com.google.inject.Module;
 import eu.pmsoft.sam.definition.implementation.AbstractSamImplementationPackage;
 import eu.pmsoft.sam.definition.implementation.AbstractSamServiceImplementationDefinition;
 import eu.pmsoft.see.api.data.architecture.service.*;

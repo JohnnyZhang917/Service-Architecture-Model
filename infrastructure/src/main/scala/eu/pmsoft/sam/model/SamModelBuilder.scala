@@ -8,7 +8,7 @@ import eu.pmsoft.sam.definition.service.{SamServiceDefinition, SamServiceDefinit
 import eu.pmsoft.sam.definition.service.SamServiceDefinitionLoader.SamServiceDefinitionInterfacesLoader
 import eu.pmsoft.sam.definition.implementation.SamServiceImplementationDefinitionLoader.ContractAndModule
 import eu.pmsoft.sam.architecture.definition.SamArchitectureLoader.SamCategoryLoader
-
+import eu.pmsoft.sam.architecture.exceptions.IncorrectArchitectureDefinition
 
 
 case class SEEConfiguration(
@@ -27,12 +27,7 @@ case class SEEConfigurationBuilder(config: SEEConfiguration) {
 }
 
 
-
-
-
 object SamModelBuilder {
-
-
 
   def implementationKey(module: GuiceModule) = SamServiceImplementationKey(module)
 
@@ -54,9 +49,10 @@ object SamModelBuilder {
     reader.implementations.map(loadImplementationDefinition _)
   }
 
+  @throws[IncorrectArchitectureDefinition]
   def loadImplementationDefinition(implementationDefinition: ServiceImplementationDefinition): SamServiceImplementation = {
-    val loader = new SamServiceImplementationLoader
-    implementationDefinition.loadServiceImplementationDefinition(loader)
+    val loader = new SamServiceImplementationLoader()
+    implementationDefinition.loadServiceImplementationDefinition(loader: SamServiceImplementationDefinitionLoader)
     loader.expression.build
   }
 
@@ -89,11 +85,29 @@ class SamArchitectureDefinitionLoader extends SamArchitectureLoader {
     builder
   }
 
+  @throws[IncorrectArchitectureDefinition]
   def createCategory(categoryName: String): SamCategoryLoader = {
+    if (categoryMap.contains(categoryName)) throw new IncorrectArchitectureDefinition("duplicate category name")
     categoryMap.getOrElse(categoryName, createCategoryBuilder(categoryName))
   }
 
-  def build = SamArchitecture(categoryMap.values.map(_.category).toSet, accessMap)
+  @throws[IncorrectArchitectureDefinition]
+  def build = {
+
+    if (categoryMap.isEmpty) throw new IncorrectArchitectureDefinition("no categories")
+
+    val categories = categoryMap.values.map(_.category).toSet
+    val emptyCategories = categories.filter(_.services.isEmpty)
+    if (!emptyCategories.isEmpty) throw new IncorrectArchitectureDefinition("empty categories %s".format(emptyCategories))
+
+    val selfAccessCategories = accessMap.filter {
+      case (catId: String, accessSet: Set[String]) => accessSet.contains(catId)
+    }
+    if (!selfAccessCategories.isEmpty) throw new IncorrectArchitectureDefinition("cycle access on category %s".format(selfAccessCategories.keySet))
+
+    SamArchitecture(categories, accessMap)
+  }
+
 
 }
 
@@ -135,7 +149,7 @@ case class ServiceImplementationBuilder(implementation: SamServiceImplementation
   def withBindingsTo(userService: ServiceContract) = {
     ServiceImplementationBuilder(
       implementation.copy(
-        bindServices =  SamServiceKey(userService) +: implementation.bindServices
+        bindServices = SamServiceKey(userService) +: implementation.bindServices
       ))
   }
 

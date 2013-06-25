@@ -83,25 +83,25 @@ sealed class CanonicalProtocolMethodCall(
 
 case class VoidMethodCall(
                            override val instanceNr: Int,
-                           val method: Method,
+                           override val methodSignature: Int,
                            override val arguments: Array[Int]
                            )
-  extends CanonicalProtocolMethodCall(instanceNr, method.hashCode(), arguments, None)
+  extends CanonicalProtocolMethodCall(instanceNr, methodSignature, arguments, None)
 
 case class InterfaceMethodCall(
                                 override val instanceNr: Int,
-                                val method: Method,
+                                override val methodSignature: Int,
                                 override val arguments: Array[Int],
                                 val returnNr: Int
                                 )
-  extends CanonicalProtocolMethodCall(instanceNr, method.hashCode(), arguments, Some(returnNr))
+  extends CanonicalProtocolMethodCall(instanceNr, methodSignature, arguments, Some(returnNr))
 
 case class ReturnMethodCall(
                              override val instanceNr: Int,
-                             val method: Method,
+                             override val methodSignature: Int,
                              override val arguments: Array[Int],
                              val returnNr: Int
                              )
-  extends CanonicalProtocolMethodCall(instanceNr, method.hashCode(), arguments, Some(returnNr))
+  extends CanonicalProtocolMethodCall(instanceNr, methodSignature, arguments, Some(returnNr))
 
 

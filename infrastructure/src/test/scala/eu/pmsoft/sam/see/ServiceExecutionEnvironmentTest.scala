@@ -147,7 +147,7 @@ class ServiceExecutionEnvironmentTest extends Assertions {
       def executeInteraction(service: ShoppingStoreWithCourierInteraction): Integer = service.makeShoping()
     })
 
-    Await.result(shoppingPrice, 20 seconds)
+    Await.result(shoppingPrice, 40 seconds)
 
   }
 

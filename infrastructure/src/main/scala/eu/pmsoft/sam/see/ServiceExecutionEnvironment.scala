@@ -201,7 +201,7 @@ private class SamInjectionTransaction(
         val context = createExecutionContext(localConfig(url))
         new DirectExecutionPipe(context)
       }
-      case ExternalServiceBind(_, url) => new ExternalInstanceExecutionPipe(server.openPipe(url))
+      case ExternalServiceBind(_, url) => server.getExecutionPipe(url)
     }
     pipes
   }
