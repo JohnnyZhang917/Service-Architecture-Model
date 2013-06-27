@@ -1,7 +1,5 @@
 package eu.pmsoft.sam.idgenerator;
 
-import com.google.common.base.Objects;
-
 import java.io.Serializable;
 
 public class LongLongID implements Serializable {
@@ -34,11 +32,4 @@ public class LongLongID implements Serializable {
         return result;
     }
 
-    @Override
-    public String toString() {
-        return Objects.toStringHelper(this)
-                .add("m", mark)
-                .add("l", linear)
-                .toString();
-    }
 }
