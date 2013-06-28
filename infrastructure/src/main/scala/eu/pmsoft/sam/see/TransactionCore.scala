@@ -196,7 +196,7 @@ private trait StackOfStack {
   def getCurrentStack = threadExecutionStack.head
 }
 
-case class CanonicalRequest(instances: Seq[CanonicalProtocolInstance], calls: Seq[CanonicalProtocolMethodCall], closeThread: Boolean)
+case class CanonicalRequest(instances: Seq[CanonicalProtocolInstance] = Seq(), calls: Seq[CanonicalProtocolMethodCall] = Seq(), closeThread: Boolean)
 
 case class ProtocolMethodCall(slot: Int, call: CanonicalProtocolMethodCall)
 

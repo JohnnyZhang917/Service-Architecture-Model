@@ -71,7 +71,7 @@ case class ServerFilledDataInstance(override val instanceNr: Int, override val k
 case class ServerDataInstance(override val instanceNr: Int, override val key: Key[_], data: java.io.Serializable) extends CanonicalProtocolInstance(instanceNr, key)
 
 
-sealed class CanonicalProtocolMethodCall(
+abstract sealed class CanonicalProtocolMethodCall(
                                           val instanceNr: Int,
                                           val methodSignature: Int,
                                           val arguments: Array[Int],

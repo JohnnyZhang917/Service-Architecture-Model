@@ -1,25 +1,24 @@
 package eu.pmsoft.sam.see
 
-import org.scalatest.Assertions
+import scala.concurrent.Await
+import scala.concurrent.duration._
 import org.testng.annotations.Test
+import com.google.inject.Key
+import org.slf4j.LoggerFactory
 import eu.pmsoft.see.api.data.architecture.SeeTestArchitecture
 import eu.pmsoft.see.api.data.impl._
 import eu.pmsoft.sam.model._
 import eu.pmsoft.see.api.data.architecture.contract.{TestInterfaceTwo0, TestInterfaceOne}
-import com.google.inject.Key
 import eu.pmsoft.see.api.data.impl.shopping.TestShoppingModule
 import eu.pmsoft.see.api.data.impl.courier.TestCourierServiceModule
 import eu.pmsoft.see.api.data.impl.store.TestStoreServiceModule
 import eu.pmsoft.see.api.data.architecture.contract.store.StoreServiceContract
 import eu.pmsoft.see.api.data.architecture.contract.courier.CourierServiceContract
 import eu.pmsoft.see.api.data.architecture.contract.shopping.ShoppingStoreWithCourierInteraction
-import org.slf4j.LoggerFactory
 import eu.pmsoft.see.api.data.architecture.service.{CourierService, StoreService}
 import eu.pmsoft.sam.execution.ServiceAction
-import scala.concurrent.Await
-import scala.concurrent.duration._
 
-class ServiceExecutionEnvironmentTest extends Assertions {
+class ServiceExecutionEnvironmentTest  {
 
   val logger = LoggerFactory.getLogger(this.getClass)
 
@@ -147,7 +146,7 @@ class ServiceExecutionEnvironmentTest extends Assertions {
       def executeInteraction(service: ShoppingStoreWithCourierInteraction): Integer = service.makeShoping()
     })
 
-    Await.result(shoppingPrice, 40 seconds)
+    Await.result(shoppingPrice, 4 seconds)
 
   }
 

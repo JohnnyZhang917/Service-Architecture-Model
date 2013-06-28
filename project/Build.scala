@@ -2,6 +2,7 @@ import sbt._
 import Keys._
 
 import de.johoop.testngplugin.Keys._
+import scalabuff.ScalaBuffPlugin._
 
 object InjectionBusBuild extends Build {
 
@@ -20,7 +21,7 @@ object InjectionBusBuild extends Build {
       "org.slf4j" % "slf4j-simple" % slf4jVersion % "test",
       "com.google.guava" % "guava" %  "14.0.1" % "test"
       )
-  )
+  ) ++ TestNGExecution ++ scalabuffSettings
 
   lazy val CommonSettings = Defaults.defaultSettings ++ Seq(
     organization := "eu.pmsoft.sam",
@@ -69,12 +70,14 @@ object InjectionBusBuild extends Build {
     core
     )
 
+
   lazy val infrastructure = Project(
     id = "infrastructure",
     base = file("infrastructure"),
-    settings =  InjectionBusSettings ++ TestNGExecution
-  ) dependsOn(
+    settings =  InjectionBusSettings
+  ).configs(ScalaBuff).dependsOn(
     core,model
     )
+
 
 }

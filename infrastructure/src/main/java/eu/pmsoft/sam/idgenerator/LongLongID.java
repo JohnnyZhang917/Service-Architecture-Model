@@ -32,4 +32,11 @@ public class LongLongID implements Serializable {
         return result;
     }
 
+    public long getMark() {
+        return mark;
+    }
+
+    public long getLinear() {
+        return linear;
+    }
 }

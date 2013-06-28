@@ -25,7 +25,7 @@ class NettyFutureApiTest {
   def testActionResultHandling() {
     val clientApi = NettyTransport.api()
     val address = new InetSocketAddress(9002)
-    val server = NettyTransport.createNettyServer(address)
+    val server = NettyTransport.createNettyServer(null:SamInjectionTransactionApi, address)
 
     val client = server.channel.map {
       serverReady => clientApi.getEnvironmentConnection("localhost",9002)

@@ -9,6 +9,7 @@ import eu.pmsoft.sam.model.SamServiceImplementationKey
 import eu.pmsoft.sam.model.SamServiceImplementation
 import eu.pmsoft.sam.execution.ServiceAction
 import scala.concurrent.Future
+import eu.pmsoft.sam.idgenerator.LongLongID
 
 object SamApi {
 
@@ -39,6 +40,8 @@ trait SamExecutionNodeApi {
 
 
 trait SamInjectionTransactionApi {
+
+  def openTransactionContext(url: ServiceInstanceURL) : Future[LongLongID]
 
   def getTransaction(configurationId: ServiceConfigurationID): InjectionTransactionAccessApi
 

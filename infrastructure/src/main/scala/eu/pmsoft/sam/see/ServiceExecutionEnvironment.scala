@@ -1,19 +1,22 @@
 package eu.pmsoft.sam.see
 
-import eu.pmsoft.sam.model._
+
+import scala.concurrent._
+import ExecutionContext.Implicits.global
+import scala.collection.mutable
 import com.google.inject._
+import org.slf4j.LoggerFactory
+import eu.pmsoft.sam.model._
 import eu.pmsoft.sam.model.ServiceInstanceID
 import eu.pmsoft.sam.model.SamServiceImplementation
 import eu.pmsoft.sam.model.SamServiceKey
 import eu.pmsoft.sam.model.SamService
 import eu.pmsoft.sam.model.SamServiceInstance
 import eu.pmsoft.sam.injection.{FreeBindingInjectionUtil, ExternalBindingController, ExtrenalBindingInfrastructureModule}
-import scala.collection.mutable
 import eu.pmsoft.sam.architecture.definition.SamArchitectureDefinition
 import eu.pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract
-import org.slf4j.LoggerFactory
 import eu.pmsoft.sam.execution.ServiceAction
-import scala.concurrent.Future
+import eu.pmsoft.sam.idgenerator.{LongLongIdGenerator, LongLongID}
 
 object ServiceExecutionEnvironment {
 
@@ -25,8 +28,7 @@ object ServiceExecutionEnvironment {
 class ServiceExecutionEnvironment(val configuration: SEEConfiguration) {
 
   private val status = new ServiceExecutionEnvironmentStatus(configuration.implementations, configuration.architectures)
-  private val server = new CanonicalTransportServer(configuration.port)
-  private val transport = new SamInjectionTransaction(status, server)
+  private val transport = new SamInjectionTransaction(status, configuration.port)
 
   val architectureManager: SamArchitectureManagementApi = new SamArchitectureManagement(status)
   val serviceRegistry: SamServiceRegistryApi = new SamServiceRegistry(status)
@@ -155,7 +157,7 @@ private class ServiceExecutionEnvironmentStatus(val implementations: Set[SamServ
         url
       }
     }
-    logger.trace("exposeServiceConfiguration {}, url: {}", configurationId, exposedUrl : Any )
+    logger.trace("exposeServiceConfiguration {}, url: {}", configurationId, exposedUrl: Any)
     exposedUrl
   }
 
@@ -170,21 +172,23 @@ private class ServiceExecutionEnvironmentStatus(val implementations: Set[SamServ
 }
 
 private class SamInjectionTransaction(
-                                          val status: ServiceExecutionEnvironmentStatus,
-                                          val server: CanonicalTransportServer
-                                          ) extends SamInjectionTransactionApi {
+                                       val status: ServiceExecutionEnvironmentStatus,
+                                       val port: Int
+                                       ) extends SamInjectionTransactionApi {
 
   val logger = LoggerFactory.getLogger(this.getClass)
+  val server: CanonicalTransportServer = new CanonicalTransportServer(this:SamInjectionTransactionApi, port)
+  val transactionIdGenerator = LongLongIdGenerator.createGenerator()
 
   private def createExecutionContext(tid: ServiceConfigurationID): InjectionTransactionContext = {
     val config = status.getConfigurations(tid)
-    val contextBuilder = CanonicalRecordingLayer(createExternalServiceConnections _, createLoopBackEndpoint _ )
+    val contextBuilder = CanonicalRecordingLayer(createExternalServiceConnections _, createLoopBackEndpoint _)
     val context = contextBuilder.createContext(config.configurationRoot)
     logger.trace("created context for configuration {}", config.configurationRoot)
     context
   }
 
-  private def createLoopBackEndpoint() : LoopBackExecutionPipe = {
+  private def createLoopBackEndpoint(): LoopBackExecutionPipe = {
     new TMPSlotExecutionPipe()
   }
 
@@ -195,7 +199,7 @@ private class SamInjectionTransaction(
 
   def createExternalServiceConnections(endpoints: Seq[ExternalServiceBind]): Seq[SlotExecutionPipe] = {
     val localConfig = status.getExposedServiceConfigurations
-    logger.debug("bind service {}",endpoints)
+    logger.debug("bind service {}", endpoints)
     val pipes = endpoints.map {
       case ExternalServiceBind(_, url) if localConfig.contains(url) => {
         val context = createExecutionContext(localConfig(url))
@@ -216,4 +220,12 @@ private class SamInjectionTransaction(
     val injectionExecutionContext = createExecutionContext(configurationId)
     ThreadExecutionModel.openTransactionThread(injectionExecutionContext).executeServiceAction(action)
   }
+
+  def openTransactionContext(url: ServiceInstanceURL): Future[LongLongID] = Future {
+    val tid = transactionIdGenerator.getNextID()
+    ???
+    tid
+  }
+
+
 }

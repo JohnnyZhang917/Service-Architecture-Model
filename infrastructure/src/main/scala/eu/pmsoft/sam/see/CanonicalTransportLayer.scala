@@ -9,9 +9,10 @@ import eu.pmsoft.sam.model._
 import java.util.concurrent.{TimeUnit, BlockingQueue, LinkedBlockingQueue}
 import scala.util.{Failure, Success}
 import eu.pmsoft.sam.see.netty.{NettyTransport, Result}
+import eu.pmsoft.sam.idgenerator.LongLongID
 
 object CanonicalTransportLayer {
-  def apply(port: Int) = new CanonicalTransportServer(port)
+
 }
 
 trait CanonicalProtocolCommunicationApi {
@@ -23,7 +24,10 @@ trait EnvironmentConnection {
 
   def ping: Future[Result]
 
-  def protocolAction(message : ThreadMessage) : Future[ThreadMessage]
+  def protocolAction(transactionId : LongLongID, message : ThreadMessage) : Future[ThreadMessage]
+
+  def openPipeTransaction(url : ServiceInstanceURL) : Future[LongLongID]
+
 }
 
 
@@ -74,28 +78,32 @@ trait ExecutionPipe {
 
 
 
-private[see] class CanonicalTransportServer(val port: Int) {
+private[see] class CanonicalTransportServer(val transactionApi: SamInjectionTransactionApi , val port: Int) {
   val logger = LoggerFactory.getLogger(this.getClass)
   val serverAddress = new InetSocketAddress(port)
-  val environmentServer = NettyTransport.createNettyServer(serverAddress)
+  val environmentServer = NettyTransport.createNettyServer(transactionApi,serverAddress)
 
   val transportApi = NettyTransport.api()
 
   def getExecutionPipe(url :  ServiceInstanceURL) : SlotExecutionPipe = {
-    new ExternalTransportPipeImplementation(transportApi.getEnvironmentConnection(url.url.getHost, url.url.getPort))
+    new ExternalTransportPipeImplementation(url,transportApi.getEnvironmentConnection(url.url.getHost, url.url.getPort))
   }
 }
 
 
-private class ExternalTransportPipeImplementation( connection : EnvironmentConnection ) extends SlotExecutionPipe with ExecutionPipe {
+private class ExternalTransportPipeImplementation( url :  ServiceInstanceURL, connection : EnvironmentConnection ) extends SlotExecutionPipe with ExecutionPipe {
+
+  val transactionPipeID : Future[LongLongID] = connection.openPipeTransaction(url)
 
   def openPipe(): ExecutionPipe = this
 
-  def transport(message: ThreadMessage): Future[ThreadMessage] = {
-    // TODO transactionID????
-    logger.debug("rooting sending message {}", message)
-    connection.protocolAction(message)
+  def transport(message: ThreadMessage): Future[ThreadMessage] = transactionPipeID flatMap {
+    tid => {
+      connection.protocolAction(tid,message)
+    }
   }
+
+
 }
 
 private class TMPSlotExecutionPipe extends LoopBackExecutionPipe with ExecutionPipe {
