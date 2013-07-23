@@ -1,6 +1,5 @@
 package eu.pmsoft.sam.see
 
-import eu.pmsoft.sam.model._
 import org.slf4j.LoggerFactory
 
 import eu.pmsoft.sam.model._
@@ -9,7 +8,7 @@ object TransactionClient {
 
 }
 
-private class InjectionTransactionRecordManager(val injectionConfiguration: InjectionConfigurationElement, transportProvider: Seq[ExternalServiceBind] => Seq[SlotExecutionPipe]) extends TransactionStatusFlow with InstanceRegistry {
+private class InjectionTransactionRecordManager(val injectionConfiguration: InjectionConfigurationElement, transportProvider: Seq[ExternalServiceBind] => Seq[ExecutionPipe]) extends TransactionStatusFlow with InstanceRegistry {
   private val logger = LoggerFactory.getLogger(this.getClass)
   private val externalBind = InjectionTransaction.getExternalBind(injectionConfiguration)
   val nrOfSlots = externalBind.size
@@ -27,7 +26,7 @@ private class InjectionTransactionRecordManager(val injectionConfiguration: Inje
 
   def nextInstanceNr(slotNr: Int): Int = transactionRecordStatus.slots(slotNr).instances.size
 
-  val recordingExecutionManager = new ExecutionStackManager(transportProvider(externalBind).map(_.openPipe()).toVector, this)
+  val recordingExecutionManager = new ExecutionStackManager(transportProvider(externalBind).toVector, this)
 
   def recordCall(slotNr: Int, call: CanonicalProtocolMethodCall) {
     recordingExecutionManager.pushMethodCall(ProtocolMethodCall(slotNr, call))
@@ -47,9 +46,9 @@ private class InjectionTransactionRecordManager(val injectionConfiguration: Inje
   def getInstanceReferenceToTransfer(slotNr: Int): Seq[CanonicalProtocolInstance] = {
     val startPosition = transactionRecordStatus.slots(slotNr).transferMark
     val slotInstance = transactionRecordStatus.slots(slotNr).instances.drop(startPosition).map(_.instance)
-    val toSend = slotInstance.filter( CanonicalProtocol.isClientInstance _)
+    val toSend = slotInstance.filter(CanonicalProtocol.isClientInstance _)
     transactionRecordStatus = transactionRecordStatus.updated(UpdateTransferMark(startPosition + toSend.size))(slotNr)
-    val toMerge =  getInstancetoMerge(slotNr)
+    val toMerge = getInstancetoMerge(slotNr)
     toSend ++ toMerge
   }
 

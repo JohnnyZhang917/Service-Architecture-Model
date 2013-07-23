@@ -39,7 +39,7 @@ public class ExternalBindingSwitch<T> implements InvocationHandler {
 
     public T getInternalInstance() {
         ExternalInstanceProvider externalProvider = providerExternalInstanceProvider.get();
-        T internalReference = externalProvider.getReference(slotNr,key, instanceReferenceNr);
+        T internalReference = externalProvider.getReference(slotNr, key, instanceReferenceNr);
         return internalReference;
     }
 }

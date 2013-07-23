@@ -1,12 +1,12 @@
 <suite name="CoreapiTest" verbose="2" thread-count="4">
     <test name="apiTest">
         <classes>
-            <class name="eu.pmsoft.sam.architecture.test.ArchitectureLoadingNegativeTest" />
-            <class name="eu.pmsoft.sam.architecture.test.ArchitectureLoadingPositiveTest" />
-            <class name="eu.pmsoft.see.api.TestServiceExecutionCreationByStep" />
-            <class name="eu.pmsoft.sam.idgenerator.IdGenerationTest" />
-            <class name="eu.pmsoft.sam.see.NettyFutureApiTest" />
-            <class name="eu.pmsoft.sam.see.ServiceExecutionEnvironmentTest" />
+            <class name="eu.pmsoft.sam.architecture.test.ArchitectureLoadingNegativeTest"/>
+            <class name="eu.pmsoft.sam.architecture.test.ArchitectureLoadingPositiveTest"/>
+            <class name="eu.pmsoft.see.api.TestServiceExecutionCreationByStep"/>
+            <class name="eu.pmsoft.sam.idgenerator.IdGenerationTest"/>
+            <class name="eu.pmsoft.sam.see.NettyFutureApiTest"/>
+            <class name="eu.pmsoft.sam.see.ServiceExecutionEnvironmentTest"/>
         </classes>
     </test>
 </suite>

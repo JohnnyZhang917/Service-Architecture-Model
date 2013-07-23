@@ -17,14 +17,14 @@ public abstract class AbstractSamServiceImplementationDefinition<T extends SamSe
     @Override
     public final void loadServiceImplementationDefinition(SamServiceImplementationDefinitionLoader loader) {
         try {
-            this.definitionLoader = loader.signature(serviceContract,implementationModule);
+            this.definitionLoader = loader.signature(serviceContract, implementationModule);
             implementationDefinition();
         } finally {
             this.definitionLoader = null;
         }
     }
 
-    protected void implementationDefinition(){
+    protected void implementationDefinition() {
 
     }
 

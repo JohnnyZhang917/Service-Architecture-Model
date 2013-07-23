@@ -1,57 +1,40 @@
 package eu.pmsoft.sam.see.netty
 
-import eu.pmsoft.sam.see.{SamInjectionTransactionApi, EnvironmentConnection, CanonicalProtocolCommunicationApi, ThreadMessage}
+import scala.util._
+import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future, Promise}
-import io.netty.channel._
-import scala.util.Try
 import ExecutionContext.Implicits.global
 import java.util.concurrent.{ConcurrentHashMap, CancellationException}
+import java.io.{ByteArrayOutputStream, IOException, ObjectOutputStream, ObjectInputStream}
+import java.net.InetSocketAddress
+import io.netty.channel._
 import io.netty.bootstrap.{ServerBootstrap, Bootstrap}
 import io.netty.channel.socket.nio.{NioServerSocketChannel, NioSocketChannel}
 import io.netty.channel.socket.SocketChannel
-import io.netty.handler.logging.{LogLevel, LoggingHandler}
 import io.netty.channel.nio.NioEventLoopGroup
-import eu.pmsoft.sam.see.netty.NettyFutureTranslation._
 import io.netty.handler.codec.serialization.{ClassResolvers, ObjectDecoder, ObjectEncoder}
+import io.netty.handler.logging.{LogLevel, LoggingHandler}
 import org.slf4j.LoggerFactory
-import eu.pmsoft.sam.idgenerator.{LongLongID, LongLongIdGenerator}
-import scala.collection.mutable
-import java.net.InetSocketAddress
-import eu.pmsoft.sam.model._
-import eu.pmsoft.sam.model.CanonicalProtocolMethodCallProto.CallType
-import eu.pmsoft.sam.model.CanonicalProtocolInstanceProto.InstanceType
 import com.google.inject.Key
-import java.io._
 import com.google.protobuf.ByteString
-import eu.pmsoft.sam.model.ClientFilledDataInstance
-import eu.pmsoft.sam.model.ClientDataInstance
-import scala.util.Failure
-import eu.pmsoft.sam.model.InterfaceMethodCall
-import scala.Some
-import eu.pmsoft.sam.model.ServerReturnBindingKeyInstance
-import scala.util.Success
-import eu.pmsoft.sam.model.ClientPendingDataInstance
-import eu.pmsoft.sam.model.ServerExternalInstanceBinding
-import eu.pmsoft.sam.model.VoidMethodCall
-import eu.pmsoft.sam.model.ServerBindingKeyInstance
-import eu.pmsoft.sam.model.ServerDataInstance
-import eu.pmsoft.sam.model.ClientExternalInstanceBinding
-import eu.pmsoft.sam.model.ServerPendingDataInstance
-import eu.pmsoft.sam.model.ServerFilledDataInstance
-import eu.pmsoft.sam.model.ReturnMethodCall
-import eu.pmsoft.sam.model.ClientBindingKeyInstance
-import eu.pmsoft.sam.model.ClientReturnBindingKeyInstance
+import eu.pmsoft.sam.see.netty.NettyFutureTranslation._
+import eu.pmsoft.sam.see._
+import eu.pmsoft.sam.idgenerator.{LongLongIdGenerator, LongLongID}
+import eu.pmsoft.sam.model._
+import eu.pmsoft.sam.model.CanonicalProtocolInstanceProto.InstanceType
+import eu.pmsoft.sam.model.CanonicalProtocolMethodCallProto.CallType
+
 
 object NettyTransport {
 
-  def createNettyServer(transactionApi: SamInjectionTransactionApi,address: InetSocketAddress) = new NettyCanonicalProtocolServer(transactionApi,address)
+  def createNettyServer(transactionApi: SamInjectionTransaction, address: InetSocketAddress) = new NettyCanonicalProtocolServer(transactionApi, address)
 
   def api(): CanonicalProtocolCommunicationApi = new NettyCanonicalProtocolCommunicationApi()
 
 }
 
 
-class NettyCanonicalProtocolServer(transactionApi: SamInjectionTransactionApi, address: InetSocketAddress) {
+class NettyCanonicalProtocolServer(transactionApi: SamInjectionTransaction, address: InetSocketAddress) {
   val logger = LoggerFactory.getLogger(this.getClass)
   val server = new ServerBootstrap()
   server
@@ -159,21 +142,21 @@ private class NettyEnvironmentConnection(val host: String, val port: Int) extend
   }
 
   def protocolAction(transactionId: LongLongID, message: ThreadMessage): Future[ThreadMessage] = connection.flatMap {
-    c => c.send[ProtocolMessageAction, ProtocolMessageResult](ProtocolMessageAction(translateToProto(transactionId,message)))
+    c => c.send[ProtocolMessageAction, ProtocolMessageResult](ProtocolMessageAction(translateToProto(transactionId, message)))
   }.map {
     response => translateFromProto(response.message)
   }
 
   def openPipeTransaction(url: ServiceInstanceURL): Future[LongLongID] = connection.flatMap {
-    c => c.send[OpenTransactionAction,OpenTransactionResult](OpenTransactionAction(url))
+    c => c.send[OpenTransactionAction, OpenTransactionResult](OpenTransactionAction(url))
   }.map {
     response => response.id
   }
 
 
-  private def translateToProto(transactionId: LongLongID,message: ThreadMessage): CanonicalRequestProto = {
-    def idMapper(llid : LongLongID) : LongLongIDProto = {
-      LongLongIDProto(llid.getMark,llid.getLinear)
+  private def translateToProto(transactionId: LongLongID, message: ThreadMessage): CanonicalRequestProto = {
+    def idMapper(llid: LongLongID): LongLongIDProto = {
+      LongLongIDProto(llid.getMark, llid.getLinear)
     }
     def keyMapper(key: Key[_]): BindingKey = {
       BindingKey(
@@ -190,7 +173,7 @@ private class NettyEnvironmentConnection(val host: String, val port: Int) extend
         out.writeObject(serializable)
         ByteString.copyFrom(bos.toByteArray)
       } catch {
-        case e : Throwable => ???
+        case e: Throwable => ???
       } finally {
         out.close()
         bos.close()
@@ -222,7 +205,7 @@ private class NettyEnvironmentConnection(val host: String, val port: Int) extend
             case ServerDataInstance(instanceNr, key, data) => CanonicalProtocolInstanceProto(instanceNr, InstanceType.SERVER_DATA_INSTANCE, keyMapper(key), Some(dataMapper(data)))
           }
         }
-        CanonicalRequestProto(idMapper(transactionId),protocalls.toVector, protoInstances.toVector, data.closeThread)
+        CanonicalRequestProto(idMapper(transactionId), protocalls.toVector, protoInstances.toVector, data.closeThread)
       }
     }
   }
@@ -233,6 +216,8 @@ private class NettyEnvironmentConnection(val host: String, val port: Int) extend
 abstract sealed class Action[R <: Result]
 
 abstract sealed class Result
+
+case class ExceptionResult(exception: Throwable) extends Result
 
 case class PingAction() extends Action[PingResult]
 
@@ -266,7 +251,7 @@ case class ProtocolMessageResult(var message: CanonicalRequestProto) extends Res
 
 case class OpenTransactionAction(url: ServiceInstanceURL) extends Action[OpenTransactionResult]
 
-case class OpenTransactionResult(id : LongLongID) extends Result
+case class OpenTransactionResult(id: LongLongID) extends Result
 
 private case class Request(a: Action[_ <: Result], id: LongLongID)
 
@@ -330,17 +315,19 @@ private class NettyClientHandler extends ChannelInboundHandlerAdapter {
   private def receiveMsg(ctx: ChannelHandlerContext, message: Response) {
     val toMerge = resultsMap.remove(message.id)
     assert(toMerge != null)
-    toMerge success message
+    message.r match {
+      case ExceptionResult(e) => toMerge failure e
+      case _ => toMerge success message
+    }
   }
 }
 
-private class NettyServerHandler(val transactionApi: SamInjectionTransactionApi) extends ChannelInboundHandlerAdapter {
+private class NettyServerHandler(val transactionApi: SamInjectionTransaction) extends ChannelInboundHandlerAdapter {
   val logger = LoggerFactory.getLogger(this.getClass)
 
   override def messageReceived(ctx: ChannelHandlerContext, msgs: MessageList[AnyRef]) {
     val requestMsgs = msgs.cast[Request]()
     import scala.collection.JavaConversions._
-    logger.debug("server receive ")
     requestMsgs.foreach(m => handleSingleMessage(ctx, m))
     msgs.releaseAllAndRecycle()
   }
@@ -353,15 +340,29 @@ private class NettyServerHandler(val transactionApi: SamInjectionTransactionApi)
 
   private def handleSingleMessage(ctx: ChannelHandlerContext, msg: Request) {
     val action = msg.a
-    action match {
-      case PingAction() => ctx.write(Response(PingResult(), msg.id))
-      case ProtocolMessageAction(canonicalMessage) => {
-        val tid = mapID(canonicalMessage.`transactionID`)
+    try {
+      action match {
+        case PingAction() => ctx.write(Response(PingResult(), msg.id))
+        case ProtocolMessageAction(canonicalMessage) => {
+          val tid = mapID(canonicalMessage.`transactionID`)
+          ???
+        }
+        case OpenTransactionAction(url) => {
+          val tid = transactionApi.openTransactionContext(url)
+          tid.flatMap {
+            id => ctx.write(Response(OpenTransactionResult(id), msg.id))
+          } recover {
+            case e: Throwable => ctx.write(Response(ExceptionResult(e), msg.id))
+          }
+        }
       }
-      case OpenTransactionAction(url) => transactionApi.openTransactionContext(url)
+    } catch {
+      case e: Throwable => {
+        ctx.write(Response(ExceptionResult(e), msg.id))
+      }
     }
   }
 
-  private def mapID(idProto : LongLongIDProto) : LongLongID = new LongLongID(idProto.`mask`,idProto.`linear`)
+  private def mapID(idProto: LongLongIDProto): LongLongID = new LongLongID(idProto.`mask`, idProto.`linear`)
 
 }

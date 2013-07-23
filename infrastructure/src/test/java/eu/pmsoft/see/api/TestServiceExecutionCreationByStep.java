@@ -1,8 +1,8 @@
 package eu.pmsoft.see.api;
 
-import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.Module;
+import eu.pmsoft.sam.execution.ServiceAction;
 import eu.pmsoft.sam.model.*;
 import eu.pmsoft.sam.see.*;
 import eu.pmsoft.see.api.data.architecture.SeeTestArchitecture;
@@ -17,12 +17,13 @@ import org.testng.ITestContext;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
-import scala.None$;
-import scala.Option;
-import scala.Option$;
 import scala.collection.immutable.Set;
+import scala.concurrent.Await;
+import scala.concurrent.Future;
+import scala.concurrent.duration.Duration;
 
 import javax.inject.Inject;
+import java.util.concurrent.TimeUnit;
 
 import static org.testng.Assert.*;
 
@@ -59,15 +60,15 @@ public class TestServiceExecutionCreationByStep {
         };
     }
 
-    @Test(dataProvider = "registeredImplementations", groups = "architectureLoadCheck" )
+    @Test(dataProvider = "registeredImplementations", groups = "architectureLoadCheck")
     public void testLoadOfImplementations(Class<? extends Module> serviceKey) {
         SamServiceImplementationKey implementationKey = SamModelBuilder.implementationKey(serviceKey);
         SamServiceImplementation registered = samServiceRegistryApi.getImplementation(implementationKey);
         assertNotNull(registered);
     }
 
-    @Test(dataProvider = "registeredImplementations", groups = "architectureLoadCheck" )
-    public void testServiceInstanceCreation(Class<? extends Module> implementationModule)  {
+    @Test(dataProvider = "registeredImplementations", groups = "architectureLoadCheck")
+    public void testServiceInstanceCreation(Class<? extends Module> implementationModule) {
         SamServiceImplementationKey key = SamModelBuilder.implementationKey(implementationModule);
         SamServiceInstance serviceInstance = executionNode.createServiceInstance(key);
         assertNotNull(serviceInstance);
@@ -104,7 +105,7 @@ public class TestServiceExecutionCreationByStep {
         assertNotNull(elementOne);
         assertEquals(one.implementation().contract(), elementOne.contract().id());
 
-        InjectionConfigurationElement[] bindings = {elementOne,elementZero};
+        InjectionConfigurationElement[] bindings = {elementOne, elementZero};
         InjectionConfigurationElement elementTwo = InjectionConfigurationBuilder.complexInstanceBind(architectureManager, two, bindings);
         assertNotNull(elementTwo);
         assertEquals(two.implementation().contract(), elementTwo.contract().id());
@@ -126,7 +127,7 @@ public class TestServiceExecutionCreationByStep {
         SamService serviceZero = architectureManager.getService(zero.implementation().contract());
         InjectionConfigurationElement externalZero = InjectionConfigurationBuilder.externalServiceBind(serviceZero, zeroURL);
 
-        InjectionConfigurationElement[] externalBindings = {externalZero,externalOne};
+        InjectionConfigurationElement[] externalBindings = {externalZero, externalOne};
         InjectionConfigurationElement elementTwoRemote = InjectionConfigurationBuilder.complexInstanceBind(architectureManager, two, externalBindings);
         assertNotNull(elementTwoRemote);
         assertEquals(two.implementation().contract(), elementTwoRemote.contract().id());
@@ -138,38 +139,41 @@ public class TestServiceExecutionCreationByStep {
 
     private ServiceConfigurationID setupAndCheckTransactionRegistration(InjectionConfigurationElement element) {
         ServiceConfigurationID serviceConfigurationID = executionNode.registerInjectionConfiguration(element);
-        InjectionTransactionAccessApi transactionRegistered = transactionApi.getTransaction(serviceConfigurationID);
-        assertNotNull(transactionRegistered);
         return serviceConfigurationID;
     }
 
-    public void testInjectionTransactionExecutionForServiceOne(ServiceConfigurationID transactionOne){
-        InjectionTransactionAccessApi transaction = transactionApi.getTransaction(transactionOne);
-
+    public void testInjectionTransactionExecutionForServiceOne(ServiceConfigurationID transactionOne) {
         Key<TestInterfaceOne> interfaceOneKey = Key.get(TestInterfaceOne.class);
-        Injector injector = transaction.getTransactionInjector();
-        assertNotNull(injector);
-        assertNotNull(injector.getExistingBinding(interfaceOneKey));
-        // no transaction controller because this is a single local instance
-        TestInterfaceOne instanceOne = injector.getInstance(interfaceOneKey);
-        assertTrue(instanceOne.runTest());
+        Future<Boolean> booleanFuture = transactionApi.executeServiceAction(transactionOne, new ServiceAction<Boolean, TestInterfaceOne>(interfaceOneKey) {
+            @Override
+            public Boolean executeInteraction(TestInterfaceOne service) {
+                return service.runTest();
+            }
+        });
+        Boolean result = false;
+        try {
+            result = Await.<Boolean>result(booleanFuture, Duration.apply(2, TimeUnit.SECONDS));
+        } catch (Exception e) {
 
+        }
+        assertTrue(result);
     }
 
     public void testInjectionTransactionExecutionForServiceTwo(ServiceConfigurationID transactionURL) {
-        Key<TestInterfaceOne> interfaceOneKey = Key.get(TestInterfaceOne.class);
         Key<TestInterfaceTwo0> interfaceTwoKey = Key.get(TestInterfaceTwo0.class);
-        InjectionTransactionAccessApi transaction = transactionApi.getTransaction(transactionURL);
-        Injector injector = transaction.getTransactionInjector();
+        Future<Boolean> booleanFuture = transactionApi.executeServiceAction(transactionURL, new ServiceAction<Boolean, TestInterfaceTwo0>(interfaceTwoKey) {
+            @Override
+            public Boolean executeInteraction(TestInterfaceTwo0 service) {
+                return service.runTest();
+            }
+        });
+        Boolean result = false;
+        try {
+            result = Await.<Boolean>result(booleanFuture, Duration.apply(2, TimeUnit.SECONDS));
+        } catch (Exception e) {
 
-        assertNotNull(injector);
-        assertNotNull(injector.getExistingBinding(interfaceTwoKey));
-        assertNull(injector.getExistingBinding(interfaceOneKey));
-
-        transaction.bindTransaction(Option.<TransportAbstraction>empty());
-        TestInterfaceTwo0 instanceTwo = injector.getInstance(interfaceTwoKey);
-        assertTrue(instanceTwo.runTest());
-        transaction.unBindTransaction();
+        }
+        assertTrue(result);
     }
 
 }

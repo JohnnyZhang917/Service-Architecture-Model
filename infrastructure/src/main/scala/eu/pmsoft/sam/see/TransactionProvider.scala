@@ -12,11 +12,13 @@ private class TransactionExecutionManager(headInjector: Injector, val returnLoop
   private val logger = LoggerFactory.getLogger(this.getClass)
   private var transactionStatus: InstanceRegistryStatus = InstanceRegistryStatus(Vector(InstanceRegistrySlotStatus()))
 
-  val returnLoopInstanceProvider: RecordEmbroider = new SlotRecordEmbroider(0, new ServerCanonicalInstanceCreationSchema( { () => nextInstanceNr(0)}), this)
+  val returnLoopInstanceProvider: RecordEmbroider = new SlotRecordEmbroider(0, new ServerCanonicalInstanceCreationSchema({
+    () => nextInstanceNr(0)
+  }), this)
 
   def nextInstanceNr(slotNr: Int): Int = transactionStatus.slots(slotNr).instances.size
 
-  val executionManager = new ExecutionStackManager(Vector(returnLoopPipe.openPipe()), this)
+  val executionManager = new ExecutionStackManager(Vector(returnLoopPipe), this)
 
   def recordCall(slotNr: Int, call: CanonicalProtocolMethodCall) {
     executionManager.pushMethodCall(ProtocolMethodCall(slotNr, call))
@@ -36,11 +38,12 @@ private class TransactionExecutionManager(headInjector: Injector, val returnLoop
   def getInstanceReferenceToTransfer(slotNr: Int): Seq[CanonicalProtocolInstance] = {
     val startPosition = transactionStatus.slots(slotNr).transferMark
     val slotInstance = transactionStatus.slots(slotNr).instances.drop(startPosition).map(_.instance)
-    val toSend = slotInstance.filter( CanonicalProtocol.isServerInstance _ )
+    val toSend = slotInstance.filter(CanonicalProtocol.isServerInstance _)
     transactionStatus = transactionStatus.updated(UpdateTransferMark(startPosition + slotInstance.size))(slotNr)
     val total = toSend ++ getInstancetoMerge(slotNr)
     total
   }
+
   def getInstancetoMerge(slotNr: Int): Seq[CanonicalProtocolInstance] = {
     val startPosition = transactionStatus.slots(slotNr).mergeMark
     val slotInstance = transactionStatus.slots(slotNr).instances.drop(startPosition).map(_.instance)
@@ -98,16 +101,16 @@ private class TransactionExecutionManager(headInjector: Injector, val returnLoop
 
 }
 
-private class ServerCanonicalInstanceCreationSchema(val next :  () => Int  ) extends CanonicalInstanceCreationSchema{
+private class ServerCanonicalInstanceCreationSchema(val next: () => Int) extends CanonicalInstanceCreationSchema {
 
 
-  def keyBinding(key: Key[_]): CanonicalProtocolInstance = ServerBindingKeyInstance(next(),key)
+  def keyBinding(key: Key[_]): CanonicalProtocolInstance = ServerBindingKeyInstance(next(), key)
 
-  def externalBinding(key: Key[_]): CanonicalProtocolInstance = ServerExternalInstanceBinding(next(),key)
+  def externalBinding(key: Key[_]): CanonicalProtocolInstance = ServerExternalInstanceBinding(next(), key)
 
-  def dataBinding(key: Key[_], ref: java.io.Serializable): CanonicalProtocolInstance = ServerDataInstance(next(),key,ref)
+  def dataBinding(key: Key[_], ref: java.io.Serializable): CanonicalProtocolInstance = ServerDataInstance(next(), key, ref)
 
-  def returnBind(key: Key[_]): CanonicalProtocolInstance = ServerReturnBindingKeyInstance(next(),key)
+  def returnBind(key: Key[_]): CanonicalProtocolInstance = ServerReturnBindingKeyInstance(next(), key)
 
-  def pendingBind(key: Key[_]): CanonicalProtocolInstance = ServerPendingDataInstance(next(),key)
+  def pendingBind(key: Key[_]): CanonicalProtocolInstance = ServerPendingDataInstance(next(), key)
 }

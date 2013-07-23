@@ -10,7 +10,8 @@ import eu.pmsoft.sam.model.SamModelBuilder;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import static org.testng.AssertJUnit.*;
+import static org.testng.AssertJUnit.assertNotNull;
+import static org.testng.AssertJUnit.assertTrue;
 
 public class ArchitectureLoadingPositiveTest {
 

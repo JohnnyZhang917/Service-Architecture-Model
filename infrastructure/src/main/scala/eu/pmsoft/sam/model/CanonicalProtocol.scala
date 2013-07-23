@@ -72,10 +72,10 @@ case class ServerDataInstance(override val instanceNr: Int, override val key: Ke
 
 
 abstract sealed class CanonicalProtocolMethodCall(
-                                          val instanceNr: Int,
-                                          val methodSignature: Int,
-                                          val arguments: Array[Int],
-                                          val returnInstance: Option[Int]) {
+                                                   val instanceNr: Int,
+                                                   val methodSignature: Int,
+                                                   val arguments: Array[Int],
+                                                   val returnInstance: Option[Int]) {
 
   def toCallString = s"$instanceNr.${methodSignature}(${arguments.mkString(",")}):#$returnInstance"
 

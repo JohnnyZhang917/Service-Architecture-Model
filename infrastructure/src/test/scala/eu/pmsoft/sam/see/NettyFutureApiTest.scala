@@ -25,10 +25,10 @@ class NettyFutureApiTest {
   def testActionResultHandling() {
     val clientApi = NettyTransport.api()
     val address = new InetSocketAddress(9002)
-    val server = NettyTransport.createNettyServer(null:SamInjectionTransactionApi, address)
+    val server = NettyTransport.createNettyServer(null: SamInjectionTransaction, address)
 
     val client = server.channel.map {
-      serverReady => clientApi.getEnvironmentConnection("localhost",9002)
+      serverReady => clientApi.getEnvironmentConnection("localhost", 9002)
     }
 
     val testResult = client.flatMap {
@@ -40,7 +40,7 @@ class NettyFutureApiTest {
       }
     }
 
-    assert(Await.result(testResult,3 seconds))
+    assert(Await.result(testResult, 3 seconds))
   }
 
 
@@ -51,7 +51,7 @@ class NettyFutureApiTest {
     val clientGroup: NioEventLoopGroup = new NioEventLoopGroup()
     val port = 9001
     val address = new InetSocketAddress(port)
-    val serverChannelFuture = createServer(address , bossGroup, workerGroup)
+    val serverChannelFuture = createServer(address, bossGroup, workerGroup)
     val closeServerFuture = serverChannelFuture.flatMap {
       channel => channel.closeFuture()
     }
@@ -64,7 +64,7 @@ class NettyFutureApiTest {
 
     val clientChannelFuture = serverChannelFuture.flatMap {
       serverReady => {
-        createClient(clientGroup,port)
+        createClient(clientGroup, port)
       }
     }
     val closeClientFuture = clientChannelFuture.flatMap {
@@ -90,7 +90,7 @@ class NettyFutureApiTest {
     Await.result(allClosed, 30 seconds)
   }
 
-  def createClient(group: EventLoopGroup, connectTo : Int) = {
+  def createClient(group: EventLoopGroup, connectTo: Int) = {
     val b = new Bootstrap()
     b.group(group)
       .channel(classOf[NioSocketChannel])
@@ -104,10 +104,10 @@ class NettyFutureApiTest {
       }
     })
 
-    NettyFutureTranslation.futureFromNetty(b.connect("localhost",connectTo))
+    NettyFutureTranslation.futureFromNetty(b.connect("localhost", connectTo))
   }
 
-  def createServer(port: InetSocketAddress, bossGroup: NioEventLoopGroup, workerGroup: NioEventLoopGroup) =  {
+  def createServer(port: InetSocketAddress, bossGroup: NioEventLoopGroup, workerGroup: NioEventLoopGroup) = {
     val server = new ServerBootstrap()
 
     server
@@ -125,7 +125,6 @@ class NettyFutureApiTest {
     })
     NettyFutureTranslation.futureFromNetty(server.bind(port))
   }
-
 
 
 }
@@ -163,7 +162,7 @@ class TestEchoClientHandler(firstMessageSize: Int) extends ChannelInboundHandler
   override def messageReceived(ctx: ChannelHandlerContext, msgs: MessageList[AnyRef]) {
     logger.debug("debug received ")
     counter = counter - 1
-    if( counter < 0) {
+    if (counter < 0) {
       ctx.close()
     } else {
       ctx.write(msgs)

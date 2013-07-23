@@ -9,6 +9,7 @@ public class IdFactorialGenerator {
 
     private static AtomicInteger nextPrimeNumber = new AtomicInteger();
     private static final int[] commonPrimes = new int[numberOfCommonPrimes];
+
     static {
         for (int i = 0; i < numberOfCommonPrimes; i++) {
             commonPrimes[i] = Sieve$.MODULE$.primeNumber(nextPrimeNumber.getAndAdd(1));
@@ -20,11 +21,12 @@ public class IdFactorialGenerator {
     private long[] factors = new long[64];
     private long id;
 
-    public synchronized static IdFactorialGenerator createGenerator(){
+    public synchronized static IdFactorialGenerator createGenerator() {
         return new IdFactorialGenerator();
     }
-    private IdFactorialGenerator(){
-        usedSlots = numberOfCommonPrimes +1;
+
+    private IdFactorialGenerator() {
+        usedSlots = numberOfCommonPrimes + 1;
         for (int i = 0; i < numberOfCommonPrimes; i++) {
             primes[i] = commonPrimes[i];
             factors[i] = 1;
@@ -35,27 +37,27 @@ public class IdFactorialGenerator {
     }
 
     public long[] getConfig() {
-        return Arrays.copyOf(primes,64);
+        return Arrays.copyOf(primes, 64);
     }
 
-    public long nextId(){
+    public long nextId() {
         for (int factorToUpdate = 0; factorToUpdate < 64; factorToUpdate++) {
-            if(factorToUpdate == usedSlots) {
+            if (factorToUpdate == usedSlots) {
                 factors[factorToUpdate] = 1;
                 primes[factorToUpdate] = Sieve$.MODULE$.primeNumber(nextPrimeNumber.getAndAdd(1));
                 usedSlots++;
             }
             long primeToExtend = primes[factorToUpdate];
-            if( primeToExtend < Long.MAX_VALUE / id) {
+            if (primeToExtend < Long.MAX_VALUE / id) {
                 // id * primeToExtend < Long.MAX_VALUE
-                factors[factorToUpdate] = factors[factorToUpdate]*primeToExtend;
-                id = id*primeToExtend;
+                factors[factorToUpdate] = factors[factorToUpdate] * primeToExtend;
+                id = id * primeToExtend;
                 return id;
             } else {
                 factors[factorToUpdate] = 1;
                 id = 1;
                 for (int i = 0; i < usedSlots; i++) {
-                    id = id*factors[i];
+                    id = id * factors[i];
                 }
             }
         }

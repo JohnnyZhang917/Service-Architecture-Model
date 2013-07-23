@@ -1,18 +1,29 @@
 package eu.pmsoft.sam.see
 
 import scala.concurrent._
-import ExecutionContext.Implicits.global
 import eu.pmsoft.sam.execution.ServiceAction
 import org.slf4j.LoggerFactory
+import scala.util.{Failure, Success}
+import java.util.concurrent.Executors
 
 
 object ThreadExecutionModel {
   def openTransactionThread(context: InjectionTransactionContext) = new TransactionThreadStatus(context)
+
+}
+
+private object ThreadExecutionContext {
+  implicit lazy val possibleBlockingExecutor: ExecutionContextExecutor = {
+    val service = Executors.newCachedThreadPool()
+    ExecutionContext.fromExecutorService(service)
+  }
 }
 
 
 class TransactionThreadStatus(context: InjectionTransactionContext) {
   private val logger = LoggerFactory.getLogger(this.getClass)
+
+  import ThreadExecutionContext._
 
   def executeServiceAction[R, T](action: ServiceAction[R, T]): Future[R] = {
     Future {
@@ -25,11 +36,18 @@ class TransactionThreadStatus(context: InjectionTransactionContext) {
   }
 
   def executeCanonicalProtocolMessage(clientTransport: TransportAbstraction): Future[Unit] = {
-    clientTransport.receive().map {
+    logger.trace("execution on transaction thread starting on client receive")
+    val process = clientTransport.receive().map {
       rootMessage => {
         try {
           logger.trace("pre bind")
           context.bindTransaction(Option(clientTransport))
+
+          logger.trace("execute call")
+          val rootResponse = context.protocolExecution(rootMessage)
+          logger.trace("execution done")
+          context.unBindTransaction
+          rootResponse
         } catch {
           case e: Throwable => {
             e.printStackTrace()
@@ -38,15 +56,20 @@ class TransactionThreadStatus(context: InjectionTransactionContext) {
         } finally {
           logger.trace("post bind")
         }
-        logger.trace("execute call")
-        val rootResponse = context.protocolExecution(rootMessage)
-        logger.trace("execution done")
-        context.unBindTransaction
-        rootResponse
+      }
+    }.flatMap {
+      response => clientTransport.send(response)
+    }
+    process.onComplete {
+      case Success(r) => {
+        logger.trace("external bind success")
+      }
+      case Failure(t) => {
+        logger.trace("external bind failed")
+        t.printStackTrace()
       }
     }
-  }.flatMap {
-    response => clientTransport.send(response)
+    process
   }
 }
 

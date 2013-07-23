@@ -5,7 +5,6 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.testng.annotations.Test;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.verify;
 
 public class SamServiceDefinitionTest {
@@ -29,7 +28,7 @@ public class SamServiceDefinitionTest {
     @Test
     public void testServiceDefinitionReader() {
         SamServiceDefinitionLoader loader = Mockito.mock(SamServiceDefinitionLoader.class);
-        SamServiceDefinitionLoader.SamServiceDefinitionInterfacesLoader lmock= Mockito.mock(SamServiceDefinitionLoader.SamServiceDefinitionInterfacesLoader.class);
+        SamServiceDefinitionLoader.SamServiceDefinitionInterfacesLoader lmock = Mockito.mock(SamServiceDefinitionLoader.SamServiceDefinitionInterfacesLoader.class);
         Mockito.when(loader.definedIn(Matchers.<Class<? extends SamServiceDefinition>>any())).thenReturn(lmock);
         TestServiceDefinition definition = new TestServiceDefinition();
         definition.loadServiceDefinition(loader);

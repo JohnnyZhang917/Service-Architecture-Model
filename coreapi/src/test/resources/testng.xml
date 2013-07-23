@@ -1,8 +1,8 @@
 <suite name="CoreapiTest" verbose="2" thread-count="4">
     <test name="apiTest">
         <classes>
-            <class name="eu.pmsoft.sam.definition.instance.SamImplementationTest" />
-            <class name="eu.pmsoft.sam.definition.service.SamServiceDefinitionTest" />
+            <class name="eu.pmsoft.sam.definition.instance.SamImplementationTest"/>
+            <class name="eu.pmsoft.sam.definition.service.SamServiceDefinitionTest"/>
         </classes>
     </test>
 </suite>

@@ -157,7 +157,7 @@ private class ExecutionStackManager(val pipes: Vector[ExecutionPipe], val instan
                 }
                 val finishData = CanonicalRequest(instanceRegistry.getInstanceReferenceToTransfer(currentStack.waitingSlotNr), Seq(), true)
                 val finishMessage = ThreadMessage(Some(finishData))
-                logger.trace("sending finish message to slot {}",currentStack.waitingSlotNr)
+                logger.trace("sending finish message to slot {}", currentStack.waitingSlotNr)
                 pipe.sendMessage(finishMessage)
               }
             }

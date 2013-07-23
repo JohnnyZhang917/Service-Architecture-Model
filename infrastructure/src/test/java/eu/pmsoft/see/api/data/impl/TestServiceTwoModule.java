@@ -32,7 +32,6 @@ public class TestServiceTwoModule extends AbstractModule {
         }
 
 
-
     }
 
     static public class TestInterfaceTwo1Impl implements TestInterfaceTwo1 {

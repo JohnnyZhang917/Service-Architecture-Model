@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory
 
 object CanonicalRecordingLayer {
 
-  def apply(transportProvider: Seq[ExternalServiceBind] => Seq[SlotExecutionPipe], returnLoopPipe: () => LoopBackExecutionPipe) = new CanonicalRecordingLayer(transportProvider, returnLoopPipe)
+  def apply(transportProvider: Seq[ExternalServiceBind] => Seq[ExecutionPipe], returnLoopPipe: () => LoopBackExecutionPipe) = new CanonicalRecordingLayer(transportProvider, returnLoopPipe)
 
 }
 
@@ -40,9 +40,9 @@ trait RecordEmbroider {
 }
 
 
-class CanonicalRecordingLayer(transportProvider: Seq[ExternalServiceBind] => Seq[SlotExecutionPipe], returnLoopPipe: () => LoopBackExecutionPipe) {
+class CanonicalRecordingLayer(transportProvider: Seq[ExternalServiceBind] => Seq[ExecutionPipe], returnLoopPipe: () => LoopBackExecutionPipe) {
 
-  def createContext(injectionConfiguration: InjectionConfigurationElement) = {
+  def createContext(injectionConfiguration: InjectionConfigurationElement): InjectionTransactionContext = {
     new InjectionTransactionContext(injectionConfiguration, transportProvider, returnLoopPipe)
   }
 
@@ -50,7 +50,7 @@ class CanonicalRecordingLayer(transportProvider: Seq[ExternalServiceBind] => Seq
 
 
 class InjectionTransactionContext(injectionConfiguration: InjectionConfigurationElement,
-                                  transportProvider: Seq[ExternalServiceBind] => Seq[SlotExecutionPipe],
+                                  transportProvider: Seq[ExternalServiceBind] => Seq[ExecutionPipe],
                                   returnLoopPipe: () => LoopBackExecutionPipe) extends InjectionTransactionAccessApi {
 
   private val recorder = new InjectionTransactionRecordManager(injectionConfiguration, transportProvider)
@@ -68,8 +68,8 @@ class InjectionTransactionContext(injectionConfiguration: InjectionConfiguration
   def getTransactionInjector: Injector = transaction.transactionInjector
 
   def bindTransaction(clientTransport: Option[TransportAbstraction]) {
-    logger.debug("bind on transaction {}",transaction.rootNode.configurationElement.contract)
-    clientTransport.map( executor.returnLoopPipe.bindTransportContext( _ ) )
+    logger.debug("bind on transaction {}", transaction.rootNode.configurationElement.contract)
+    clientTransport.map(executor.returnLoopPipe.bindTransportContext(_))
     recorder.recordingExecutionManager.bindTransaction
     executor.executionManager.bindTransaction
     transaction.rootNode.bindSwitchingScope
@@ -113,7 +113,7 @@ trait CanonicalInstanceCreationSchema {
 
   def externalBinding(key: Key[_]): CanonicalProtocolInstance
 
-  def dataBinding(key: Key[_], ref: java.io.Serializable ): CanonicalProtocolInstance
+  def dataBinding(key: Key[_], ref: java.io.Serializable): CanonicalProtocolInstance
 
   def returnBind(key: Key[_]): CanonicalProtocolInstance
 
@@ -121,17 +121,17 @@ trait CanonicalInstanceCreationSchema {
 
 }
 
-class ClientCanonicalInstanceCreationSchema(val next :  () => Int  ) extends CanonicalInstanceCreationSchema{
+class ClientCanonicalInstanceCreationSchema(val next: () => Int) extends CanonicalInstanceCreationSchema {
 
-  def keyBinding(key: Key[_]): CanonicalProtocolInstance = ClientBindingKeyInstance(next(),key)
+  def keyBinding(key: Key[_]): CanonicalProtocolInstance = ClientBindingKeyInstance(next(), key)
 
-  def externalBinding(key: Key[_]): CanonicalProtocolInstance = ClientExternalInstanceBinding(next(),key)
+  def externalBinding(key: Key[_]): CanonicalProtocolInstance = ClientExternalInstanceBinding(next(), key)
 
-  def dataBinding(key: Key[_], ref: java.io.Serializable): CanonicalProtocolInstance = ClientDataInstance(next(),key,ref)
+  def dataBinding(key: Key[_], ref: java.io.Serializable): CanonicalProtocolInstance = ClientDataInstance(next(), key, ref)
 
-  def returnBind(key: Key[_]): CanonicalProtocolInstance = ClientReturnBindingKeyInstance(next(),key)
+  def returnBind(key: Key[_]): CanonicalProtocolInstance = ClientReturnBindingKeyInstance(next(), key)
 
-  def pendingBind(key: Key[_]): CanonicalProtocolInstance = ClientPendingDataInstance(next(),key)
+  def pendingBind(key: Key[_]): CanonicalProtocolInstance = ClientPendingDataInstance(next(), key)
 }
 
 

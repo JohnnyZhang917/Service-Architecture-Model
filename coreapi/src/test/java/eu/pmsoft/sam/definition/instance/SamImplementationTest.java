@@ -87,12 +87,12 @@ public class SamImplementationTest {
                 return mockInternalDefinition;
             }
         });
-        stubber.when(mockLoader).signature(FakeServiceDefinitionImpl.class,FakeServiceModule.class);
+        stubber.when(mockLoader).signature(FakeServiceDefinitionImpl.class, FakeServiceModule.class);
 
         FakeServiceImplementation implementationDefinition = new FakeServiceImplementation();
         implementationDefinition.loadServiceImplementationDefinition(mockLoader);
 
-        verify(mockLoader).signature(FakeServiceDefinitionImpl.class,FakeServiceModule.class);
+        verify(mockLoader).signature(FakeServiceDefinitionImpl.class, FakeServiceModule.class);
         verify(mockInternalDefinition).withBindingsTo(FakeServiceDefinitionExternalOne.class);
         verify(mockInternalDefinition).withBindingsTo(FakeServiceDefinitionExternalTwo.class);
     }

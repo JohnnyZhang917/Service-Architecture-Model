@@ -6,10 +6,6 @@ import eu.pmsoft.sam.see._
 import java.util.concurrent.atomic.AtomicInteger
 import eu.pmsoft.sam.injection.{DependenciesBindingContext, FreeBindingInjectionUtil, ExternalBindingController}
 import scala.Some
-import eu.pmsoft.sam.architecture.definition.SamArchitectureDefinition
-import eu.pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract
-
-
 
 
 sealed abstract class ArchitectureModel
@@ -65,10 +61,6 @@ case class SamServiceInstance(instanceId: ServiceInstanceID, implementation: Sam
 case class InjectionConfiguration(configurationRoot: InjectionConfigurationElement, configurationId: ServiceConfigurationID = ServiceConfigurationID())
 
 
-
-
-
-
 sealed abstract class InjectionConfigurationElement(val contract: SamService)
 
 case class ExternalServiceBind(override val contract: SamService, url: ServiceInstanceURL) extends InjectionConfigurationElement(contract)
@@ -94,7 +86,7 @@ object InjectionConfigurationBuilder {
     require(serviceMatches.filter(_._2.isEmpty).isEmpty)
 
     val service = registry.getService(instance.implementation.contract)
-    val orderedBinding = serviceMatches.map( _._2.get )
+    val orderedBinding = serviceMatches.map(_._2.get)
     InstanceServiceBind(service, orderedBinding, instance)
   }
 
