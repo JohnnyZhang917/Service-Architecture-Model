@@ -56,7 +56,7 @@ trait InstanceRegistry {
 }
 
 
-private class ExecutionStackManager(val pipes: Vector[ExecutionPipe], val instanceRegistry: InstanceRegistry) extends StackOfStack {
+private class ExecutionStackManager(val pipes: Vector[TransportPipe], val instanceRegistry: InstanceRegistry) extends StackOfStack {
   private val logger = LoggerFactory.getLogger(this.getClass)
 
   def bindTransaction {
@@ -91,7 +91,7 @@ private class ExecutionStackManager(val pipes: Vector[ExecutionPipe], val instan
     logger.trace("flush execution done")
   }
 
-  def getPipe(slotNr: Int): ExecutionPipe = pipes(slotNr)
+  def getPipe(slotNr: Int): TransportPipe = pipes(slotNr)
 
   def executeCalls(slotNr: Int, calls: Seq[CanonicalProtocolMethodCall]) = {
     calls foreach {
@@ -132,7 +132,6 @@ private class ExecutionStackManager(val pipes: Vector[ExecutionPipe], val instan
       } else {
         pipe.pollResponse
       }
-
       response.map {
         res =>
           logger.trace("waiting done")

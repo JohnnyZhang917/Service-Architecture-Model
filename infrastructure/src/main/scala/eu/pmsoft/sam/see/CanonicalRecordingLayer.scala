@@ -12,12 +12,11 @@ import scala.annotation.tailrec
 import com.google.inject.{Injector, Key}
 import eu.pmsoft.sam.injection.{ExternalInstanceProvider, DependenciesBindingContext, ExternalBindingSwitch}
 import scala.collection.mutable
-import eu.pmsoft.sam.model
 import org.slf4j.LoggerFactory
 
 object CanonicalRecordingLayer {
 
-  def apply(transportProvider: Seq[ExternalServiceBind] => Seq[ExecutionPipe], returnLoopPipe: () => LoopBackExecutionPipe) = new CanonicalRecordingLayer(transportProvider, returnLoopPipe)
+  def apply(injectionConfiguration: InjectionConfigurationElement, transportContext: TransactionTransportContext) = new CanonicalRecordingLayer(injectionConfiguration, transportContext)
 
 }
 
@@ -39,26 +38,20 @@ trait RecordEmbroider {
 
 }
 
+class TransactionTransportContext(
+                                   val externalBind: Seq[(ExternalServiceBind, TransportPipe)],
+                                   val inputPipe: TransportPipe,
+                                   val loopBackPipe: TransportPipe
+                                   )
 
-class CanonicalRecordingLayer(transportProvider: Seq[ExternalServiceBind] => Seq[ExecutionPipe], returnLoopPipe: () => LoopBackExecutionPipe) {
+class CanonicalRecordingLayer(injectionConfiguration: InjectionConfigurationElement, transportContext: TransactionTransportContext) extends InjectionTransactionAccessApi {
 
-  def createContext(injectionConfiguration: InjectionConfigurationElement): InjectionTransactionContext = {
-    new InjectionTransactionContext(injectionConfiguration, transportProvider, returnLoopPipe)
-  }
-
-}
-
-
-class InjectionTransactionContext(injectionConfiguration: InjectionConfigurationElement,
-                                  transportProvider: Seq[ExternalServiceBind] => Seq[ExecutionPipe],
-                                  returnLoopPipe: () => LoopBackExecutionPipe) extends InjectionTransactionAccessApi {
-
-  private val recorder = new InjectionTransactionRecordManager(injectionConfiguration, transportProvider)
+  private val recorder = new InjectionTransactionRecordManager(injectionConfiguration, transportContext)
   val logger = LoggerFactory.getLogger(this.getClass)
 
   private val headInjector = InjectionTransaction.glueInjector(recorder.injectionConfiguration)
   require(headInjector.isDefined)
-  private val executor = new TransactionExecutionManager(headInjector.get, returnLoopPipe())
+  private val executor = new TransactionExecutionManager(headInjector.get, transportContext)
 
   private val transaction: InjectionTransaction = {
     val rootNode = InjectionTransaction.createNode(new InjectionTransactionWrappingContext(recorder.externalInstanceProviders), recorder.injectionConfiguration)
@@ -67,9 +60,8 @@ class InjectionTransactionContext(injectionConfiguration: InjectionConfiguration
 
   def getTransactionInjector: Injector = transaction.transactionInjector
 
-  def bindTransaction(clientTransport: Option[TransportAbstraction]) {
+  def bindTransaction {
     logger.debug("bind on transaction {}", transaction.rootNode.configurationElement.contract)
-    clientTransport.map(executor.returnLoopPipe.bindTransportContext(_))
     recorder.recordingExecutionManager.bindTransaction
     executor.executionManager.bindTransaction
     transaction.rootNode.bindSwitchingScope
@@ -79,7 +71,8 @@ class InjectionTransactionContext(injectionConfiguration: InjectionConfiguration
     transaction.rootNode.unbindSwitchingScope
     executor.executionManager.unbindTransaction
     recorder.recordingExecutionManager.unbindTransaction
-    executor.returnLoopPipe.unbindTransportContext()
+    //    executor.returnLoopPipe.unbindTransportContext()
+    ???
   }
 
   def protocolExecution(message: ThreadMessage): ThreadMessage = {
@@ -210,7 +203,7 @@ private class SlotRecordEmbroider(val slotNr: Int,
 }
 
 
-private class InjectionTransactionWrappingContext(externalInstanceProviders: Map[ExternalServiceBind, InstanceProvider]) extends model.InjectionTransactionContext {
+private class InjectionTransactionWrappingContext(externalInstanceProviders: Map[ExternalServiceBind, InstanceProvider]) extends InjectionTransactionContext {
 
   def instanceProvider(externalBind: ExternalServiceBind): InstanceProvider = externalInstanceProviders(externalBind)
 
@@ -269,14 +262,14 @@ class MemoizedInstanceProvider(val instanceProvider: InstanceProvider) {
 
 
 object VoidCanonicalProtocolInstanceRef extends CanonicalProtocolInstanceRef[AnyRef] {
-  def getInstance: AnyRef = throw new IllegalAccessException("You are trying to call on void")
+  def getInstance: AnyRef = throw new IllegalAccessException("You are trying to call a instance reference on void")
 }
 
 class PromiseCanonicalProtocolInstanceRef[T] extends CanonicalProtocolInstanceRef[T] {
   val promise: Promise[AnyRef] = Promise()
 
   def getInstance: T = {
-    Await.result(promise.future, 100 nanos).asInstanceOf[T]
+    Await.result(promise.future, 0 nanos).asInstanceOf[T]
   }
 }
 

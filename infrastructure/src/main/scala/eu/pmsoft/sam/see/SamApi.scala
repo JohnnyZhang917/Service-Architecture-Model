@@ -50,7 +50,7 @@ trait InjectionTransactionAccessApi {
 
   def getTransactionInjector: Injector
 
-  def bindTransaction(clientTransport: Option[TransportAbstraction]): Unit
+  def bindTransaction: Unit
 
   def unBindTransaction: Unit
 

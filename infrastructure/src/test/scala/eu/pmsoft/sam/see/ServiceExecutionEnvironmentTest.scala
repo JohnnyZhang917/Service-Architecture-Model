@@ -88,7 +88,7 @@ class ServiceExecutionEnvironmentTest {
     assert(complexTransactionTwo.getTransactionInjector.getExistingBinding(Key.get(classOf[TestInterfaceOne])) == null)
     assert(complexTransactionTwo.getTransactionInjector.getExistingBinding(apiTwoInterface) != null)
 
-    complexTransactionTwo.bindTransaction(None)
+    complexTransactionTwo.bindTransaction
     val apiTwoRef = complexTransactionTwo.getTransactionInjector.getInstance(apiTwoInterface)
     assert(apiTwoRef.runTest())
     complexTransactionTwo.unBindTransaction
@@ -109,7 +109,7 @@ class ServiceExecutionEnvironmentTest {
     // direct use of the transaction injector
     // Simple call
     for (i <- 0 to 3) {
-      complexTransactionTwoExternal.bindTransaction(None)
+      complexTransactionTwoExternal.bindTransaction
       val apiTwoRefExternal = complexTransactionTwoExternal.getTransactionInjector.getInstance(apiTwoInterface)
       assert(apiTwoRefExternal.runTest())
       complexTransactionTwoExternal.unBindTransaction
@@ -227,7 +227,7 @@ class ServiceExecutionEnvironmentTest {
 
     // direct use of the transaction injector
     logger.debug("init shopping transaction")
-    complexTransactionTwoExternal.bindTransaction(None)
+    complexTransactionTwoExternal.bindTransaction
     val shoppingApi = complexTransactionTwoExternal.getTransactionInjector.getInstance(Key.get(classOf[ShoppingStoreWithCourierInteraction]))
     assert(shoppingApi.makeShoping() != null)
     complexTransactionTwoExternal.unBindTransaction

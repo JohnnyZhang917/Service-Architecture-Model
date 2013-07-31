@@ -41,13 +41,33 @@ private trait TransportAbstraction {
 
 case class CanonicalProtocolMessage(instances: Seq[CanonicalProtocolInstance], calls: Seq[CanonicalProtocolMethodCall], closeHomotopy: Boolean)
 
-trait LoopBackExecutionPipe extends ExecutionPipe {
+trait LoopBackExecutionPipe extends TransportPipe {
   def bindTransportContext(context: TransportAbstraction)
 
   def unbindTransportContext()
 }
 
-trait ExecutionPipe {
+trait TransportPipe {
+
+  def waitResponse: ThreadMessage
+
+  def pollResponse: Option[ThreadMessage]
+
+  def sendMessage(message: ThreadMessage): Unit
+
+}
+
+class FakeTransportPipe extends TransportPipe {
+  def waitResponse: ThreadMessage = ???
+
+  def pollResponse: Option[ThreadMessage] = ???
+
+  def sendMessage(message: ThreadMessage) {
+    ???
+  }
+}
+
+private trait ExecutionPipe extends TransportPipe {
   val logger = LoggerFactory.getLogger(this.getClass)
   private val queue = new LinkedBlockingQueue[ThreadMessage]()
 
@@ -80,7 +100,7 @@ private[see] class CanonicalTransportServer(val transactionApi: SamInjectionTran
 
   val transportApi = NettyTransport.api()
 
-  def getExecutionPipe(url: ServiceInstanceURL): ExecutionPipe = {
+  def getExecutionPipe(url: ServiceInstanceURL): TransportPipe = {
     new ExternalTransportPipeImplementation(url, transportApi.getEnvironmentConnection(url.url.getHost, url.url.getPort))
   }
 }
@@ -94,8 +114,11 @@ private class ExternalTransportPipeImplementation(url: ServiceInstanceURL, conne
     tid => {
       connection.protocolAction(tid, message)
     }
+  } recover {
+    case e:Throwable => throw e
   }
 }
+
 
 private class TMPSlotExecutionPipe extends LoopBackExecutionPipe with ExecutionPipe {
 
@@ -111,7 +134,7 @@ private class TMPSlotExecutionPipe extends LoopBackExecutionPipe with ExecutionP
     transportRef.remove()
   }
 
-  def openPipe(): ExecutionPipe = this
+  def openPipe(): TransportPipe = this
 
   def transport(message: ThreadMessage): Future[ThreadMessage] = {
     assert(transportRef.get() != null)
@@ -122,7 +145,7 @@ private class TMPSlotExecutionPipe extends LoopBackExecutionPipe with ExecutionP
   }
 }
 
-private class DirectExecutionPipe(val transaction: InjectionTransactionContext) extends ExecutionPipe {
+private class DirectExecutionPipe(val transaction: InjectionTransactionAccessApi) extends ExecutionPipe {
   val executionThread = ThreadExecutionModel.openTransactionThread(transaction)
   val localTransportFake = new LocalJVMSingleMessageTransport
 
@@ -154,7 +177,6 @@ private class LocalJVMSingleMessageTransport {
 
   val logger = LoggerFactory.getLogger(this.getClass)
   val clientView: TransportAbstraction = new TransportAbstraction() {
-
 
     def send(message: ThreadMessage): Future[Unit] = Future {
       logger.trace("C ADD")

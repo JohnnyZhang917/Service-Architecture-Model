@@ -8,7 +8,7 @@ object TransactionProvider {
 
 }
 
-private class TransactionExecutionManager(headInjector: Injector, val returnLoopPipe: LoopBackExecutionPipe) extends TransactionStatusFlow with InstanceRegistry {
+private class TransactionExecutionManager(val headInjector: Injector, val transportContext : TransactionTransportContext) extends TransactionStatusFlow with InstanceRegistry {
   private val logger = LoggerFactory.getLogger(this.getClass)
   private var transactionStatus: InstanceRegistryStatus = InstanceRegistryStatus(Vector(InstanceRegistrySlotStatus()))
 
@@ -18,7 +18,7 @@ private class TransactionExecutionManager(headInjector: Injector, val returnLoop
 
   def nextInstanceNr(slotNr: Int): Int = transactionStatus.slots(slotNr).instances.size
 
-  val executionManager = new ExecutionStackManager(Vector(returnLoopPipe), this)
+  val executionManager = new ExecutionStackManager(Vector(transportContext.loopBackPipe), this)
 
   def recordCall(slotNr: Int, call: CanonicalProtocolMethodCall) {
     executionManager.pushMethodCall(ProtocolMethodCall(slotNr, call))

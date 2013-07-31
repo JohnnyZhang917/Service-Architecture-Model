@@ -119,7 +119,6 @@ private object FreeBindingBuilder {
 
 private class ServiceExecutionEnvironmentStatus(val implementations: Set[SamServiceImplementationPackageContract],
                                                 val architectures: Set[SamArchitectureDefinition]) {
-  private val transactionOpen: mutable.Map[LongLongID, InjectionTransactionContext] = mutable.Map.empty
   private val instanceRunning: mutable.Map[ServiceInstanceID, SamServiceInstance] = mutable.Map.empty
   private val configurations: mutable.Map[ServiceConfigurationID, InjectionConfiguration] = mutable.Map.empty
   private val exposedServicesUrl: mutable.Map[ServiceConfigurationID, ServiceInstanceURL] = mutable.Map.empty
@@ -142,8 +141,6 @@ private class ServiceExecutionEnvironmentStatus(val implementations: Set[SamServ
       _.categories.flatMap(c => c.services).map(s => s.id -> s)
     }
   }
-
-  def addOpenTransaction(tid: LongLongID, context: InjectionTransactionContext) = transactionOpen.update(tid, context)
 
   def addServiceInstance(instance: SamServiceInstance) = instanceRunning.update(instance.instanceId, instance)
 
@@ -184,14 +181,24 @@ private class SamInjectionTransaction(
 
   def createExecutionContext(tid: ServiceConfigurationID) = {
     val config = status.getConfigurations(tid)
-    val contextBuilder = CanonicalRecordingLayer(createExternalServiceConnections _, createLoopBackEndpoint _)
-    val context = contextBuilder.createContext(config.configurationRoot)
+    val transportContext = createTransactionTransportContext(config)
+    val context = CanonicalRecordingLayer(config.configurationRoot,transportContext)
     logger.trace("created context for configuration {}", config.configurationRoot)
     context
   }
-
-  private def createLoopBackEndpoint(): LoopBackExecutionPipe = {
-    new TMPSlotExecutionPipe()
+  private def createTransactionTransportContext(config : InjectionConfiguration) : TransactionTransportContext = {
+    val externalBind = InjectionTransaction.getExternalBind(config.configurationRoot)
+    val localConfig = status.getExposedServiceConfigurations
+    val externalPipes = externalBind map {
+      case e@ExternalServiceBind(_, url) if localConfig.contains(url) => {
+        val context = createExecutionContext(localConfig(url))
+        (e,new DirectExecutionPipe(context))
+      }
+      case e@ExternalServiceBind(_, url) => (e,server.getExecutionPipe(url))
+    }
+    val loopBackPipe = new FakeTransportPipe()
+    val input = new FakeTransportPipe()
+    new TransactionTransportContext(externalPipes, input, loopBackPipe)
   }
 
   def createUrl(configurationId: ServiceConfigurationID): ServiceInstanceURL = {
@@ -199,18 +206,18 @@ private class SamInjectionTransaction(
     ServiceInstanceURL(new java.net.URL("http", server.serverAddress.getHostName, server.serverAddress.getPort, s"/service/${configurationId.id}"))
   }
 
-  def createExternalServiceConnections(endpoints: Seq[ExternalServiceBind]): Seq[ExecutionPipe] = {
-    val localConfig = status.getExposedServiceConfigurations
-    logger.debug("bind service {}", endpoints)
-    val pipes = endpoints.map {
-      case ExternalServiceBind(_, url) if localConfig.contains(url) => {
-        val context = createExecutionContext(localConfig(url))
-        new DirectExecutionPipe(context)
-      }
-      case ExternalServiceBind(_, url) => server.getExecutionPipe(url)
-    }
-    pipes
-  }
+//  private def createExternalServiceConnections(endpoints: Seq[ExternalServiceBind]): Seq[TransportPipe] = {
+//    val localConfig = status.getExposedServiceConfigurations
+//    logger.debug("bind service {}", endpoints)
+//    val pipes = endpoints.map {
+//      case ExternalServiceBind(_, url) if localConfig.contains(url) => {
+//        val context = createExecutionContext(localConfig(url))
+//        new DirectExecutionPipe(context)
+//      }
+//      case ExternalServiceBind(_, url) => server.getExecutionPipe(url)
+//    }
+//    pipes
+//  }
 
   def liftServiceConfiguration(configurationId: ServiceConfigurationID): ServiceInstanceURL = status.exposeServiceConfiguration(configurationId, createUrl)
 
@@ -223,9 +230,8 @@ private class SamInjectionTransaction(
     val configId = status.getExposedServiceConfigurations.getOrElse(url, throw new IllegalStateException())
     val context = createExecutionContext(configId)
     val tid = transactionIdGenerator.getNextID()
-    status.addOpenTransaction(tid, context)
+    ???
     tid
   }
-
 
 }
