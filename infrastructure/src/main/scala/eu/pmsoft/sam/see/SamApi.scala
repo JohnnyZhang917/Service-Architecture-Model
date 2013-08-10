@@ -9,24 +9,17 @@ import eu.pmsoft.sam.model.SamServiceImplementationKey
 import eu.pmsoft.sam.model.SamServiceImplementation
 import eu.pmsoft.sam.execution.ServiceAction
 import scala.concurrent.Future
-
-object SamApi {
-
-}
-
+import java.net.InetSocketAddress
 
 trait SamArchitectureManagementApi {
-
   def getService(key: SamServiceKey): SamService
 }
 
 trait SamServiceRegistryApi {
-
   def getImplementation(key: SamServiceImplementationKey): SamServiceImplementation
 }
 
 trait SamExecutionNodeApi {
-
   def createServiceInstance(key: SamServiceImplementationKey): SamServiceInstance
 
   def getServiceInstances(key: SamServiceImplementationKey): Set[ServiceInstanceID]
@@ -34,30 +27,28 @@ trait SamExecutionNodeApi {
   def getInstance(id: ServiceInstanceID): SamServiceInstance
 
   def registerInjectionConfiguration(element: InjectionConfigurationElement): ServiceConfigurationID
-
 }
 
 
 trait SamInjectionTransactionApi {
-
   def liftServiceConfiguration(configurationId: ServiceConfigurationID): ServiceInstanceURL
 
   def executeServiceAction[R, T](configurationId: ServiceConfigurationID, action: ServiceAction[R, T]): Future[R]
-
 }
 
 trait InjectionTransactionAccessApi {
-
   def getTransactionInjector: Injector
 
   def bindTransaction: Unit
 
   def unBindTransaction: Unit
-
-}
-
-trait ExternalTransactionApi {
-
 }
 
 
+trait SamEnvironmentExternalConnector {
+  def onEnvironment(address: InetSocketAddress): SamEnvironmentExternalApi
+}
+
+trait SamEnvironmentExternalApi {
+  def getArchitectureSignature(): Future[String]
+}

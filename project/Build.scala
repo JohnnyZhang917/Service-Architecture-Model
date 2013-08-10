@@ -16,7 +16,7 @@ object InjectionBusBuild extends Build {
     scalaVersion := "2.10.1",
     crossPaths := true,
     libraryDependencies ++= Seq(
-      "io.netty" % "netty-all" % "4.0.0.CR6",
+      "io.netty" % "netty-all" % "4.0.7.Final",
       "org.slf4j" % "slf4j-api" % slf4jVersion,
       "org.slf4j" % "slf4j-simple" % slf4jVersion % "test",
       "com.google.guava" % "guava" % "14.0.1" % "test"

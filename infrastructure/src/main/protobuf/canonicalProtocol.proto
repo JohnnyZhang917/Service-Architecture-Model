@@ -4,11 +4,29 @@ option optimize_for = SPEED;
 option java_package = "eu.pmsoft.sam.model";
 option java_outer_classname = "InjectionBusMessage";
 
+enum SamEnvironmentCommandType {
+    PING = 0;
+    ARCHITECTURE_INFO = 1;
+    SERVICE_LIST = 2;
+}
+
+message SamEnvironmentAction {
+    required SamEnvironmentCommandType command = 1;
+    // optional --- architectureInfo -- not used
+}
+
+message SamEnvironmentResult {
+    required SamEnvironmentCommandType command = 1;
+    optional string architectureInfoSignature = 2;
+}
 
 message LongLongIDProto {
     required int64 mask = 1;
     required int64 linear = 2;
 }
+
+
+
 
 message CanonicalProtocolMethodCallProto {
     required int32 instanceNr = 1;

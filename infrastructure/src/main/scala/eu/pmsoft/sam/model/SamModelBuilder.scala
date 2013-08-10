@@ -71,6 +71,15 @@ class SamServicePackageDefinitionLoader extends SamServicePackageLoader {
 class SamArchitectureDefinitionLoader extends SamArchitectureLoader {
   var categoryMap: Map[String, SamCategoryBuilder] = Map.empty
   var accessMap: Map[String, Set[String]] = Map.empty
+  var signature : Option[String] = None
+
+
+  def architectureSignature(architectureSignature: String) {
+    signature = signature match {
+      case None=> Some(architectureSignature)
+      case Some(sig)=> throw new IllegalStateException("Architecture Signature already given")
+    }
+  }
 
   def accessMark(from: String, to: String) = {
     accessMap.get(from) match {
@@ -94,6 +103,7 @@ class SamArchitectureDefinitionLoader extends SamArchitectureLoader {
   @throws[IncorrectArchitectureDefinition]
   def build = {
 
+    if (signature.isEmpty) throw new IncorrectArchitectureDefinition("no architecture signature")
     if (categoryMap.isEmpty) throw new IncorrectArchitectureDefinition("no categories")
 
     val categories = categoryMap.values.map(_.category).toSet
@@ -105,7 +115,7 @@ class SamArchitectureDefinitionLoader extends SamArchitectureLoader {
     }
     if (!selfAccessCategories.isEmpty) throw new IncorrectArchitectureDefinition("cycle access on category %s".format(selfAccessCategories.keySet))
 
-    SamArchitecture(categories, accessMap)
+    SamArchitecture(signature.get,categories, accessMap)
   }
 
 

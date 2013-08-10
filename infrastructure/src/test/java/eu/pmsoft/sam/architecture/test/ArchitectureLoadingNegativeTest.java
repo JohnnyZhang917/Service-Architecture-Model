@@ -24,6 +24,7 @@ public class ArchitectureLoadingNegativeTest {
 
     // Empty architecture
     static class ArchitectureInCorrectEmpty extends AbstractSamArchitectureDefinition {
+
         @Override
         protected void loadArchitectureDefinition() {
         }

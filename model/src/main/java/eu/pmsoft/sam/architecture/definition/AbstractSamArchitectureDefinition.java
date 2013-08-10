@@ -15,7 +15,16 @@ import eu.pmsoft.sam.architecture.definition.SamArchitectureLoader.SamCategoryLo
  */
 public abstract class AbstractSamArchitectureDefinition implements SamArchitectureDefinition {
 
+    private final String architectureSignature;
     private SamArchitectureLoader loaderRef;
+
+    protected AbstractSamArchitectureDefinition(String architectureSignature) {
+        this.architectureSignature = architectureSignature;
+    }
+
+    protected AbstractSamArchitectureDefinition() {
+        this.architectureSignature = this.getClass().getCanonicalName();
+    }
 
     protected abstract void loadArchitectureDefinition();
 
@@ -26,6 +35,7 @@ public abstract class AbstractSamArchitectureDefinition implements SamArchitectu
     public final void loadArchitectureDefinition(SamArchitectureLoader loader) {
         try {
             this.loaderRef = loader;
+            this.loaderRef.architectureSignature(architectureSignature);
             loadArchitectureDefinition();
         } finally {
             this.loaderRef = null;

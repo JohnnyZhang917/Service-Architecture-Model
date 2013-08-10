@@ -6,6 +6,12 @@ import eu.pmsoft.see.api.data.architecture.service.*;
 
 public class SeeTestArchitecture extends AbstractSamArchitectureDefinition {
 
+    public static String signature = "Test Architecture 0.1";
+
+    public SeeTestArchitecture() {
+        super(signature);
+    }
+
     @Override
     protected void loadArchitectureDefinition() {
         SamCategoryLoader test = createCategory("Test");

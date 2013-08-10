@@ -13,7 +13,7 @@ object ThreadExecutionModel {
 
 }
 
-private object ThreadExecutionContext {
+object ThreadExecutionContext {
   implicit lazy val possibleBlockingExecutor: ExecutionContextExecutor = {
     val service = Executors.newCachedThreadPool()
     ExecutionContext.fromExecutorService(service)

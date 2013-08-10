@@ -38,7 +38,7 @@ public class TestServiceExecutionCreationByStep {
                     .withArchitecture(new SeeTestArchitecture())
                     .withImplementation(new TestImplementationDeclaration()).build();
             ServiceExecutionEnvironment environment = ServiceExecutionEnvironment.apply(seeConfiguration);
-            return environment.javaApiModule();
+            return environment.clientApiModule();
         }
     }
 

@@ -5,6 +5,8 @@ import eu.pmsoft.sam.definition.service.SamServiceDefinition;
 
 public interface SamArchitectureLoader {
 
+    public void architectureSignature(String architectureSignature);
+
     SamCategoryLoader createCategory(String categoryName);
 
     static public interface SamCategoryLoader {

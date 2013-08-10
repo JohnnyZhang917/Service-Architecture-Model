@@ -7,45 +7,27 @@ import java.net.InetSocketAddress
 import org.slf4j.LoggerFactory
 import eu.pmsoft.sam.model._
 import java.util.concurrent.LinkedBlockingQueue
-import scala.util.{Failure, Success}
-import eu.pmsoft.sam.see.netty.{NettyTransport, Result}
-import eu.pmsoft.sam.idgenerator.LongLongID
-import com.twitter.concurrent.AsyncQueue
+import scala.util.Success
+import scala.util.Failure
+import scala.Some
+
+import eu.pmsoft.sam.transport._
 
 object CanonicalTransportLayer {
 
-}
+  private val EnvProtoCodec = TransportCodecBuilder.clientProtobuff[SamEnvironmentAction, SamEnvironmentResult](SamEnvironmentResult.getDefaultInstance)
 
-trait CanonicalProtocolCommunicationApi {
-
-  def getEnvironmentConnection(host: String, port: Int): EnvironmentConnection
-}
-
-trait EnvironmentConnection {
-
-  def ping: Future[Result]
-
-  def protocolAction(transactionId: LongLongID, message: ThreadMessage): Future[ThreadMessage]
-
-  def openPipeTransaction(url: ServiceInstanceURL): Future[LongLongID]
-
-}
-
-
-private trait TransportAbstraction {
-  def send(message: ThreadMessage): Future[Unit]
-
-  def receive(): Future[ThreadMessage]
+  def createClientDispatcher(address: InetSocketAddress) : Future[RPCDispatcher[SamEnvironmentAction, SamEnvironmentResult]] = {
+    val client = ClientConnector[SamEnvironmentAction, SamEnvironmentResult](EnvProtoCodec)
+    client.connect(address) map {
+      transport => RPCDispatcher[SamEnvironmentAction, SamEnvironmentResult](transport)
+    }
+  }
 }
 
 
 case class CanonicalProtocolMessage(instances: Seq[CanonicalProtocolInstance], calls: Seq[CanonicalProtocolMethodCall], closeHomotopy: Boolean)
 
-trait LoopBackExecutionPipe extends TransportPipe {
-  def bindTransportContext(context: TransportAbstraction)
-
-  def unbindTransportContext()
-}
 
 trait TransportPipe {
 
@@ -92,57 +74,44 @@ private trait ExecutionPipe extends TransportPipe {
   }
 }
 
-
-private[see] class CanonicalTransportServer(val transactionApi: SamInjectionTransaction, val port: Int) {
+private[see] class CanonicalTransportServer(val handler: SamEnvironmentAction => Future[SamEnvironmentResult], val port: Int) extends SamEnvironmentExternalConnector {
   val logger = LoggerFactory.getLogger(this.getClass)
   val serverAddress = new InetSocketAddress(port)
-  val environmentServer = NettyTransport.createNettyServer(transactionApi, serverAddress)
 
-  val transportApi = NettyTransport.api()
+  private val server = ServerConnector[SamEnvironmentAction, SamEnvironmentResult](
+    serverAddress,
+    TransportCodecBuilder.serverProtobuff[SamEnvironmentAction, SamEnvironmentResult](SamEnvironmentAction.getDefaultInstance),
+    onConnection
+  )
 
-  def getExecutionPipe(url: ServiceInstanceURL): TransportPipe = {
-    new ExternalTransportPipeImplementation(url, transportApi.getEnvironmentConnection(url.url.getHost, url.url.getPort))
+  val channel = server.bind
+
+  def onConnection(transport: Transport[SamEnvironmentResult, SamEnvironmentAction]) {
+    // TODO Disconect and clean
+    new SerialServerDispatcher(transport, handler)
   }
+
+  def createUrl(configurationId: ServiceConfigurationID): ServiceInstanceURL = {
+    logger.trace("createUrl {}", configurationId)
+    ServiceInstanceURL(new java.net.URL("http", serverAddress.getHostName, serverAddress.getPort, s"/service/${configurationId.id}"))
+  }
+
+  def onEnvironment(address: InetSocketAddress): SamEnvironmentExternalApi = new EnvironmentConnection(CanonicalTransportLayer.createClientDispatcher(address))
+}
+
+private class EnvironmentConnection(val dispatcher: Future[RPCDispatcher[SamEnvironmentAction, SamEnvironmentResult]]) extends SamEnvironmentExternalApi {
+
+  def getArchitectureSignature(): Future[String] = dispatcher flatMap { disp =>
+    val action = SamEnvironmentAction.getDefaultInstance.copy(SamEnvironmentCommandType.ARCHITECTURE_INFO)
+    disp.dispatch(action)
+  } map { _.`architectureInfoSignature`.get }
 }
 
 
-private class ExternalTransportPipeImplementation(url: ServiceInstanceURL, connection: EnvironmentConnection) extends ExecutionPipe {
+private trait TransportAbstraction {
+  def send(message: ThreadMessage): Future[Unit]
 
-  val transactionPipeID: Future[LongLongID] = connection.openPipeTransaction(url)
-
-  def transport(message: ThreadMessage): Future[ThreadMessage] = transactionPipeID flatMap {
-    tid => {
-      connection.protocolAction(tid, message)
-    }
-  } recover {
-    case e:Throwable => throw e
-  }
-}
-
-
-private class TMPSlotExecutionPipe extends LoopBackExecutionPipe with ExecutionPipe {
-
-  val transportRef: ThreadLocal[TransportAbstraction] = new ThreadLocal[TransportAbstraction]()
-
-  def bindTransportContext(context: TransportAbstraction) {
-    logger.debug("bind transport to pipe")
-    transportRef.set(context)
-  }
-
-  def unbindTransportContext() {
-    logger.debug("unbind transport to pipe")
-    transportRef.remove()
-  }
-
-  def openPipe(): TransportPipe = this
-
-  def transport(message: ThreadMessage): Future[ThreadMessage] = {
-    assert(transportRef.get() != null)
-    val transport = transportRef.get()
-    transport.send(message).flatMap {
-      ok => transport.receive()
-    }
-  }
+  def receive(): Future[ThreadMessage]
 }
 
 private class DirectExecutionPipe(val transaction: InjectionTransactionAccessApi) extends ExecutionPipe {

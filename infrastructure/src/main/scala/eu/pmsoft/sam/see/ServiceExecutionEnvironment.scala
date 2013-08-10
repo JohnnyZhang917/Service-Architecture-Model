@@ -7,16 +7,22 @@ import scala.collection.mutable
 import com.google.inject._
 import org.slf4j.LoggerFactory
 import eu.pmsoft.sam.model._
-import eu.pmsoft.sam.model.ServiceInstanceID
-import eu.pmsoft.sam.model.SamServiceImplementation
-import eu.pmsoft.sam.model.SamServiceKey
-import eu.pmsoft.sam.model.SamService
-import eu.pmsoft.sam.model.SamServiceInstance
 import eu.pmsoft.sam.injection.{FreeBindingInjectionUtil, ExternalBindingController, ExtrenalBindingInfrastructureModule}
 import eu.pmsoft.sam.architecture.definition.SamArchitectureDefinition
 import eu.pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract
 import eu.pmsoft.sam.execution.ServiceAction
 import eu.pmsoft.sam.idgenerator.{LongLongIdGenerator, LongLongID}
+import eu.pmsoft.sam.model.InjectionConfiguration
+import eu.pmsoft.sam.model.SamService
+import scala.Some
+import eu.pmsoft.sam.model.SamServiceImplementation
+import eu.pmsoft.sam.model.ServiceInstanceURL
+import eu.pmsoft.sam.model.SamServiceKey
+import eu.pmsoft.sam.model.SamServiceInstance
+import eu.pmsoft.sam.model.ExternalServiceBind
+import eu.pmsoft.sam.model.SEEConfigurationBuilder
+import eu.pmsoft.sam.model.SEEConfiguration
+import eu.pmsoft.sam.model.SamServiceImplementationKey
 
 object ServiceExecutionEnvironment {
 
@@ -25,26 +31,46 @@ object ServiceExecutionEnvironment {
   def configurationBuilder(port: Int) = SEEConfigurationBuilder(SEEConfiguration(Set(), Set(), port))
 }
 
-class ServiceExecutionEnvironment(val configuration: SEEConfiguration) {
+class ServiceExecutionEnvironment(val configuration: SEEConfiguration) extends EnvironmentActionHandler {
 
-  private val status = new ServiceExecutionEnvironmentStatus(configuration.implementations, configuration.architectures)
-  private[see] val transaction = new SamInjectionTransaction(status, configuration.port)
+  private[this] val status = new ServiceExecutionEnvironmentStatus(configuration.implementations, configuration.architectures)
+//  private[this] val actionHandler = new EnvironmentActionHandler()
+  private[this] val server = new CanonicalTransportServer(this.handle _, configuration.port)
+  // Visible for testing
+  private[see] val transaction = new SamInjectionTransaction(status, server.createUrl _)
 
   val architectureManager: SamArchitectureManagementApi = new SamArchitectureManagement(status)
   val serviceRegistry: SamServiceRegistryApi = new SamServiceRegistry(status)
   val executionNode: SamExecutionNodeApi = new SamExecutionNode(serviceRegistry, architectureManager, status)
-
   val transactionApi: SamInjectionTransactionApi = transaction
 
-  lazy val javaApiModule: Module = new AbstractModule() {
+  lazy val clientApiModule: Module = new AbstractModule() {
     def configure() {
       bind(classOf[SamArchitectureManagementApi]).toInstance(architectureManager)
       bind(classOf[SamServiceRegistryApi]).toInstance(serviceRegistry)
       bind(classOf[SamExecutionNodeApi]).toInstance(executionNode)
       bind(classOf[SamInjectionTransactionApi]).toInstance(transactionApi)
+      bind(classOf[SamEnvironmentExternalConnector]).toInstance(server)
     }
   }
 
+  def getArchitectureInfo(): String = status.architectures map { arch => arch.signature } mkString(":")
+}
+
+trait EnvironmentActionHandler {
+
+  def getArchitectureInfo(): String
+
+  def handle(action: SamEnvironmentAction): Future[SamEnvironmentResult] = {
+    import SamEnvironmentCommandType._
+    Future {
+      val result = SamEnvironmentResult.getDefaultInstance.copy(`command` = action.`command`)
+      action.`command` match {
+        case ARCHITECTURE_INFO => result.setArchitectureInfoSignature(getArchitectureInfo())
+        case _ => ???
+      }
+    }
+  }
 }
 
 private class SamArchitectureManagement(val status: ServiceExecutionEnvironmentStatus) extends SamArchitectureManagementApi {
@@ -117,8 +143,8 @@ private object FreeBindingBuilder {
   }
 }
 
-private class ServiceExecutionEnvironmentStatus(val implementations: Set[SamServiceImplementationPackageContract],
-                                                val architectures: Set[SamArchitectureDefinition]) {
+private class ServiceExecutionEnvironmentStatus(val implementationContracts: Set[SamServiceImplementationPackageContract],
+                                                val architectureDefinitions: Set[SamArchitectureDefinition]) {
   private val instanceRunning: mutable.Map[ServiceInstanceID, SamServiceInstance] = mutable.Map.empty
   private val configurations: mutable.Map[ServiceConfigurationID, InjectionConfiguration] = mutable.Map.empty
   private val exposedServicesUrl: mutable.Map[ServiceConfigurationID, ServiceInstanceURL] = mutable.Map.empty
@@ -127,17 +153,19 @@ private class ServiceExecutionEnvironmentStatus(val implementations: Set[SamServ
 
   // Registration of implementations
   val implementationRegistry: Map[SamServiceImplementationKey, SamServiceImplementation] = Map() ++ {
-    implementations map {
+    implementationContracts map {
       SamModelBuilder.loadImplementationPackage _
     } flatMap {
       _ map (s => s.implKey -> s)
     }
   }
 
+  val architectures = architectureDefinitions map {
+    SamModelBuilder.loadArchitectureDefinition _
+  }
+
   val serviceByKey: Map[SamServiceKey, SamService] = Map() ++ {
-    architectures map {
-      SamModelBuilder.loadArchitectureDefinition _
-    } flatMap {
+    architectures flatMap {
       _.categories.flatMap(c => c.services).map(s => s.id -> s)
     }
   }
@@ -172,54 +200,38 @@ private class ServiceExecutionEnvironmentStatus(val implementations: Set[SamServ
 
 private class SamInjectionTransaction(
                                        val status: ServiceExecutionEnvironmentStatus,
-                                       val port: Int
+                                       val urlCreator: ServiceConfigurationID => ServiceInstanceURL
                                        ) extends SamInjectionTransactionApi {
 
   val logger = LoggerFactory.getLogger(this.getClass)
-  val server: CanonicalTransportServer = new CanonicalTransportServer(this, port)
   val transactionIdGenerator = LongLongIdGenerator.createGenerator()
 
   def createExecutionContext(tid: ServiceConfigurationID) = {
     val config = status.getConfigurations(tid)
     val transportContext = createTransactionTransportContext(config)
-    val context = CanonicalRecordingLayer(config.configurationRoot,transportContext)
+    val context = CanonicalRecordingLayer(config.configurationRoot, transportContext)
     logger.trace("created context for configuration {}", config.configurationRoot)
     context
   }
-  private def createTransactionTransportContext(config : InjectionConfiguration) : TransactionTransportContext = {
+
+  private def createTransactionTransportContext(config: InjectionConfiguration): TransactionTransportContext = {
     val externalBind = InjectionTransaction.getExternalBind(config.configurationRoot)
     val localConfig = status.getExposedServiceConfigurations
     val externalPipes = externalBind map {
       case e@ExternalServiceBind(_, url) if localConfig.contains(url) => {
         val context = createExecutionContext(localConfig(url))
-        (e,new DirectExecutionPipe(context))
+        (e, new DirectExecutionPipe(context))
       }
-      case e@ExternalServiceBind(_, url) => (e,server.getExecutionPipe(url))
+      case e@ExternalServiceBind(_, url) => (e, ???)
     }
     val loopBackPipe = new FakeTransportPipe()
     val input = new FakeTransportPipe()
     new TransactionTransportContext(externalPipes, input, loopBackPipe)
   }
 
-  def createUrl(configurationId: ServiceConfigurationID): ServiceInstanceURL = {
-    logger.trace("createUrl {}", configurationId)
-    ServiceInstanceURL(new java.net.URL("http", server.serverAddress.getHostName, server.serverAddress.getPort, s"/service/${configurationId.id}"))
+  def liftServiceConfiguration(configurationId: ServiceConfigurationID): ServiceInstanceURL = {
+    status.exposeServiceConfiguration(configurationId, urlCreator)
   }
-
-//  private def createExternalServiceConnections(endpoints: Seq[ExternalServiceBind]): Seq[TransportPipe] = {
-//    val localConfig = status.getExposedServiceConfigurations
-//    logger.debug("bind service {}", endpoints)
-//    val pipes = endpoints.map {
-//      case ExternalServiceBind(_, url) if localConfig.contains(url) => {
-//        val context = createExecutionContext(localConfig(url))
-//        new DirectExecutionPipe(context)
-//      }
-//      case ExternalServiceBind(_, url) => server.getExecutionPipe(url)
-//    }
-//    pipes
-//  }
-
-  def liftServiceConfiguration(configurationId: ServiceConfigurationID): ServiceInstanceURL = status.exposeServiceConfiguration(configurationId, createUrl)
 
   def executeServiceAction[R, T](configurationId: ServiceConfigurationID, action: ServiceAction[R, T]): Future[R] = {
     val injectionExecutionContext = createExecutionContext(configurationId)

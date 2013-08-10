@@ -194,7 +194,7 @@ private class SlotRecordEmbroider(val slotNr: Int,
   }
 
   def key[T](bindingKey: Key[T]): CanonicalProtocolInstanceRef[T] = {
-    logger.trace("create bind key on slot {} for key {}", slotNr, bindingKey)
+    logger.trace("apply bind key on slot {} for key {}", slotNr, bindingKey)
     val canonicalInstance = creationSchema.keyBinding(bindingKey)
     val ref = new CanonicalProtocolRecorderRef[T](canonicalInstance, this)
     transactionFlow.bind(slotNr, canonicalInstance, ref.getInstance.asInstanceOf[AnyRef])
