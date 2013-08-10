@@ -16,7 +16,9 @@ import org.slf4j.LoggerFactory
 
 object CanonicalRecordingLayer {
 
-  def apply(injectionConfiguration: InjectionConfigurationElement, transportContext: TransactionTransportContext) = new CanonicalRecordingLayer(injectionConfiguration, transportContext)
+  def apply(registry: SamArchitectureManagementApi,
+            injectionConfiguration: InjectionConfigurationElement,
+            transportContext: TransactionTransportContext) = new CanonicalRecordingLayer(registry, injectionConfiguration, transportContext)
 
 }
 
@@ -44,12 +46,12 @@ class TransactionTransportContext(
                                    val loopBackPipe: TransportPipe
                                    )
 
-class CanonicalRecordingLayer(injectionConfiguration: InjectionConfigurationElement, transportContext: TransactionTransportContext) extends InjectionTransactionAccessApi {
+class CanonicalRecordingLayer(registry: SamArchitectureManagementApi, injectionConfiguration: InjectionConfigurationElement, transportContext: TransactionTransportContext) extends InjectionTransactionAccessApi {
 
   private val recorder = new InjectionTransactionRecordManager(injectionConfiguration, transportContext)
   val logger = LoggerFactory.getLogger(this.getClass)
 
-  private val headInjector = InjectionTransaction.glueInjector(recorder.injectionConfiguration)
+  private val headInjector = InjectionTransaction.glueInjector(registry, recorder.injectionConfiguration)
   require(headInjector.isDefined)
   private val executor = new TransactionExecutionManager(headInjector.get, transportContext)
 
@@ -61,7 +63,6 @@ class CanonicalRecordingLayer(injectionConfiguration: InjectionConfigurationElem
   def getTransactionInjector: Injector = transaction.transactionInjector
 
   def bindTransaction {
-    logger.debug("bind on transaction {}", transaction.rootNode.configurationElement.contract)
     recorder.recordingExecutionManager.bindTransaction
     executor.executionManager.bindTransaction
     transaction.rootNode.bindSwitchingScope

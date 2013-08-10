@@ -115,9 +115,9 @@ class ServiceExecutionEnvironmentTest {
     val toUseAsExternalConfigurationElements = bindConfigElements.take(2)
     val toUseAsExternalConfiguration = bindConfigurationIDs.take(2)
     val externalConfigElements = toUseAsExternalConfigurationElements zip toUseAsExternalConfiguration map {
-      case (element, config) => (element.contract, env.transactionApi.liftServiceConfiguration(config))
+      case (element, config) => (element.contractKey, env.transactionApi.liftServiceConfiguration(config))
     } map {
-      case (contract, exposed) => InjectionConfigurationBuilder.externalServiceBind(contract, exposed.url)
+      case (contractKey, exposed) => InjectionConfigurationBuilder.externalServiceBind(contractKey, exposed.url)
     }
     val externalConfig = InjectionConfigurationBuilder.complexInstanceBind(env.architectureManager, sTwo, externalConfigElements.toArray)
     val externalConfigId = env.executionNode.registerInjectionConfiguration(externalConfig)
@@ -142,12 +142,12 @@ class ServiceExecutionEnvironmentTest {
 
 
     val storeUrl = bindSingleInstance(storeServer, SamModelBuilder.implementationKey(classOf[TestStoreServiceModule]))
-    val storeContract = storeServer.architectureManager.getService(SamServiceKey(classOf[StoreService]))
-    val storeConfigurationRef = InjectionConfigurationBuilder.externalServiceBind(storeContract, storeUrl)
+//    val storeContract = storeServer.architectureManager.getService(SamServiceKey(classOf[StoreService]))
+    val storeConfigurationRef = InjectionConfigurationBuilder.externalServiceBind(SamServiceKey(classOf[StoreService]), storeUrl)
 
     val courierUrl = bindSingleInstance(courierServer, SamModelBuilder.implementationKey(classOf[TestCourierServiceModule]))
-    val courierContract = storeServer.architectureManager.getService(SamServiceKey(classOf[CourierService]))
-    val courierConfigurationRef = InjectionConfigurationBuilder.externalServiceBind(courierContract, courierUrl)
+//    val courierContract = storeServer.architectureManager.getService(SamServiceKey(classOf[CourierService]))
+    val courierConfigurationRef = InjectionConfigurationBuilder.externalServiceBind(SamServiceKey(classOf[CourierService]), courierUrl)
 
     val shoppingServiceInstance = shoppingServer.executionNode.createServiceInstance(SamModelBuilder.implementationKey(classOf[TestShoppingModule]))
     val shoppingConfiguration = InjectionConfigurationBuilder.complexInstanceBind(shoppingServer.architectureManager, shoppingServiceInstance,
@@ -225,9 +225,9 @@ class ServiceExecutionEnvironmentTest {
     val toUseAsExternalConfigurationElements = bindConfigElements.take(2)
     val toUseAsExternalConfiguration = bindConfigurationIDs.take(2)
     val externalConfigElements = toUseAsExternalConfigurationElements zip toUseAsExternalConfiguration map {
-      case (element, config) => (element.contract, env.transactionApi.liftServiceConfiguration(config))
+      case (element, config) => (element.contractKey, env.transactionApi.liftServiceConfiguration(config))
     } map {
-      case (contract, exposed) => InjectionConfigurationBuilder.externalServiceBind(contract, exposed.url)
+      case (contractKey, exposed) => InjectionConfigurationBuilder.externalServiceBind(contractKey, exposed.url)
     }
     val externalConfig = InjectionConfigurationBuilder.complexInstanceBind(env.architectureManager, shoppingService, externalConfigElements.toArray)
     val externalConfigId = env.executionNode.registerInjectionConfiguration(externalConfig)
@@ -242,5 +242,6 @@ class ServiceExecutionEnvironmentTest {
     complexTransactionTwoExternal.unBindTransaction
 
   }
+
 
 }

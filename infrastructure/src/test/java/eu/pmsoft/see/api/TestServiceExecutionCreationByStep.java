@@ -99,16 +99,16 @@ public class TestServiceExecutionCreationByStep {
 
         InjectionConfigurationElement elementZero = InjectionConfigurationBuilder.singleInstanceBind(architectureManager, zero);
         assertNotNull(elementZero);
-        assertEquals(zero.implementation().contract(), elementZero.contract().id());
+        assertEquals(zero.implementation().contract(), elementZero.contractKey());
 
         InjectionConfigurationElement elementOne = InjectionConfigurationBuilder.singleInstanceBind(architectureManager, one);
         assertNotNull(elementOne);
-        assertEquals(one.implementation().contract(), elementOne.contract().id());
+        assertEquals(one.implementation().contract(), elementOne.contractKey());
 
         InjectionConfigurationElement[] bindings = {elementOne, elementZero};
         InjectionConfigurationElement elementTwo = InjectionConfigurationBuilder.complexInstanceBind(architectureManager, two, bindings);
         assertNotNull(elementTwo);
-        assertEquals(two.implementation().contract(), elementTwo.contract().id());
+        assertEquals(two.implementation().contract(), elementTwo.contractKey());
 
 
         ServiceConfigurationID transactionZero = setupAndCheckTransactionRegistration(elementZero);
@@ -122,15 +122,15 @@ public class TestServiceExecutionCreationByStep {
         ServiceInstanceURL oneURL = transactionApi.liftServiceConfiguration(transactionOne).url();
 
         SamService serviceOne = architectureManager.getService(one.implementation().contract());
-        InjectionConfigurationElement externalOne = InjectionConfigurationBuilder.externalServiceBind(serviceOne, oneURL);
+        InjectionConfigurationElement externalOne = InjectionConfigurationBuilder.externalServiceBind(serviceOne.id(), oneURL);
 
         SamService serviceZero = architectureManager.getService(zero.implementation().contract());
-        InjectionConfigurationElement externalZero = InjectionConfigurationBuilder.externalServiceBind(serviceZero, zeroURL);
+        InjectionConfigurationElement externalZero = InjectionConfigurationBuilder.externalServiceBind(serviceZero.id(), zeroURL);
 
         InjectionConfigurationElement[] externalBindings = {externalZero, externalOne};
         InjectionConfigurationElement elementTwoRemote = InjectionConfigurationBuilder.complexInstanceBind(architectureManager, two, externalBindings);
         assertNotNull(elementTwoRemote);
-        assertEquals(two.implementation().contract(), elementTwoRemote.contract().id());
+        assertEquals(two.implementation().contract(), elementTwoRemote.contractKey());
 
         ServiceConfigurationID siurlRemoteTwo = setupAndCheckTransactionRegistration(elementTwoRemote);
 

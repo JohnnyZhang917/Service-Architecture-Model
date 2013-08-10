@@ -36,9 +36,9 @@ class ServiceExecutionEnvironment(val configuration: SEEConfiguration) extends E
   private[this] val status = new ServiceExecutionEnvironmentStatus(configuration.implementations, configuration.architectures)
   private[this] val server = new CanonicalTransportServer(this.handle _, configuration.port)
   // Visible for testing
-  private[see] val transaction = new SamInjectionTransaction(status, server.createUrl _)
 
   val architectureManager: SamArchitectureManagementApi = new SamArchitectureManagement(status)
+  private[see] val transaction = new SamInjectionTransaction(architectureManager, status, server.createUrl _)
   val serviceRegistry: SamServiceRegistryApi = new SamServiceRegistry(status)
   val executionNode: SamExecutionNodeApi = new SamExecutionNode(serviceRegistry, architectureManager, status)
   val transactionApi: SamInjectionTransactionApi = transaction
@@ -116,7 +116,7 @@ private class SamExecutionNode(val serviceRegistry: SamServiceRegistryApi,
   def getInstance(id: ServiceInstanceID): SamServiceInstance = status.getRunningServiceInstances.getOrElse(id, null)
 
   def registerInjectionConfiguration(element: InjectionConfigurationElement): ServiceConfigurationID = {
-    logger.trace("registerInjectionConfiguration {}", element.contract)
+    logger.trace("registerInjectionConfiguration {}", element.contractKey)
     val configuration = InjectionConfiguration(element)
     status.addInjectionConfiguration(configuration)
     configuration.configurationId
@@ -200,6 +200,7 @@ private class ServiceExecutionEnvironmentStatus(val implementationContracts: Set
 }
 
 private class SamInjectionTransaction(
+      val architectureManager: SamArchitectureManagementApi,
                                        val status: ServiceExecutionEnvironmentStatus,
                                        val urlCreator: ServiceConfigurationID => ServiceInstanceURL
                                        ) extends SamInjectionTransactionApi {
@@ -210,7 +211,7 @@ private class SamInjectionTransaction(
   def createExecutionContext(tid: LiftedServiceConfiguration) = {
     val config = status.getConfigurations(tid.configId)
     val transportContext = createTransactionTransportContext(config)
-    val context = CanonicalRecordingLayer(config.configurationRoot, transportContext)
+    val context = CanonicalRecordingLayer(architectureManager, config.configurationRoot, transportContext)
     logger.trace("created context for configuration {}", config.configurationRoot)
     context
   }
