@@ -105,6 +105,11 @@ private class EnvironmentConnection(val dispatcher: Future[RPCDispatcher[SamEnvi
     val action = SamEnvironmentAction.getDefaultInstance.copy(SamEnvironmentCommandType.ARCHITECTURE_INFO)
     disp.dispatch(action)
   } map { _.`architectureInfoSignature`.get }
+
+  def ping(): Future[Boolean] = dispatcher flatMap { disp =>
+    val action = SamEnvironmentAction.getDefaultInstance.copy(SamEnvironmentCommandType.PING)
+    disp.dispatch(action)
+  } map { res => true }
 }
 
 

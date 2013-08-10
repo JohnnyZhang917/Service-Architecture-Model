@@ -31,9 +31,9 @@ trait SamExecutionNodeApi {
 
 
 trait SamInjectionTransactionApi {
-  def liftServiceConfiguration(configurationId: ServiceConfigurationID): ServiceInstanceURL
+  def liftServiceConfiguration(configurationId: ServiceConfigurationID): LiftedServiceConfiguration
 
-  def executeServiceAction[R, T](configurationId: ServiceConfigurationID, action: ServiceAction[R, T]): Future[R]
+  def executeServiceAction[R, T](configuration: LiftedServiceConfiguration, action: ServiceAction[R, T]): Future[R]
 }
 
 trait InjectionTransactionAccessApi {
@@ -51,4 +51,5 @@ trait SamEnvironmentExternalConnector {
 
 trait SamEnvironmentExternalApi {
   def getArchitectureSignature(): Future[String]
+  def ping(): Future[Boolean]
 }

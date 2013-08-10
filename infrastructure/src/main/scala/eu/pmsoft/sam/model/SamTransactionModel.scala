@@ -17,6 +17,7 @@ object ServiceConfigurationID {
 }
 
 class ServiceConfigurationID(val id: Int)
+case class LiftedServiceConfiguration(url: ServiceInstanceURL, configId: ServiceConfigurationID)
 
 object ServiceTransactionID {
   private val counter: AtomicInteger = new AtomicInteger(0)
@@ -27,6 +28,7 @@ object ServiceTransactionID {
 class ServiceTransactionID(val id: Int)
 
 case class ServiceInstanceURL(val url: URL)
+
 
 case class SamServiceInstance(instanceId: ServiceInstanceID, implementation: SamServiceImplementation, injector: Injector)
 

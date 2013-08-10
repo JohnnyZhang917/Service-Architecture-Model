@@ -34,7 +34,6 @@ object ServiceExecutionEnvironment {
 class ServiceExecutionEnvironment(val configuration: SEEConfiguration) extends EnvironmentActionHandler {
 
   private[this] val status = new ServiceExecutionEnvironmentStatus(configuration.implementations, configuration.architectures)
-//  private[this] val actionHandler = new EnvironmentActionHandler()
   private[this] val server = new CanonicalTransportServer(this.handle _, configuration.port)
   // Visible for testing
   private[see] val transaction = new SamInjectionTransaction(status, server.createUrl _)
@@ -67,6 +66,8 @@ trait EnvironmentActionHandler {
       val result = SamEnvironmentResult.getDefaultInstance.copy(`command` = action.`command`)
       action.`command` match {
         case ARCHITECTURE_INFO => result.setArchitectureInfoSignature(getArchitectureInfo())
+        case PING => result
+        case SERVICE_LIST => ???
         case _ => ???
       }
     }
@@ -147,8 +148,8 @@ private class ServiceExecutionEnvironmentStatus(val implementationContracts: Set
                                                 val architectureDefinitions: Set[SamArchitectureDefinition]) {
   private val instanceRunning: mutable.Map[ServiceInstanceID, SamServiceInstance] = mutable.Map.empty
   private val configurations: mutable.Map[ServiceConfigurationID, InjectionConfiguration] = mutable.Map.empty
-  private val exposedServicesUrl: mutable.Map[ServiceConfigurationID, ServiceInstanceURL] = mutable.Map.empty
-  private val exposedServiceConfigurations: mutable.Map[ServiceInstanceURL, ServiceConfigurationID] = mutable.Map.empty
+  private val exposedServicesUrl: mutable.Map[ServiceConfigurationID, LiftedServiceConfiguration] = mutable.Map.empty
+  private val exposedServiceConfigurations: mutable.Map[ServiceInstanceURL, LiftedServiceConfiguration] = mutable.Map.empty
   val logger = LoggerFactory.getLogger(this.getClass)
 
   // Registration of implementations
@@ -174,18 +175,18 @@ private class ServiceExecutionEnvironmentStatus(val implementationContracts: Set
 
   def addInjectionConfiguration(configuration: InjectionConfiguration) = configurations.update(configuration.configurationId, configuration)
 
-  def exposeServiceConfiguration(configurationId: ServiceConfigurationID, urlCreator: ServiceConfigurationID => ServiceInstanceURL): ServiceInstanceURL = {
-    val exposedUrl = exposedServicesUrl.get(configurationId) match {
+  def exposeServiceConfiguration(configurationId: ServiceConfigurationID, urlCreator: ServiceConfigurationID => ServiceInstanceURL): LiftedServiceConfiguration = {
+    val exposed = exposedServicesUrl.get(configurationId) match {
       case Some(url) => url
       case None => {
         val url = urlCreator(configurationId)
-        exposedServicesUrl.put(configurationId, url)
-        exposedServiceConfigurations.put(url, configurationId)
-        url
+        val lifted = LiftedServiceConfiguration(url,configurationId)
+        exposedServicesUrl.put(configurationId, lifted)
+        exposedServiceConfigurations.put(url, lifted)
+        lifted
       }
     }
-    logger.trace("exposeServiceConfiguration {}, url: {}", configurationId, exposedUrl: Any)
-    exposedUrl
+    exposed
   }
 
   def getRunningServiceInstances = instanceRunning
@@ -206,8 +207,8 @@ private class SamInjectionTransaction(
   val logger = LoggerFactory.getLogger(this.getClass)
   val transactionIdGenerator = LongLongIdGenerator.createGenerator()
 
-  def createExecutionContext(tid: ServiceConfigurationID) = {
-    val config = status.getConfigurations(tid)
+  def createExecutionContext(tid: LiftedServiceConfiguration) = {
+    val config = status.getConfigurations(tid.configId)
     val transportContext = createTransactionTransportContext(config)
     val context = CanonicalRecordingLayer(config.configurationRoot, transportContext)
     logger.trace("created context for configuration {}", config.configurationRoot)
@@ -229,21 +230,21 @@ private class SamInjectionTransaction(
     new TransactionTransportContext(externalPipes, input, loopBackPipe)
   }
 
-  def liftServiceConfiguration(configurationId: ServiceConfigurationID): ServiceInstanceURL = {
+  def liftServiceConfiguration(configurationId: ServiceConfigurationID): LiftedServiceConfiguration = {
     status.exposeServiceConfiguration(configurationId, urlCreator)
   }
 
-  def executeServiceAction[R, T](configurationId: ServiceConfigurationID, action: ServiceAction[R, T]): Future[R] = {
-    val injectionExecutionContext = createExecutionContext(configurationId)
+  def executeServiceAction[R, T](configuration: LiftedServiceConfiguration, action: ServiceAction[R, T]): Future[R] = {
+    val injectionExecutionContext = createExecutionContext(configuration)
     ThreadExecutionModel.openTransactionThread(injectionExecutionContext).executeServiceAction(action)
   }
 
   def openTransactionContext(url: ServiceInstanceURL): Future[LongLongID] = Future {
     val configId = status.getExposedServiceConfigurations.getOrElse(url, throw new IllegalStateException())
-    val context = createExecutionContext(configId)
-    val tid = transactionIdGenerator.getNextID()
+//    val context = createExecutionContext(configId)
+//    val tid = transactionIdGenerator.getNextID()
     ???
-    tid
+//    tid
   }
 
 }

@@ -118,8 +118,8 @@ public class TestServiceExecutionCreationByStep {
 
         testInjectionTransactionExecutionForServiceOne(transactionOne);
 //
-        ServiceInstanceURL zeroURL = transactionApi.liftServiceConfiguration(transactionZero);
-        ServiceInstanceURL oneURL = transactionApi.liftServiceConfiguration(transactionOne);
+        ServiceInstanceURL zeroURL = transactionApi.liftServiceConfiguration(transactionZero).url();
+        ServiceInstanceURL oneURL = transactionApi.liftServiceConfiguration(transactionOne).url();
 
         SamService serviceOne = architectureManager.getService(one.implementation().contract());
         InjectionConfigurationElement externalOne = InjectionConfigurationBuilder.externalServiceBind(serviceOne, oneURL);
@@ -144,7 +144,8 @@ public class TestServiceExecutionCreationByStep {
 
     public void testInjectionTransactionExecutionForServiceOne(ServiceConfigurationID transactionOne) {
         Key<TestInterfaceOne> interfaceOneKey = Key.get(TestInterfaceOne.class);
-        Future<Boolean> booleanFuture = transactionApi.executeServiceAction(transactionOne, new ServiceAction<Boolean, TestInterfaceOne>(interfaceOneKey) {
+        LiftedServiceConfiguration liftedServiceConfiguration = transactionApi.liftServiceConfiguration(transactionOne);
+        Future<Boolean> booleanFuture = transactionApi.executeServiceAction(liftedServiceConfiguration, new ServiceAction<Boolean, TestInterfaceOne>(interfaceOneKey) {
             @Override
             public Boolean executeInteraction(TestInterfaceOne service) {
                 return service.runTest();
@@ -159,9 +160,10 @@ public class TestServiceExecutionCreationByStep {
         assertTrue(result);
     }
 
-    public void testInjectionTransactionExecutionForServiceTwo(ServiceConfigurationID transactionURL) {
+    public void testInjectionTransactionExecutionForServiceTwo(ServiceConfigurationID configurationID) {
         Key<TestInterfaceTwo0> interfaceTwoKey = Key.get(TestInterfaceTwo0.class);
-        Future<Boolean> booleanFuture = transactionApi.executeServiceAction(transactionURL, new ServiceAction<Boolean, TestInterfaceTwo0>(interfaceTwoKey) {
+        LiftedServiceConfiguration liftedServiceConfiguration = transactionApi.liftServiceConfiguration(configurationID);
+        Future<Boolean> booleanFuture = transactionApi.executeServiceAction(liftedServiceConfiguration, new ServiceAction<Boolean, TestInterfaceTwo0>(interfaceTwoKey) {
             @Override
             public Boolean executeInteraction(TestInterfaceTwo0 service) {
                 return service.runTest();
