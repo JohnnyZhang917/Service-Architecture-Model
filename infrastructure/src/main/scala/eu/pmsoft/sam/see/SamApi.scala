@@ -52,4 +52,5 @@ trait SamEnvironmentExternalConnector {
 trait SamEnvironmentExternalApi {
   def getArchitectureSignature(): Future[String]
   def ping(): Future[Boolean]
+  def getExposedServices(): Future[Seq[ExposedServiceTransaction]]
 }

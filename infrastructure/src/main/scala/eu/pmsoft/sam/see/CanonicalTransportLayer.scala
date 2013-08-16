@@ -3,7 +3,7 @@ package eu.pmsoft.sam.see
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import java.net.InetSocketAddress
+import java.net.{URL, InetSocketAddress}
 import org.slf4j.LoggerFactory
 import eu.pmsoft.sam.model._
 import java.util.concurrent.LinkedBlockingQueue
@@ -74,7 +74,7 @@ private trait ExecutionPipe extends TransportPipe {
   }
 }
 
-private[see] class CanonicalTransportServer(val handler: SamEnvironmentAction => Future[SamEnvironmentResult], val port: Int) extends SamEnvironmentExternalConnector {
+private[see] class CanonicalTransportServer(val logic: EnvironmentExternalApiLogic, val port: Int) extends SamEnvironmentExternalConnector {
   val logger = LoggerFactory.getLogger(this.getClass)
   val serverAddress = new InetSocketAddress(port)
 
@@ -88,7 +88,7 @@ private[see] class CanonicalTransportServer(val handler: SamEnvironmentAction =>
 
   def onConnection(transport: Transport[SamEnvironmentResult, SamEnvironmentAction]) {
     // TODO Disconect and clean
-    new SerialServerDispatcher(transport, handler)
+    new SerialServerDispatcher(transport, logic.handle _ )
   }
 
   def createUrl(configurationId: ServiceConfigurationID): ServiceInstanceURL = {
@@ -96,10 +96,10 @@ private[see] class CanonicalTransportServer(val handler: SamEnvironmentAction =>
     ServiceInstanceURL(new java.net.URL("http", serverAddress.getHostName, serverAddress.getPort, s"/service/${configurationId.id}"))
   }
 
-  def onEnvironment(address: InetSocketAddress): SamEnvironmentExternalApi = new EnvironmentConnection(CanonicalTransportLayer.createClientDispatcher(address))
+  def onEnvironment(address: InetSocketAddress): SamEnvironmentExternalApi = new EnvironmentConnection(logic, CanonicalTransportLayer.createClientDispatcher(address))
 }
 
-private class EnvironmentConnection(val dispatcher: Future[RPCDispatcher[SamEnvironmentAction, SamEnvironmentResult]]) extends SamEnvironmentExternalApi {
+private class EnvironmentConnection(val logic: EnvironmentExternalApiLogic, val dispatcher: Future[RPCDispatcher[SamEnvironmentAction, SamEnvironmentResult]]) extends SamEnvironmentExternalApi {
 
   def getArchitectureSignature(): Future[String] = dispatcher flatMap { disp =>
     val action = SamEnvironmentAction.getDefaultInstance.copy(SamEnvironmentCommandType.ARCHITECTURE_INFO)
@@ -110,6 +110,15 @@ private class EnvironmentConnection(val dispatcher: Future[RPCDispatcher[SamEnvi
     val action = SamEnvironmentAction.getDefaultInstance.copy(SamEnvironmentCommandType.PING)
     disp.dispatch(action)
   } map { res => true }
+
+  def getExposedServices: Future[Seq[ExposedServiceTransaction]] =  dispatcher flatMap { disp =>
+    val action = SamEnvironmentAction.getDefaultInstance.copy(SamEnvironmentCommandType.SERVICE_LIST)
+    disp.dispatch(action)
+  } map { res =>
+     res.`serviceList` map { ref =>
+       ExposedServiceTransaction(logic.createUrl(ref.`url`), logic.findServiceContract(ref.`contract`))
+     }
+  }
 }
 
 

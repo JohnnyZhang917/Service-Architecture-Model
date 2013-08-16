@@ -8,6 +8,7 @@ import com.google.inject.Guice
 import java.net.InetSocketAddress
 import scala.concurrent._
 import scala.concurrent.duration._
+import eu.pmsoft.sam.model.ExposedServiceTransaction
 
 class SamEnvironmentExternalApiTest {
 
@@ -41,6 +42,39 @@ class SamEnvironmentExternalApiTest {
   def testPing() {
     assertTrue(Await.result(externalApi.ping(), 1 second))
   }
+
+  @Test
+  def testGetAccessiblyServices() {
+    val services: Future[Seq[ExposedServiceTransaction]] = externalApi.getExposedServices()
+    val result: Seq[ExposedServiceTransaction] = Await.result(services, 2 seconds)
+    assertTrue(result.isEmpty)
+  }
+
+  @Test
+  def testAccessiblyServiceSignatureAndType() {
+    assertTrue(false)
+  }
+
+  @Test
+  def testCheckTransactionConfigurationPositive() {
+    assertTrue(false)
+  }
+
+  @Test
+  def testCheckTransactionConfigurationNegative() {
+    assertTrue(false)
+  }
+
+  @Test
+  def testTransactionGlobalIdSetup() {
+    assertTrue(false)
+  }
+
+  @Test
+  def testTransactionCommunicationByGlobalId() {
+    assertTrue(false)
+  }
+
 
 
 }

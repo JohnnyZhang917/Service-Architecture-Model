@@ -31,12 +31,12 @@ object ServiceExecutionEnvironment {
   def configurationBuilder(port: Int) = SEEConfigurationBuilder(SEEConfiguration(Set(), Set(), port))
 }
 
-class ServiceExecutionEnvironment(val configuration: SEEConfiguration) extends EnvironmentActionHandler {
+class ServiceExecutionEnvironment(val configuration: SEEConfiguration) extends EnvironmentExternalApiLogic {
 
   private[this] val status = new ServiceExecutionEnvironmentStatus(configuration.implementations, configuration.architectures)
-  private[this] val server = new CanonicalTransportServer(this.handle _, configuration.port)
-  // Visible for testing
+  private[this] val server = new CanonicalTransportServer(this, configuration.port)
 
+  // Visible for testing
   val architectureManager: SamArchitectureManagementApi = new SamArchitectureManagement(status)
   private[see] val transaction = new SamInjectionTransaction(architectureManager, status, server.createUrl _)
   val serviceRegistry: SamServiceRegistryApi = new SamServiceRegistry(status)
@@ -54,11 +54,19 @@ class ServiceExecutionEnvironment(val configuration: SEEConfiguration) extends E
   }
 
   def getArchitectureInfo(): String = status.architectures map { arch => arch.signature } mkString(":")
+
+  def getExposedServiceTransaction(): Seq[ExposedServiceTransaction] = status.getExposedServiceConfigurations.values map { liftId =>
+    ExposedServiceTransaction(liftId.url, status.getConfigurations(liftId.configId).configurationRoot.contractKey)
+  } toSeq
 }
 
-trait EnvironmentActionHandler {
+trait EnvironmentExternalApiLogic {
 
   def getArchitectureInfo(): String
+
+  def getExposedServiceTransaction() : Seq[ExposedServiceTransaction]
+
+  private def mapExposedTo(ref : ExposedServiceTransaction) : SamExposedServiceReference = ???
 
   def handle(action: SamEnvironmentAction): Future[SamEnvironmentResult] = {
     import SamEnvironmentCommandType._
@@ -67,11 +75,15 @@ trait EnvironmentActionHandler {
       action.`command` match {
         case ARCHITECTURE_INFO => result.setArchitectureInfoSignature(getArchitectureInfo())
         case PING => result
-        case SERVICE_LIST => ???
+        case SERVICE_LIST => result.addAllServiceList(getExposedServiceTransaction() map mapExposedTo _)
         case _ => ???
       }
     }
   }
+
+  def createUrl(urlStr : String) : ServiceInstanceURL = ???
+
+  def findServiceContract(contractStr : String) : SamServiceKey= ???
 }
 
 private class SamArchitectureManagement(val status: ServiceExecutionEnvironmentStatus) extends SamArchitectureManagementApi {

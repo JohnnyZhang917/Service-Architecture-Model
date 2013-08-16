@@ -12,12 +12,19 @@ enum SamEnvironmentCommandType {
 
 message SamEnvironmentAction {
     required SamEnvironmentCommandType command = 1;
-    // optional --- architectureInfo -- not used
+    // optional --- architectureInfo -- not used  = 2;
+    // optional --- serviceList -- not used = 3;
 }
 
 message SamEnvironmentResult {
     required SamEnvironmentCommandType command = 1;
     optional string architectureInfoSignature = 2;
+    repeated SamExposedServiceReference serviceList = 3;
+}
+
+message SamExposedServiceReference {
+    required string url = 1;
+    required string contract = 2;
 }
 
 message LongLongIDProto {

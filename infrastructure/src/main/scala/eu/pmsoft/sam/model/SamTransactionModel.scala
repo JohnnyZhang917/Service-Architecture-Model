@@ -28,7 +28,7 @@ object ServiceTransactionID {
 class ServiceTransactionID(val id: Int)
 
 case class ServiceInstanceURL(val url: URL)
-
+case class ExposedServiceTransaction(url: ServiceInstanceURL, contract: SamServiceKey)
 
 case class SamServiceInstance(instanceId: ServiceInstanceID, implementation: SamServiceImplementation, injector: Injector)
 
@@ -41,7 +41,9 @@ case class ExternalServiceBind(override val contractKey: SamServiceKey, url: Ser
 
 case class InstanceServiceBind(override val contractKey: SamServiceKey, binding: Seq[InjectionConfigurationElement], headInstance: SamServiceInstance) extends InjectionConfigurationElement(contractKey)
 
+
 object InjectionConfigurationBuilder {
+
   def singleInstanceBind(registry: SamArchitectureManagementApi, instance: SamServiceInstance): InjectionConfigurationElement = {
     require(instance.implementation.bindServices.isEmpty)
     val service = registry.getService(instance.implementation.contract)
