@@ -231,7 +231,7 @@ private class SamInjectionTransaction(
   val logger = LoggerFactory.getLogger(this.getClass)
   val transactionIdGenerator = LongLongIdGenerator.createGenerator()
 
-  def createExecutionContext(tid: LiftedServiceConfiguration) = {
+  private def createExecutionContext(tid: LiftedServiceConfiguration) = {
     val config = status.getConfigurations(tid.configId)
     val transportContext = createTransactionTransportContext(config)
     val context = CanonicalRecordingLayer(architectureManager, config.configurationRoot, transportContext)

@@ -171,7 +171,7 @@ public class TestServiceExecutionCreationByStep {
         try {
             result = Await.<Boolean>result(booleanFuture, Duration.apply(2, TimeUnit.SECONDS));
         } catch (Exception e) {
-
+            throw new RuntimeException(e);
         }
         assertTrue(result);
     }
