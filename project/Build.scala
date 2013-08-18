@@ -9,11 +9,11 @@ object InjectionBusBuild extends Build {
   lazy val slf4jVersion = "1.7.3"
 
   override lazy val settings = super.settings ++ Seq(
-    scalaVersion := "2.10.1"
+    scalaVersion := "2.10.2"
   )
 
   lazy val InjectionBusSettings = CommonSettings ++ Seq(
-    scalaVersion := "2.10.1",
+    scalaVersion := "2.10.2",
     crossPaths := true,
     libraryDependencies ++= Seq(
       "io.netty" % "netty-all" % "4.0.7.Final",

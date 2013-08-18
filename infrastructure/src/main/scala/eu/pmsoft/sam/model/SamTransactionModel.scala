@@ -8,25 +8,28 @@ import eu.pmsoft.sam.injection.{FreeBindingInjectionUtil, ExternalBindingControl
 
 object SamTransactionModel {
 
-  def externalReference(contractKey: SamServiceKey, url: ServiceInstanceURL) : InjectionConfigurationDefinition = ExternalServiceReference(contractKey,url)
+  def externalReference(contractKey: SamServiceKey, url: ServiceInstanceURL): InjectionConfigurationDefinition = ExternalServiceReference(contractKey, url)
 
   // for java accessibility
-  def definitionElement(end : ServiceHeadReference) : InjectionConfigurationDefinition = definitionElement(end, Seq() )
-  def definitionElement(end : ServiceHeadReference, binding: Array[InjectionConfigurationDefinition]): InjectionConfigurationDefinition = definitionElement(end, binding.toSeq )
+  def definitionElement(end: ServiceHeadReference): InjectionConfigurationDefinition = definitionElement(end, Seq())
 
-  def definitionElement(end : ServiceHeadReference, binding: Seq[InjectionConfigurationDefinition]) : InjectionConfigurationDefinition = end match {
+  def definitionElement(end: ServiceHeadReference, binding: Array[InjectionConfigurationDefinition]): InjectionConfigurationDefinition = definitionElement(end, binding.toSeq)
+
+  def definitionElement(end: ServiceHeadReference, binding: Seq[InjectionConfigurationDefinition]): InjectionConfigurationDefinition = end match {
     case HeadServiceInstanceReference(head) => InstanceServiceReference(head.implementation.implKey.contract, binding, end)
-    case HeadServiceImplementationReference(head) => InstanceServiceReference(head.contract,binding,end)
+    case HeadServiceImplementationReference(head) => InstanceServiceReference(head.contract, binding, end)
   }
 
-  def buildConfiguration(registry: SamArchitectureManagementApi, nodeApi : SamExecutionNodeApi , definition : InjectionConfigurationDefinition) : InjectionConfigurationElement = definition match {
-    case ExternalServiceReference(contractKey, url) => InjectionConfigurationBuilder.externalServiceBind(contractKey,url)
+  def buildConfiguration(registry: SamArchitectureManagementApi, nodeApi: SamExecutionNodeApi, definition: InjectionConfigurationDefinition): InjectionConfigurationElement = definition match {
+    case ExternalServiceReference(contractKey, url) => InjectionConfigurationBuilder.externalServiceBind(contractKey, url)
     case InstanceServiceReference(contractKey, binding, headRef) => {
       val serviceInstance = headRef match {
         case HeadServiceInstanceReference(head) => head
         case HeadServiceImplementationReference(head) => nodeApi.createServiceInstance(head)
       }
-      InjectionConfigurationBuilder.complexInstanceBind(registry,serviceInstance, binding map { buildConfiguration(registry, nodeApi, _ ) } toSeq )
+      InjectionConfigurationBuilder.complexInstanceBind(registry, serviceInstance, binding map {
+        buildConfiguration(registry, nodeApi, _)
+      } toSeq)
     }
   }
 
@@ -34,17 +37,16 @@ object SamTransactionModel {
 
 
 sealed abstract class ServiceHeadReference
-case class HeadServiceInstanceReference(head : SamServiceInstance) extends ServiceHeadReference
-case class HeadServiceImplementationReference(head : SamServiceImplementationKey) extends ServiceHeadReference
+
+case class HeadServiceInstanceReference(head: SamServiceInstance) extends ServiceHeadReference
+
+case class HeadServiceImplementationReference(head: SamServiceImplementationKey) extends ServiceHeadReference
 
 sealed abstract class InjectionConfigurationDefinition(val contractKey: SamServiceKey)
+
 case class ExternalServiceReference(override val contractKey: SamServiceKey, url: ServiceInstanceURL) extends InjectionConfigurationDefinition(contractKey)
+
 case class InstanceServiceReference(override val contractKey: SamServiceKey, binding: Seq[InjectionConfigurationDefinition], headRef: ServiceHeadReference) extends InjectionConfigurationDefinition(contractKey)
-
-
-
-
-
 
 
 object ServiceConfigurationID {
@@ -54,6 +56,7 @@ object ServiceConfigurationID {
 }
 
 class ServiceConfigurationID(val id: Int)
+
 case class LiftedServiceConfiguration(url: ServiceInstanceURL, configId: ServiceConfigurationID)
 
 object ServiceTransactionID {
@@ -65,6 +68,7 @@ object ServiceTransactionID {
 class ServiceTransactionID(val id: Int)
 
 case class ServiceInstanceURL(val url: URL)
+
 case class ExposedServiceTransaction(url: ServiceInstanceURL, contract: SamServiceKey)
 
 case class SamServiceInstance(instanceId: ServiceInstanceID, implementation: SamServiceImplementation, injector: Injector)
@@ -90,16 +94,20 @@ object InjectionConfigurationBuilder {
   def externalServiceBind(contract: SamServiceKey, url: ServiceInstanceURL): InjectionConfigurationElement = ExternalServiceBind(contract, url)
 
   def complexInstanceBind(registry: SamArchitectureManagementApi, instance: SamServiceInstance, bindings: Array[InjectionConfigurationElement]): InjectionConfigurationElement = {
-    complexInstanceBind(registry,instance,bindings.toIterable)
+    complexInstanceBind(registry, instance, bindings.toSeq)
   }
-  def complexInstanceBind(registry: SamArchitectureManagementApi, instance: SamServiceInstance, bindings: Iterable[InjectionConfigurationElement]): InjectionConfigurationElement = {
+
+  def complexInstanceBind(registry: SamArchitectureManagementApi, instance: SamServiceInstance, bindings: Seq[InjectionConfigurationElement]): InjectionConfigurationElement = {
     val requiredBindings = instance.implementation.bindServices
+    def errorMsg = s"Service instance implementation require services $requiredBindings, but provided is $bindings"
+    require(requiredBindings.size == bindings.size, errorMsg)
     val serviceMatches = requiredBindings map {
       registry.getService _
     } map {
       service => (service, bindings.find(_.contractKey == service.id))
     }
-    require(serviceMatches.filter(_._2.isEmpty).isEmpty)
+
+    require(serviceMatches.filter(_._2.isEmpty).isEmpty, errorMsg)
 
     val service = registry.getService(instance.implementation.implKey.contract)
     val orderedBinding = serviceMatches.map(_._2.get)
@@ -145,14 +153,16 @@ object InjectionTransaction {
       }
       case i@InstanceServiceBind(contractKey, binding, head) => {
         val service = registry.getService(contractKey)
-        val subModules = binding map { glueInjector(registry, _ )} filter( _.isDefined ) map ( _.get )
+        val subModules = binding map {
+          glueInjector(registry, _)
+        } filter (_.isDefined) map (_.get)
         val glueModule = new PrivateModule() {
           def configure() {
             val b = binder()
             b.requireExplicitBindings()
-            subModules.foreach( b.install( _ ))
+            subModules.foreach(b.install(_))
             service.api.foreach(k => {
-              require( k != null )
+              require(k != null)
               FreeBindingInjectionUtil.createGlueBinding(b, k, head.injector)
               b.expose(k)
             })

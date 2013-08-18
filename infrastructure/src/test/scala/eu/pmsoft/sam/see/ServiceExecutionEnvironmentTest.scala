@@ -24,29 +24,21 @@ import eu.pmsoft.sam.model.SamServiceKey
 import eu.pmsoft.sam.model.HeadServiceImplementationReference
 import eu.pmsoft.sam.model.SEEConfiguration
 import eu.pmsoft.sam.model.SamServiceImplementationKey
+import java.util.concurrent.atomic.AtomicInteger
 
-class ServiceExecutionEnvironmentTest {
+class ServiceExecutionEnvironmentTest extends SamTestUtil {
 
   val logger = LoggerFactory.getLogger(this.getClass)
 
-  private def createEnvironment(port: Int) = {
-    val builder = ServiceExecutionEnvironment.configurationBuilder(port)
-    val config = builder.withArchitecture(new SeeTestArchitecture())
-      .withImplementation(new TestImplementationDeclaration()).build
-    ServiceExecutionEnvironment(config)
-  }
-
-
   @Test def builderApi() {
-    val anyPort = 3000
+    val anyPort = getAnyPortValue
     val expected = SEEConfiguration(Set(), Set(), anyPort)
     val result = ServiceExecutionEnvironment.configurationBuilder(anyPort).build
     assert(expected == result)
   }
 
   @Test def architectureIsLoadCorrectly() {
-    val anyPort = 3001
-    val env = createEnvironment(anyPort)
+    val env = createEnvironment
 
     val expectedImplementation = Seq(
       (classOf[TestStoreServiceModule], SamServiceKey(classOf[StoreService])),
@@ -74,17 +66,9 @@ class ServiceExecutionEnvironmentTest {
     )
   }
 
-  private def createTransaction(env: ServiceExecutionEnvironment, definition : InjectionConfigurationDefinition ) = {
-    val configuration = buildConfiguration(env.architectureManager, env.executionNode, definition )
-    val externalConfigId = env.executionNode.registerInjectionConfiguration(configuration)
-    val externalConfigLifted = env.transaction.liftServiceConfiguration(externalConfigId)
-    env.transaction.createExecutionContext(externalConfigLifted)
-  }
 
-  @Test def directTestServicesExecution() {
-    val anyPort = 3002
-    val env = createEnvironment(anyPort)
-
+  @Test def testSimpleServiceDirect() {
+    val env = createEnvironment
     val testZero = SamModelBuilder.implementationKey(classOf[TestServiceZeroModule], SamServiceKey(classOf[TestServiceZero]))
     val testOne = SamModelBuilder.implementationKey(classOf[TestServiceOneModule], SamServiceKey(classOf[TestServiceOne]))
     val testTwo = SamModelBuilder.implementationKey(classOf[TestServiceTwoModule], SamServiceKey(classOf[TestServiceTwo]))
@@ -96,21 +80,46 @@ class ServiceExecutionEnvironmentTest {
         definitionElement(HeadServiceImplementationReference(testZero))
       )
     )
-    val transaction = createTransaction(env,definition)
-
-    // direct use of the transaction injector
-    // Simple call
-    for (i <- 0 to 3) {
+    testServiceSetup(env, definition, { transaction =>
       transaction.bindTransaction
       val serviceTwoApi = transaction.getTransactionInjector.getInstance(Key.get(classOf[TestInterfaceTwo1]))
-      assertTrue(serviceTwoApi.runTest())
+      val result = serviceTwoApi.runTest()
       transaction.unBindTransaction
-    }
+      result
+    })
   }
 
-  @Test def directShoppingExecution() {
-    val anyPort = 3003
-    val env = createEnvironment(anyPort)
+
+  @Test def testSimpleServiceByUrl() {
+    val env = createEnvironment
+
+    val testZero = SamModelBuilder.implementationKey(classOf[TestServiceZeroModule], SamServiceKey(classOf[TestServiceZero]))
+    val testOne = SamModelBuilder.implementationKey(classOf[TestServiceOneModule], SamServiceKey(classOf[TestServiceOne]))
+    val testTwo = SamModelBuilder.implementationKey(classOf[TestServiceTwoModule], SamServiceKey(classOf[TestServiceTwo]))
+
+    val urlOne = createSimpleInstanceAndGetUrl(env,testOne)
+    val urlZero = createSimpleInstanceAndGetUrl(env,testZero)
+
+    import SamTransactionModel._
+
+    val definition = definitionElement(
+      HeadServiceImplementationReference(testTwo),
+      Seq(
+        externalReference(SamServiceKey(classOf[TestServiceOne]),urlOne),
+        externalReference(SamServiceKey(classOf[TestServiceZero]),urlZero)
+      )
+    )
+    testServiceSetup(env, definition, { transaction =>
+      transaction.bindTransaction
+      val serviceTwoApi = transaction.getTransactionInjector.getInstance(Key.get(classOf[TestInterfaceTwo1]))
+      val result = serviceTwoApi.runTest()
+      transaction.unBindTransaction
+      result
+    })
+  }
+
+  @Test def directShoppingExecutionDirect() {
+    val env = createEnvironment
 
     val shoppingServiceImplKey = SamModelBuilder.implementationKey(classOf[TestShoppingModule], SamServiceKey(classOf[ShoppingService]))
     val storeServiceImplKey = SamModelBuilder.implementationKey(classOf[TestStoreServiceModule], SamServiceKey(classOf[StoreService]))
@@ -133,7 +142,6 @@ class ServiceExecutionEnvironmentTest {
       assertEquals(apiTwoRefExternal.makeShoping(),8800)
       transaction.unBindTransaction
     }
-
   }
 //
 //  @Test def simpleExecutionLocalTest() {

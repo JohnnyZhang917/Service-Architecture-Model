@@ -12,17 +12,22 @@ import eu.pmsoft.sam.architecture.definition.SamArchitectureDefinition
 import eu.pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract
 import eu.pmsoft.sam.execution.ServiceAction
 import eu.pmsoft.sam.idgenerator.{LongLongIdGenerator, LongLongID}
+import scala.Some
+import java.net.URL
 import eu.pmsoft.sam.model.InjectionConfiguration
 import eu.pmsoft.sam.model.SamService
 import scala.Some
+import eu.pmsoft.sam.model.ExposedServiceTransaction
 import eu.pmsoft.sam.model.SamServiceImplementation
 import eu.pmsoft.sam.model.ServiceInstanceURL
+import eu.pmsoft.sam.model.LiftedServiceConfiguration
 import eu.pmsoft.sam.model.SamServiceKey
 import eu.pmsoft.sam.model.SamServiceInstance
 import eu.pmsoft.sam.model.ExternalServiceBind
 import eu.pmsoft.sam.model.SEEConfigurationBuilder
 import eu.pmsoft.sam.model.SEEConfiguration
 import eu.pmsoft.sam.model.SamServiceImplementationKey
+import eu.pmsoft.sam.definition.service.SamServiceDefinition
 
 object ServiceExecutionEnvironment {
 
@@ -66,7 +71,7 @@ trait EnvironmentExternalApiLogic {
 
   def getExposedServiceTransaction() : Seq[ExposedServiceTransaction]
 
-  private def mapExposedTo(ref : ExposedServiceTransaction) : SamExposedServiceReference = ???
+  private def mapExposedTo(ref : ExposedServiceTransaction) : SamExposedServiceReference = SamExposedServiceReference(ref.url.url.toExternalForm, ref.contract.signature.getCanonicalName)
 
   def handle(action: SamEnvironmentAction): Future[SamEnvironmentResult] = {
     import SamEnvironmentCommandType._
@@ -81,9 +86,15 @@ trait EnvironmentExternalApiLogic {
     }
   }
 
-  def createUrl(urlStr : String) : ServiceInstanceURL = ???
+  // FIXME: security check and validation
 
-  def findServiceContract(contractStr : String) : SamServiceKey= ???
+  def createUrl(urlStr : String) : ServiceInstanceURL = ServiceInstanceURL(new URL(urlStr))
+
+  def findServiceContract(contractStr : String) : SamServiceKey= {
+    val loadClass: Class[_] = this.getClass.getClassLoader.loadClass(contractStr)
+    SamServiceKey(loadClass.asSubclass(classOf[SamServiceDefinition]))
+  }
+
 }
 
 private class SamArchitectureManagement(val status: ServiceExecutionEnvironmentStatus) extends SamArchitectureManagementApi {
@@ -250,14 +261,6 @@ private class SamInjectionTransaction(
   def executeServiceAction[R, T](configuration: LiftedServiceConfiguration, action: ServiceAction[R, T]): Future[R] = {
     val injectionExecutionContext = createExecutionContext(configuration)
     ThreadExecutionModel.openTransactionThread(injectionExecutionContext).executeServiceAction(action)
-  }
-
-  def openTransactionContext(url: ServiceInstanceURL): Future[LongLongID] = Future {
-    val configId = status.getExposedServiceConfigurations.getOrElse(url, throw new IllegalStateException())
-//    val context = createExecutionContext(configId)
-//    val tid = transactionIdGenerator.getNextID()
-    ???
-//    tid
   }
 
 }
