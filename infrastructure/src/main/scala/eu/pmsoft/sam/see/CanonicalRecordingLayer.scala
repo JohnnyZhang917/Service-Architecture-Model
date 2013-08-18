@@ -9,7 +9,7 @@ import eu.pmsoft.sam.model.ExternalServiceBind
 import scala.concurrent._
 import scala.concurrent.duration._
 import scala.annotation.tailrec
-import com.google.inject.{Injector, Key}
+import com.google.inject.{Guice, Injector, Key}
 import eu.pmsoft.sam.injection.{ExternalInstanceProvider, DependenciesBindingContext, ExternalBindingSwitch}
 import scala.collection.mutable
 import org.slf4j.LoggerFactory
@@ -51,13 +51,13 @@ class CanonicalRecordingLayer(registry: SamArchitectureManagementApi, injectionC
   private val recorder = new InjectionTransactionRecordManager(injectionConfiguration, transportContext)
   val logger = LoggerFactory.getLogger(this.getClass)
 
-  private val headInjector = InjectionTransaction.glueInjector(registry, recorder.injectionConfiguration)
-  require(headInjector.isDefined)
-  private val executor = new TransactionExecutionManager(headInjector.get, transportContext)
+  private val headInjector = Guice.createInjector(InjectionTransaction.glueInjector(registry, recorder.injectionConfiguration).get )
+
+  private val executor = new TransactionExecutionManager(headInjector, transportContext)
 
   private val transaction: InjectionTransaction = {
     val rootNode = InjectionTransaction.createNode(new InjectionTransactionWrappingContext(recorder.externalInstanceProviders), recorder.injectionConfiguration)
-    new InjectionTransaction(headInjector.get, rootNode)
+    new InjectionTransaction(headInjector, rootNode)
   }
 
   def getTransactionInjector: Injector = transaction.transactionInjector
@@ -73,7 +73,7 @@ class CanonicalRecordingLayer(registry: SamArchitectureManagementApi, injectionC
     executor.executionManager.unbindTransaction
     recorder.recordingExecutionManager.unbindTransaction
     //    executor.returnLoopPipe.unbindTransportContext()
-    ???
+//    ???
   }
 
   def protocolExecution(message: ThreadMessage): ThreadMessage = {

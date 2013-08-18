@@ -29,7 +29,7 @@ case class SEEConfigurationBuilder(config: SEEConfiguration) {
 
 object SamModelBuilder {
 
-  def implementationKey(module: GuiceModule) = SamServiceImplementationKey(module)
+  def implementationKey(module: GuiceModule,  contract : SamServiceKey) = SamServiceImplementationKey(module,contract)
 
   def loadArchitectureDefinition(architectureDefinition: SamArchitectureDefinition): SamArchitecture = {
     val loader = new SamArchitectureDefinitionLoader
@@ -141,7 +141,7 @@ class SamCategoryBuilder(val id: String, val architectureLoader: SamArchitecture
 
 
 class SamServiceImplementationLoader extends SamServiceImplementationDefinitionLoader with SamServiceImplementationDefinitionLoader.ContractAndModule {
-  var expression: ServiceImplementationBuilder = ServiceImplementationBuilder(SamServiceImplementation(null, null, Seq.empty))
+  var expression: ServiceImplementationBuilder = ServiceImplementationBuilder(SamServiceImplementation(null, Seq.empty))
 
 
   def withBindingsTo(userService: ServiceContract): ContractAndModule = {
@@ -166,8 +166,7 @@ case class ServiceImplementationBuilder(implementation: SamServiceImplementation
   def signature(contract: ServiceContract, serviceImplementationModule: GuiceModule) = {
     ServiceImplementationBuilder(
       implementation.copy(
-        implKey = SamServiceImplementationKey(serviceImplementationModule),
-        contract = SamServiceKey(contract)
+        implKey = SamServiceImplementationKey(serviceImplementationModule,SamServiceKey(contract))
       ))
   }
 

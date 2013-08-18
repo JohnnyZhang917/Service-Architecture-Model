@@ -2,13 +2,50 @@ package eu.pmsoft.sam.model
 
 import java.util.concurrent.atomic.AtomicInteger
 import java.net.URL
-import com.google.inject.{Guice, PrivateModule, Injector}
-import eu.pmsoft.sam.see.{InstanceProvider, SamArchitectureManagementApi}
+import com.google.inject.{Module, Guice, PrivateModule, Injector}
+import eu.pmsoft.sam.see.{SamExecutionNodeApi, InstanceProvider, SamArchitectureManagementApi}
 import eu.pmsoft.sam.injection.{FreeBindingInjectionUtil, ExternalBindingController, DependenciesBindingContext}
 
 object SamTransactionModel {
 
+  def externalReference(contractKey: SamServiceKey, url: ServiceInstanceURL) : InjectionConfigurationDefinition = ExternalServiceReference(contractKey,url)
+
+  // for java accessibility
+  def definitionElement(end : ServiceHeadReference) : InjectionConfigurationDefinition = definitionElement(end, Seq() )
+  def definitionElement(end : ServiceHeadReference, binding: Array[InjectionConfigurationDefinition]): InjectionConfigurationDefinition = definitionElement(end, binding.toSeq )
+
+  def definitionElement(end : ServiceHeadReference, binding: Seq[InjectionConfigurationDefinition]) : InjectionConfigurationDefinition = end match {
+    case HeadServiceInstanceReference(head) => InstanceServiceReference(head.implementation.implKey.contract, binding, end)
+    case HeadServiceImplementationReference(head) => InstanceServiceReference(head.contract,binding,end)
+  }
+
+  def buildConfiguration(registry: SamArchitectureManagementApi, nodeApi : SamExecutionNodeApi , definition : InjectionConfigurationDefinition) : InjectionConfigurationElement = definition match {
+    case ExternalServiceReference(contractKey, url) => InjectionConfigurationBuilder.externalServiceBind(contractKey,url)
+    case InstanceServiceReference(contractKey, binding, headRef) => {
+      val serviceInstance = headRef match {
+        case HeadServiceInstanceReference(head) => head
+        case HeadServiceImplementationReference(head) => nodeApi.createServiceInstance(head)
+      }
+      InjectionConfigurationBuilder.complexInstanceBind(registry,serviceInstance, binding map { buildConfiguration(registry, nodeApi, _ ) } toSeq )
+    }
+  }
+
 }
+
+
+sealed abstract class ServiceHeadReference
+case class HeadServiceInstanceReference(head : SamServiceInstance) extends ServiceHeadReference
+case class HeadServiceImplementationReference(head : SamServiceImplementationKey) extends ServiceHeadReference
+
+sealed abstract class InjectionConfigurationDefinition(val contractKey: SamServiceKey)
+case class ExternalServiceReference(override val contractKey: SamServiceKey, url: ServiceInstanceURL) extends InjectionConfigurationDefinition(contractKey)
+case class InstanceServiceReference(override val contractKey: SamServiceKey, binding: Seq[InjectionConfigurationDefinition], headRef: ServiceHeadReference) extends InjectionConfigurationDefinition(contractKey)
+
+
+
+
+
+
 
 object ServiceConfigurationID {
   private val counter: AtomicInteger = new AtomicInteger(0)
@@ -46,13 +83,16 @@ object InjectionConfigurationBuilder {
 
   def singleInstanceBind(registry: SamArchitectureManagementApi, instance: SamServiceInstance): InjectionConfigurationElement = {
     require(instance.implementation.bindServices.isEmpty)
-    val service = registry.getService(instance.implementation.contract)
+    val service = registry.getService(instance.implementation.implKey.contract)
     InstanceServiceBind(service.id, Seq.empty, instance)
   }
 
   def externalServiceBind(contract: SamServiceKey, url: ServiceInstanceURL): InjectionConfigurationElement = ExternalServiceBind(contract, url)
 
   def complexInstanceBind(registry: SamArchitectureManagementApi, instance: SamServiceInstance, bindings: Array[InjectionConfigurationElement]): InjectionConfigurationElement = {
+    complexInstanceBind(registry,instance,bindings.toIterable)
+  }
+  def complexInstanceBind(registry: SamArchitectureManagementApi, instance: SamServiceInstance, bindings: Iterable[InjectionConfigurationElement]): InjectionConfigurationElement = {
     val requiredBindings = instance.implementation.bindServices
     val serviceMatches = requiredBindings map {
       registry.getService _
@@ -61,7 +101,7 @@ object InjectionConfigurationBuilder {
     }
     require(serviceMatches.filter(_._2.isEmpty).isEmpty)
 
-    val service = registry.getService(instance.implementation.contract)
+    val service = registry.getService(instance.implementation.implKey.contract)
     val orderedBinding = serviceMatches.map(_._2.get)
     InstanceServiceBind(service.id, orderedBinding, instance)
   }
@@ -98,24 +138,27 @@ object InjectionTransaction {
     }
   }
 
-  def glueInjector(registry: SamArchitectureManagementApi, injectionConfiguration: InjectionConfigurationElement): Option[Injector] = {
+  def glueInjector(registry: SamArchitectureManagementApi, injectionConfiguration: InjectionConfigurationElement): Option[Module] = {
     injectionConfiguration match {
       case b@ExternalServiceBind(contract, url) => {
         None
       }
       case i@InstanceServiceBind(contractKey, binding, head) => {
         val service = registry.getService(contractKey)
+        val subModules = binding map { glueInjector(registry, _ )} filter( _.isDefined ) map ( _.get )
         val glueModule = new PrivateModule() {
           def configure() {
             val b = binder()
             b.requireExplicitBindings()
+            subModules.foreach( b.install( _ ))
             service.api.foreach(k => {
+              require( k != null )
               FreeBindingInjectionUtil.createGlueBinding(b, k, head.injector)
               b.expose(k)
             })
           }
         }
-        Some(Guice.createInjector(glueModule))
+        Some(glueModule)
       }
     }
   }

@@ -1,18 +1,14 @@
 package eu.pmsoft.sam.model
 
-import com.google.inject.{PrivateModule, Guice, Injector, Key}
-import java.net.URL
-import eu.pmsoft.sam.see._
+import com.google.inject.Key
 import java.util.concurrent.atomic.AtomicInteger
-import eu.pmsoft.sam.injection.{DependenciesBindingContext, FreeBindingInjectionUtil, ExternalBindingController}
-import scala.Some
 
 
 sealed abstract class ArchitectureModel
 
 case class SamServiceKey(signature: ServiceContract)
 
-case class SamServiceImplementationKey(module: GuiceModule)
+case class SamServiceImplementationKey(module: GuiceModule, contract: SamServiceKey)
 
 
 case class SamService(id: SamServiceKey, api: Set[Key[_]]) extends ArchitectureModel
@@ -27,7 +23,7 @@ case class SamArchitecture(
 
 
 case class SamServiceImplementation(implKey: SamServiceImplementationKey,
-                                    contract: SamServiceKey,
+                                    //                                    contract: SamServiceKey,
                                     bindServices: Seq[SamServiceKey]
                                      ) extends ArchitectureModel
 
