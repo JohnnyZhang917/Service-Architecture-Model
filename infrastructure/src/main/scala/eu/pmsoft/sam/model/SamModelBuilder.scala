@@ -29,7 +29,7 @@ case class SEEConfigurationBuilder(config: SEEConfiguration) {
 
 object SamModelBuilder {
 
-  def implementationKey(module: GuiceModule,  contract : SamServiceKey) = SamServiceImplementationKey(module,contract)
+  def implementationKey(module: GuiceModule, contract: SamServiceKey) = SamServiceImplementationKey(module, contract)
 
   def loadArchitectureDefinition(architectureDefinition: SamArchitectureDefinition): SamArchitecture = {
     val loader = new SamArchitectureDefinitionLoader
@@ -71,13 +71,13 @@ class SamServicePackageDefinitionLoader extends SamServicePackageLoader {
 class SamArchitectureDefinitionLoader extends SamArchitectureLoader {
   var categoryMap: Map[String, SamCategoryBuilder] = Map.empty
   var accessMap: Map[String, Set[String]] = Map.empty
-  var signature : Option[String] = None
+  var signature: Option[String] = None
 
 
   def architectureSignature(architectureSignature: String) {
     signature = signature match {
-      case None=> Some(architectureSignature)
-      case Some(sig)=> throw new IllegalStateException("Architecture Signature already given")
+      case None => Some(architectureSignature)
+      case Some(sig) => throw new IllegalStateException("Architecture Signature already given")
     }
   }
 
@@ -115,7 +115,7 @@ class SamArchitectureDefinitionLoader extends SamArchitectureLoader {
     }
     if (!selfAccessCategories.isEmpty) throw new IncorrectArchitectureDefinition("cycle access on category %s".format(selfAccessCategories.keySet))
 
-    SamArchitecture(signature.get,categories, accessMap)
+    SamArchitecture(signature.get, categories, accessMap)
   }
 
 
@@ -166,7 +166,7 @@ case class ServiceImplementationBuilder(implementation: SamServiceImplementation
   def signature(contract: ServiceContract, serviceImplementationModule: GuiceModule) = {
     ServiceImplementationBuilder(
       implementation.copy(
-        implKey = SamServiceImplementationKey(serviceImplementationModule,SamServiceKey(contract))
+        implKey = SamServiceImplementationKey(serviceImplementationModule, SamServiceKey(contract))
       ))
   }
 

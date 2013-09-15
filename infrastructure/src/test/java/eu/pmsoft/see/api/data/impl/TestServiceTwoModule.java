@@ -28,6 +28,8 @@ public class TestServiceTwoModule extends AbstractModule {
         public boolean runTest() {
             String pingReturn = serviceZero.ping("ping");
             Assert.assertNotNull(pingReturn);
+            pingReturn = serviceZero.ping("ping2");
+            Assert.assertNotNull(pingReturn);
             return serviceOne.runTest();
         }
 

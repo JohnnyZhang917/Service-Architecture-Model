@@ -119,11 +119,14 @@ trait Permit {
  * An AsyncSemaphore is a traditional semaphore but with asynchronous
  * execution. Grabbing a permit returns a Future[Permit]
  */
-class AsyncSemaphore protected (initialPermits: Int, maxWaiters: Option[Int]) {
+class AsyncSemaphore protected(initialPermits: Int, maxWaiters: Option[Int]) {
+
   import AsyncSemaphore._
 
   def this(initialPermits: Int = 0) = this(initialPermits, None)
+
   def this(initialPermits: Int, maxWaiters: Int) = this(initialPermits, Some(maxWaiters))
+
   require(maxWaiters.getOrElse(0) >= 0)
   private[this] val waitq = new ArrayDeque[Promise[Permit]]
   private[this] var availablePermits = initialPermits
@@ -133,7 +136,7 @@ class AsyncSemaphore protected (initialPermits: Int, maxWaiters: Option[Int]) {
      * Indicate that you are done with your Permit.
      */
     override def release() {
-      val run : Promise[Permit]= AsyncSemaphore.this.synchronized {
+      val run: Promise[Permit] = AsyncSemaphore.this.synchronized {
         val next = waitq.pollFirst()
         if (next == null) availablePermits += 1
         next
@@ -144,6 +147,7 @@ class AsyncSemaphore protected (initialPermits: Int, maxWaiters: Option[Int]) {
   }
 
   def numWaiters: Int = synchronized(waitq.size)
+
   def numPermitsAvailable: Int = synchronized(availablePermits)
 
   /**
@@ -151,8 +155,8 @@ class AsyncSemaphore protected (initialPermits: Int, maxWaiters: Option[Int]) {
    * block of your onSuccess() callback.
    *
    * @return a Future[Permit] when the Future is satisfied, computation can proceed,
-   * or a Future.Exception[RejectedExecutionException] if the configured maximum number of waitq
-   * would be exceeded.
+   *         or a Future.Exception[RejectedExecutionException] if the configured maximum number of waitq
+   *         would be exceeded.
    */
   def acquire(): Future[Permit] = {
     synchronized {

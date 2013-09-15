@@ -3,13 +3,13 @@ package eu.pmsoft.sam.see
 import scala.concurrent._
 import eu.pmsoft.sam.execution.ServiceAction
 import org.slf4j.LoggerFactory
-import scala.util.{Failure, Success}
 import java.util.concurrent.Executors
+import eu.pmsoft.sam.model.{MessageRoutingInformation, ThreadExecutionIdentifier}
 
 
 object ThreadExecutionModel {
 
-  def openTransactionThread(context: InjectionTransactionAccessApi) = new TransactionThreadStatus(context)
+  def openTransactionThread(id: ThreadExecutionIdentifier, transactionInjector: InjectionTransactionAccessApi): TransactionThreadStatus = new TransactionThreadStatus(id, transactionInjector)
 
 }
 
@@ -21,56 +21,51 @@ object ThreadExecutionContext {
 }
 
 
-class TransactionThreadStatus(context: InjectionTransactionAccessApi) {
+class TransactionThreadStatus(id: ThreadExecutionIdentifier, transactionInjector: InjectionTransactionAccessApi) {
   private val logger = LoggerFactory.getLogger(this.getClass)
+
+  logger.debug("TransactionThreadStatus created")
 
   import ThreadExecutionContext._
 
   def executeServiceAction[R, T](action: ServiceAction[R, T]): Future[R] = {
     Future {
-      context.bindTransaction
-      val serviceApi = context.getTransactionInjector.getInstance(action.getInterfaceKey)
+      logger.debug("Transaction Thread running for service interaction")
+      transactionInjector.bindTransaction
+      val serviceApi = transactionInjector.getTransactionInjector.getInstance(action.getInterfaceKey)
       val result = action.executeInteraction(serviceApi)
-      context.unBindTransaction
+      transactionInjector.unBindTransaction
       result
     }
   }
 
-  def executeCanonicalProtocolMessage(clientTransport: TransportAbstraction): Future[Unit] = {
-    ???
-//    logger.trace("execution on transaction thread starting on client receive")
-//    val process = clientTransport.receive().map {
-//      rootMessage => {
-//        try {
-//          context.bindTransaction
-////          val rootResponse = context.protocolExecution(rootMessage)
-//          val rootResponse = ???
-//          //TODO
-//          logger.trace("execution done")
-//          context.unBindTransaction
-//          rootResponse
-//        } catch {
-//          case e: Throwable => {
-//            e.printStackTrace()
-//            throw e
-//          }
-//        } finally {
-//          logger.trace("post bind")
-//        }
-//      }
-//    }.flatMap {
-//      response => clientTransport.send(response)
-//    }
-//    process.onComplete {
-//      case Success(r) => {
-//        logger.trace("external bind success")
-//      }
-//      case Failure(t) => {
-//        logger.trace("external bind failed")
-//        t.printStackTrace()
-//      }
-//    }
-//    process
+  def startPendingThreadForExecution(): Future[Unit] = {
+    Future {
+      logger.debug("Transaction Thread running on pending mode ")
+      transactionInjector.bindTransaction
+      transactionInjector.enterPendingMode()
+      transactionInjector.unBindTransaction
+      logger.debug("Transaction Thread pending mode stopped ")
+    }
   }
+
+  def dispatchMessage(routingInfo: MessageRoutingInformation): Future[Unit] = {
+    Future {
+      try {
+        logger.debug("dispatch  to pipe {}", routingInfo.remoteTargetPipeRef)
+        val inputPipe = transactionInjector.getTransactionTransportContext.loopPipe.getInputPipe
+        val loopback = transactionInjector.getTransactionTransportContext.loopPipe.getLoopBackPipe
+        val targetPipe = if (inputPipe.getPipeID == routingInfo.remoteTargetPipeRef.pipeID) {
+          if (loopback.isWaitingForMessage) loopback else inputPipe
+        } else {
+          transactionInjector.getTransactionTransportContext.pipeBindMapping.get(routingInfo.remoteTargetPipeRef.pipeID).get
+        }
+        targetPipe.receiveMessage(routingInfo.message)
+      } catch {
+        case e: Exception => logger.error("dispatch failure", e)
+      }
+    }
+  }
+
 }
 

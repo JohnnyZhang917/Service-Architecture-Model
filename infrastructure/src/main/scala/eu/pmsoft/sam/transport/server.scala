@@ -7,18 +7,18 @@ import io.netty.bootstrap.ServerBootstrap
 import io.netty.channel.socket.nio.NioServerSocketChannel
 import io.netty.handler.logging.{LogLevel, LoggingHandler}
 import io.netty.channel.socket.SocketChannel
-import io.netty.handler.codec.serialization.{ClassResolvers, ObjectDecoder, ObjectEncoder}
 import scala.concurrent.Future
 
 object ServerConnector {
-  def apply[Req,Res](address: InetSocketAddress,codec: TransportCodec[Req,Res], dispatcher: Transport[Res,Req] => Unit): ServerConnector[Req,Res] = new NettyRpcServer[Req,Res](address,codec,dispatcher)
+  def apply[Req, Res](address: InetSocketAddress, codec: TransportCodec[Req, Res], dispatcher: Transport[Res, Req] => Unit): ServerConnector[Req, Res] = new NettyRpcServer[Req, Res](address, codec, dispatcher)
 }
 
-trait ServerConnector[Req,Res] {
+trait ServerConnector[Req, Res] {
   def bind: Future[Channel]
 }
 
-private class NettyRpcServer[Req,Res](address: InetSocketAddress,codec: TransportCodec[Req,Res],serving: Transport[Res,Req] => Unit) extends ServerConnector[Req,Res]{
+private class NettyRpcServer[Req, Res](address: InetSocketAddress, codec: TransportCodec[Req, Res], serving: Transport[Res, Req] => Unit) extends ServerConnector[Req, Res] {
+
   import NettyFutureTranslation._
 
   val logger = LoggerFactory.getLogger(this.getClass)
@@ -31,18 +31,18 @@ private class NettyRpcServer[Req,Res](address: InetSocketAddress,codec: Transpor
     .option(ChannelOption.TCP_NODELAY, java.lang.Boolean.valueOf(true))
     .option(ChannelOption.SO_KEEPALIVE, java.lang.Boolean.valueOf(true))
     .handler(new LoggingHandler(LogLevel.INFO))
-    .childHandler(new TransportServerBridge(codec,serving))
+    .childHandler(new TransportServerBridge(codec, serving))
 
   lazy val channel: Future[Channel] = server.bind(address)
 
-  def bind : Future[Channel] = channel
+  def bind: Future[Channel] = channel
 }
 
-private class TransportServerBridge[Req,Res](codec: TransportCodec[Req,Res],serving: Transport[Res,Req] => Unit) extends ChannelInitializer[SocketChannel] {
+private class TransportServerBridge[Req, Res](codec: TransportCodec[Req, Res], serving: Transport[Res, Req] => Unit) extends ChannelInitializer[SocketChannel] {
   def initChannel(ch: SocketChannel) {
     codec.pipelineSetup(ch.pipeline())
-    val transport = new ChannelTransport[Res,Req](ch)
-    ch.pipeline().addLast("transport",transport)
+    val transport = new ChannelTransport[Res, Req](ch)
+    ch.pipeline().addLast("transport", transport)
     serving(transport)
   }
 }

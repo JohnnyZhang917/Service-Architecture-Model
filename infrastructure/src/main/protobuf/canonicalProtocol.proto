@@ -8,18 +8,27 @@ enum SamEnvironmentCommandType {
     PING = 0;
     ARCHITECTURE_INFO = 1;
     SERVICE_LIST = 2;
+    REGISTER_TRANSACTION = 3;
+    UNREGISTER_TRANSACTION = 4;
+    PROTOCOL_EXECUTION_MESSAGE = 5;
 }
 
 message SamEnvironmentAction {
     required SamEnvironmentCommandType command = 1;
     // optional --- architectureInfo -- not used  = 2;
     // optional --- serviceList -- not used = 3;
+    optional SamTransactionRegistration registration = 4;
+    optional LongLongIDProto transactionGlobalId = 5;
+    optional CanonicalRequestProto message = 6;
 }
 
 message SamEnvironmentResult {
     required SamEnvironmentCommandType command = 1;
     optional string architectureInfoSignature = 2;
     repeated SamExposedServiceReference serviceList = 3;
+    optional SamTransactionRegistrationConfirmation registrationConfirmation = 4;
+    optional bool unregisterOk = 5;
+    optional CanonicalRequestProto message = 6;
 }
 
 message SamExposedServiceReference {
@@ -32,8 +41,22 @@ message LongLongIDProto {
     required int64 linear = 2;
 }
 
+message SamTransactionRegistration {
+    required LongLongIDProto transactionGlobalId = 1;
+    required PipeReferenceProto headPipeReference = 2;
+    required SamExposedServiceReference serviceReference = 3;
+}
 
+message PipeReferenceProto {
+    required LongLongIDProto transactionBindId = 1;
+    required LongLongIDProto pipeRefId = 2;
+    required string address = 3;
+}
 
+message SamTransactionRegistrationConfirmation {
+    required LongLongIDProto transactionBindId = 1;
+    required PipeReferenceProto headPipeRef = 2;
+}
 
 message CanonicalProtocolMethodCallProto {
     required int32 instanceNr = 1;
@@ -50,7 +73,7 @@ message CanonicalProtocolMethodCallProto {
 }
 
 message BindingKey {
-    optional string type = 1;
+    required string type = 1;
     optional string annotationType = 2;
     optional bytes annotationInstance = 3;
 }
@@ -79,8 +102,9 @@ message CanonicalProtocolInstanceProto {
 }
 
 message CanonicalRequestProto {
-    required LongLongIDProto transactionID = 1;
-    repeated CanonicalProtocolMethodCallProto calls = 2;
-    repeated CanonicalProtocolInstanceProto instances = 3;
-    required bool closeThread = 4;
+    required LongLongIDProto sourcePipeId = 1;
+    required PipeReferenceProto remotePipeRef= 2;
+    repeated CanonicalProtocolMethodCallProto calls = 3;
+    repeated CanonicalProtocolInstanceProto instances = 4;
+    required bool closeThread = 5;
 }

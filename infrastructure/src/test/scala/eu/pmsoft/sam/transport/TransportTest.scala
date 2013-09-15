@@ -46,11 +46,11 @@ class TransportTest {
     val fDispatcher = server.bind flatMap {
       done => client.connect(serverAddress)
     } map {
-      ct => RPCDispatcher[LongLongIDProto, LongLongIDProto](ct)
+      ct => RPCDispatcher.clientDispatcher[LongLongIDProto, LongLongIDProto](ct)
     }
 
     val st = Await.result(serverTransport.future, 1 second)
-    val dispatcher = Await.result(fDispatcher, 0 second)
+    val dispatcher = Await.result(fDispatcher, 1 second)
 
     val send = LongLongIDProto.apply(0L, 1L)
     val response = LongLongIDProto.apply(1L, 2L)
@@ -74,30 +74,35 @@ class TransportTest {
 
     val codec = serializableCodec[Int, Int](false)
     val dispatcher = setup[Int, Int](new InetSocketAddress(9015), handler, codec)
-    val seqRes = ParRange( 1,100,1,true ) map { iter =>
-      val test = dispatcher flatMap {
-        d => {
-          val calls = (1 to nrOfMsg) map {
-            d.dispatch(_)
+    val seqRes = ParRange(1, 100, 1, true) map {
+      iter =>
+        val test = dispatcher flatMap {
+          d => {
+            val calls = (1 to nrOfMsg) map {
+              d.dispatch(_)
+            }
+            Future.sequence(calls)
           }
-          Future.sequence(calls)
-        }
-      } map {
-        seq => {
-          val expected = (1 + nrOfMsg) to (nrOfMsg + nrOfMsg)
-          assert(expected.size == seq.size)
-          val bad = (seq zip expected).filter {
-            case (s:Int, e:Int) => s != e
+        } map {
+          seq => {
+            val expected = (1 + nrOfMsg) to (nrOfMsg + nrOfMsg)
+            assert(expected.size == seq.size)
+            val bad = (seq zip expected).filter {
+              case (s: Int, e: Int) => s != e
+            }
+            bad
           }
-          bad
         }
-      }
 
-      val result= Await.result(test, 10 second)
-      result
+        val result = Await.result(test, 10 second)
+        result
     }
-    val badSeq = seqRes filterNot { seq => seq.isEmpty}
-    val allOk = seqRes forall { res => res.isEmpty }
+    val badSeq = seqRes filterNot {
+      seq => seq.isEmpty
+    }
+    val allOk = seqRes forall {
+      res => res.isEmpty
+    }
     assert(allOk, "errors" + badSeq)
   }
 
@@ -114,7 +119,7 @@ class TransportTest {
     server.bind flatMap {
       done => client.connect(address)
     } map {
-      ct => RPCDispatcher[I, O](ct)
+      ct => RPCDispatcher.clientDispatcher[I, O](ct)
     }
   }
 
@@ -144,7 +149,7 @@ class TransportTest {
     val fDispatcher = server.bind flatMap {
       done => client.connect(serverAddress)
     } map {
-      ct => RPCDispatcher[String, String](ct)
+      ct => RPCDispatcher.clientDispatcher[String, String](ct)
     }
 
     Await.ready(serverTransport.future, 1 second)
@@ -171,7 +176,7 @@ class TransportTest {
     val fDispatcher = server.bind flatMap {
       done => client.connect(serverAddress)
     } map {
-      ct => RPCDispatcher[String, String](ct)
+      ct => RPCDispatcher.clientDispatcher[String, String](ct)
     }
 
     val st = Await.result(serverTransport.future, 1 second)

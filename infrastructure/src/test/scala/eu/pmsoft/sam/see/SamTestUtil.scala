@@ -16,10 +16,10 @@ trait SamTestUtil {
   def liftDefinition(env: ServiceExecutionEnvironment, definition: InjectionConfigurationDefinition) = {
     val configuration = buildConfiguration(env.architectureManagerApi, env.executionNode, definition)
     val externalConfigId = env.executionNode.registerInjectionConfiguration(configuration)
-    env.transactionApi.liftServiceConfiguration(externalConfigId)
+    env.executionNode.liftServiceConfiguration(externalConfigId)
   }
 
-  def executeTestAction[T](env: ServiceExecutionEnvironment, definition: InjectionConfigurationDefinition, action : ServiceAction[Boolean,T]) : Future[Boolean] = {
+  def executeTestAction[T](env: ServiceExecutionEnvironment, definition: InjectionConfigurationDefinition, action: ServiceAction[Boolean, T]): Future[Boolean] = {
     val liftId = liftDefinition(env, definition)
     env.transactionApi.executeServiceAction(liftId, action)
   }

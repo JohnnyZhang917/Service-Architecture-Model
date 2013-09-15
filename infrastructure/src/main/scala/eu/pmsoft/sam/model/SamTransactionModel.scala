@@ -2,7 +2,7 @@ package eu.pmsoft.sam.model
 
 import java.util.concurrent.atomic.AtomicInteger
 import java.net.URL
-import com.google.inject.{Module, Guice, PrivateModule, Injector}
+import com.google.inject.{Module, PrivateModule, Injector}
 import eu.pmsoft.sam.see.{SamExecutionNodeApi, InstanceProvider, SamArchitectureManagementApi}
 import eu.pmsoft.sam.injection.{FreeBindingInjectionUtil, ExternalBindingController, DependenciesBindingContext}
 

@@ -6,25 +6,18 @@ import org.testng.annotations.Test
 import org.testng.Assert._
 import com.google.inject.Key
 import org.slf4j.LoggerFactory
-import eu.pmsoft.see.api.data.architecture.SeeTestArchitecture
 import eu.pmsoft.see.api.data.impl._
 import eu.pmsoft.sam.model._
-import eu.pmsoft.see.api.data.architecture.contract.{TestInterfaceTwo1, TestInterfaceTwo0, TestInterfaceOne}
+import eu.pmsoft.see.api.data.architecture.contract.TestInterfaceTwo1
 import eu.pmsoft.see.api.data.impl.shopping.TestShoppingModule
 import eu.pmsoft.see.api.data.impl.courier.TestCourierServiceModule
 import eu.pmsoft.see.api.data.impl.store.TestStoreServiceModule
-import eu.pmsoft.see.api.data.architecture.contract.store.StoreServiceContract
-import eu.pmsoft.see.api.data.architecture.contract.courier.CourierServiceContract
 import eu.pmsoft.see.api.data.architecture.contract.shopping.ShoppingStoreWithCourierInteraction
 import eu.pmsoft.see.api.data.architecture.service._
 import eu.pmsoft.sam.execution.ServiceAction
-import eu.pmsoft.sam.model.SamTransactionModel._
-import eu.pmsoft.sam.model.ServiceInstanceURL
 import eu.pmsoft.sam.model.SamServiceKey
 import eu.pmsoft.sam.model.HeadServiceImplementationReference
 import eu.pmsoft.sam.model.SEEConfiguration
-import eu.pmsoft.sam.model.SamServiceImplementationKey
-import java.util.concurrent.atomic.AtomicInteger
 
 class ServiceExecutionEnvironmentTest extends SamTestUtil {
 
@@ -81,11 +74,11 @@ class ServiceExecutionEnvironmentTest extends SamTestUtil {
       )
     )
 
-    val action : ServiceAction[Boolean,TestInterfaceTwo1] = new ServiceAction[Boolean,TestInterfaceTwo1](Key.get(classOf[TestInterfaceTwo1])) {
+    val action: ServiceAction[Boolean, TestInterfaceTwo1] = new ServiceAction[Boolean, TestInterfaceTwo1](Key.get(classOf[TestInterfaceTwo1])) {
       def executeInteraction(serviceTwoApi: TestInterfaceTwo1): Boolean = serviceTwoApi.runTest()
     }
-    val res = executeTestAction(env,definition,action)
-    assertTrue(Await.result(res, 3 seconds))
+    val res = executeTestAction(env, definition, action)
+    assertTrue(Await.result(res, 30 seconds))
   }
 
 
@@ -96,27 +89,27 @@ class ServiceExecutionEnvironmentTest extends SamTestUtil {
     val testOne = SamModelBuilder.implementationKey(classOf[TestServiceOneModule], SamServiceKey(classOf[TestServiceOne]))
     val testTwo = SamModelBuilder.implementationKey(classOf[TestServiceTwoModule], SamServiceKey(classOf[TestServiceTwo]))
 
-    val urlOne = createSimpleInstanceAndGetUrl(env,testOne)
-    val urlZero = createSimpleInstanceAndGetUrl(env,testZero)
+    val urlOne = createSimpleInstanceAndGetUrl(env, testOne)
+    val urlZero = createSimpleInstanceAndGetUrl(env, testZero)
 
     import SamTransactionModel._
 
     val definition = definitionElement(
       HeadServiceImplementationReference(testTwo),
       Seq(
-        externalReference(SamServiceKey(classOf[TestServiceOne]),urlOne),
-        externalReference(SamServiceKey(classOf[TestServiceZero]),urlZero)
+        externalReference(SamServiceKey(classOf[TestServiceOne]), urlOne),
+        externalReference(SamServiceKey(classOf[TestServiceZero]), urlZero)
       )
     )
 
-    val action : ServiceAction[Boolean,TestInterfaceTwo1] = new ServiceAction[Boolean,TestInterfaceTwo1](Key.get(classOf[TestInterfaceTwo1])) {
+    val action: ServiceAction[Boolean, TestInterfaceTwo1] = new ServiceAction[Boolean, TestInterfaceTwo1](Key.get(classOf[TestInterfaceTwo1])) {
       def executeInteraction(serviceTwoApi: TestInterfaceTwo1): Boolean = serviceTwoApi.runTest()
     }
-    val res = executeTestAction(env,definition,action)
+    val res = executeTestAction(env, definition, action)
     assertTrue(Await.result(res, 3 seconds))
   }
 
-  @Test def directShoppingExecutionDirect() {
+  @Test def directShoppingExecution() {
     val env = createEnvironment
 
     val shoppingServiceImplKey = SamModelBuilder.implementationKey(classOf[TestShoppingModule], SamServiceKey(classOf[ShoppingService]))
@@ -130,11 +123,39 @@ class ServiceExecutionEnvironmentTest extends SamTestUtil {
         definitionElement(HeadServiceImplementationReference(courierServiceImplKey))
       )
     )
-    val action : ServiceAction[Boolean,ShoppingStoreWithCourierInteraction] = new ServiceAction[Boolean,ShoppingStoreWithCourierInteraction](Key.get(classOf[ShoppingStoreWithCourierInteraction])) {
+    val action: ServiceAction[Boolean, ShoppingStoreWithCourierInteraction] = new ServiceAction[Boolean, ShoppingStoreWithCourierInteraction](Key.get(classOf[ShoppingStoreWithCourierInteraction])) {
       def executeInteraction(service: ShoppingStoreWithCourierInteraction): Boolean = service.makeShoping() == 8800
     }
-    val res = executeTestAction(env,definition,action)
+    val res = executeTestAction(env, definition, action)
     assertTrue(Await.result(res, 3 seconds))
+  }
+
+  @Test def remoteShoppingExecution() {
+    val envShop = createEnvironment
+    val envStore = createEnvironment
+    val envCourier = createEnvironment
+
+    val shoppingServiceImplKey = SamModelBuilder.implementationKey(classOf[TestShoppingModule], SamServiceKey(classOf[ShoppingService]))
+    val storeServiceImplKey = SamModelBuilder.implementationKey(classOf[TestStoreServiceModule], SamServiceKey(classOf[StoreService]))
+    val courierServiceImplKey = SamModelBuilder.implementationKey(classOf[TestCourierServiceModule], SamServiceKey(classOf[CourierService]))
+
+
+    val storeUrl = createSimpleInstanceAndGetUrl(envStore, storeServiceImplKey)
+    val courierUrl = createSimpleInstanceAndGetUrl(envCourier, courierServiceImplKey)
+
+    import SamTransactionModel._
+    val definition = definitionElement(
+      HeadServiceImplementationReference(shoppingServiceImplKey),
+      Seq(
+        externalReference(SamServiceKey(classOf[StoreService]), storeUrl),
+        externalReference(SamServiceKey(classOf[CourierService]), courierUrl)
+      )
+    )
+    val action: ServiceAction[Boolean, ShoppingStoreWithCourierInteraction] = new ServiceAction[Boolean, ShoppingStoreWithCourierInteraction](Key.get(classOf[ShoppingStoreWithCourierInteraction])) {
+      def executeInteraction(service: ShoppingStoreWithCourierInteraction): Boolean = service.makeShoping() == 8800
+    }
+    val res = executeTestAction(envShop, definition, action)
+    assertTrue(Await.result(res, 1 seconds))
   }
 
 }

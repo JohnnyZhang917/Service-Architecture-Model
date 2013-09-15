@@ -16,7 +16,7 @@ object InjectionBusBuild extends Build {
     scalaVersion := "2.10.2",
     crossPaths := true,
     libraryDependencies ++= Seq(
-      "io.netty" % "netty-all" % "4.0.7.Final",
+      "io.netty" % "netty-all" % "4.0.9.Final",
       "org.slf4j" % "slf4j-api" % slf4jVersion,
       "org.slf4j" % "slf4j-simple" % slf4jVersion % "test",
       "com.google.guava" % "guava" % "14.0.1" % "test"
@@ -26,7 +26,7 @@ object InjectionBusBuild extends Build {
   lazy val CommonSettings = Defaults.defaultSettings ++ Seq(
     organization := "eu.pmsoft.sam",
     crossPaths := false,
-    version := "0.4.1-SNAPSHOT",
+    version := "0.4.2-SNAPSHOT",
     scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xcheckinit", "-encoding", "utf8"),
     javacOptions ++= Seq("-target", "1.6", "-source", "1.6", "-Xlint:deprecation"),
     libraryDependencies ++= CommonDependencies

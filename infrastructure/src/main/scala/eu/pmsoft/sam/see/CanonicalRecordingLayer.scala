@@ -2,6 +2,7 @@ package eu.pmsoft.sam.see
 
 
 import java.lang.reflect.{InvocationHandler, Method}
+import java.util.concurrent.atomic.AtomicBoolean
 import eu.pmsoft.sam.model._
 import scala._
 import scala.AnyRef
@@ -14,11 +15,12 @@ import eu.pmsoft.sam.injection.{ExternalInstanceProvider, DependenciesBindingCon
 import scala.collection.mutable
 import org.slf4j.LoggerFactory
 
+
 object CanonicalRecordingLayer {
 
   def apply(registry: SamArchitectureManagementApi,
             injectionConfiguration: InjectionConfigurationElement,
-            transportContext: TransactionTransportContext) = new CanonicalRecordingLayer(registry, injectionConfiguration, transportContext)
+            transportContext: TransactionTransportContext): InjectionTransactionAccessApi = new CanonicalRecordingLayer(registry, injectionConfiguration, transportContext)
 
 }
 
@@ -41,17 +43,17 @@ trait RecordEmbroider {
 }
 
 class TransactionTransportContext(
-                                   val externalBind: Seq[(ExternalServiceBind, TransportPipe)],
-                                   val inputPipe: TransportPipe,
-                                   val loopBackPipe: TransportPipe
+                                   val pipeBindMapping: Map[PipeIdentifier, TransportPipe[ThreadMessage]],
+                                   val externalBind: Seq[(ExternalServiceBind, TransportPipe[ThreadMessage])],
+                                   val loopPipe: LoopTransportPipe[ThreadMessage]
                                    )
 
-class CanonicalRecordingLayer(registry: SamArchitectureManagementApi, injectionConfiguration: InjectionConfigurationElement, transportContext: TransactionTransportContext) extends InjectionTransactionAccessApi {
+private class CanonicalRecordingLayer(registry: SamArchitectureManagementApi, injectionConfiguration: InjectionConfigurationElement, transportContext: TransactionTransportContext) extends InjectionTransactionAccessApi {
 
   private val recorder = new InjectionTransactionRecordManager(injectionConfiguration, transportContext)
   val logger = LoggerFactory.getLogger(this.getClass)
 
-  private val headInjector = Guice.createInjector(InjectionTransaction.glueInjector(registry, recorder.injectionConfiguration).get )
+  private val headInjector = Guice.createInjector(InjectionTransaction.glueInjector(registry, recorder.injectionConfiguration).get)
 
   private val executor = new TransactionExecutionManager(headInjector, transportContext)
 
@@ -72,12 +74,24 @@ class CanonicalRecordingLayer(registry: SamArchitectureManagementApi, injectionC
     transaction.rootNode.unbindSwitchingScope
     executor.executionManager.unbindTransaction
     recorder.recordingExecutionManager.unbindTransaction
-    //    executor.returnLoopPipe.unbindTransportContext()
-//    ???
   }
 
-  def protocolExecution(message: ThreadMessage): ThreadMessage = {
+  def getTransactionTransportContext: TransactionTransportContext = transportContext
 
+  private val closed = new AtomicBoolean(false)
+
+  def enterPendingMode() {
+    logger.debug("enter pending mode")
+    while (!closed.get()) {
+      protocolExecution()
+    }
+    logger.debug("exit pending mode")
+
+  }
+
+  def protocolExecution(): Unit = {
+    val inputPipe = transportContext.loopPipe.getInputPipe
+    val message = inputPipe.waitResponse
     message.data.map {
       proto => {
         executor.mergeInstances(0, proto.instances)
@@ -88,8 +102,7 @@ class CanonicalRecordingLayer(registry: SamArchitectureManagementApi, injectionC
     val finishData = CanonicalRequest(executor.getInstanceReferenceToTransfer(0), Seq(), true)
     val res = ThreadMessage(Some(finishData))
     logger.debug("response {}", res)
-    res
-
+    inputPipe.sendMessage(res)
   }
 }
 

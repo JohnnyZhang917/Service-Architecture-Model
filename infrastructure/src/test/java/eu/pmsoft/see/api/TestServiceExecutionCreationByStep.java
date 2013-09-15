@@ -9,7 +9,9 @@ import eu.pmsoft.sam.see.*;
 import eu.pmsoft.see.api.data.architecture.SeeTestArchitecture;
 import eu.pmsoft.see.api.data.architecture.contract.TestInterfaceOne;
 import eu.pmsoft.see.api.data.architecture.contract.TestInterfaceTwo0;
-import eu.pmsoft.see.api.data.architecture.service.*;
+import eu.pmsoft.see.api.data.architecture.service.TestServiceOne;
+import eu.pmsoft.see.api.data.architecture.service.TestServiceTwo;
+import eu.pmsoft.see.api.data.architecture.service.TestServiceZero;
 import eu.pmsoft.see.api.data.impl.TestImplementationDeclaration;
 import eu.pmsoft.see.api.data.impl.TestServiceOneModule;
 import eu.pmsoft.see.api.data.impl.TestServiceTwoModule;
@@ -19,17 +21,12 @@ import org.testng.ITestContext;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Guice;
 import org.testng.annotations.Test;
-import org.testng.collections.Lists;
-import scala.Array$;
-import scala.collection.Seq;
-import scala.collection.immutable.Seq$;
 import scala.collection.immutable.Set;
 import scala.concurrent.Await;
 import scala.concurrent.Future;
 import scala.concurrent.duration.Duration;
 
 import javax.inject.Inject;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.testng.Assert.*;
@@ -99,43 +96,72 @@ public class TestServiceExecutionCreationByStep {
     }
 
 
-    @Test(groups = "transactionsCreation", dependsOnGroups = "architectureLoadCheck")
-    public void testInjectionTransactionCreation() {
+    @Test(groups = "transactionsExecution", dependsOnGroups = "architectureLoadCheck")
+    public void testTransactionExecution() {
 
-        SamServiceInstance zero = getUniqueServiceInstance(TestServiceZeroModule.class,TestServiceZero.class);
+        // Get service Instances
+        SamServiceInstance zero = getUniqueServiceInstance(TestServiceZeroModule.class, TestServiceZero.class);
         SamServiceInstance one = getUniqueServiceInstance(TestServiceOneModule.class, TestServiceOne.class);
         SamServiceInstance two = getUniqueServiceInstance(TestServiceTwoModule.class, TestServiceTwo.class);
 
-//        SamTransactionModel$ b = SamTransactionModel$.MODULE$;
-//        InjectionConfigurationDefinition[] bindingDef ={b.definitionElement(new HeadServiceInstanceReference(one)),b.definitionElement(new HeadServiceInstanceReference(zero))};
-//        InjectionConfigurationDefinition definition = b.definitionElement(new HeadServiceInstanceReference(two), bindingDef);
-//        InjectionConfigurationElement configurationElement = b.buildConfiguration(architectureManager, executionNode, definition);
-
-
+        // Create configuration
+        // Service0 alone
         InjectionConfigurationElement elementZero = InjectionConfigurationBuilder.singleInstanceBind(architectureManager, zero);
         assertNotNull(elementZero);
         assertEquals(zero.implementation().implKey().contract(), elementZero.contractKey());
 
+        // Service1 alone
         InjectionConfigurationElement elementOne = InjectionConfigurationBuilder.singleInstanceBind(architectureManager, one);
         assertNotNull(elementOne);
         assertEquals(one.implementation().implKey().contract(), elementOne.contractKey());
 
+        // Service1 bind to Service0 and Service1
         InjectionConfigurationElement[] bindings = {elementOne, elementZero};
-
         InjectionConfigurationElement elementTwo = InjectionConfigurationBuilder.complexInstanceBind(architectureManager, two, bindings);
         assertNotNull(elementTwo);
         assertEquals(two.implementation().implKey().contract(), elementTwo.contractKey());
 
-
-        ServiceConfigurationID transactionZero = setupAndCheckTransactionRegistration(elementZero);
-        ServiceConfigurationID transactionOne = setupAndCheckTransactionRegistration(elementOne);
-        ServiceConfigurationID transactionTwo = setupAndCheckTransactionRegistration(elementTwo);
-
+        // Create configurations
+        ServiceConfigurationID transactionZero = registerConfiguration(elementZero);
+        ServiceConfigurationID transactionOne = registerConfiguration(elementOne);
+        ServiceConfigurationID transactionTwo = registerConfiguration(elementTwo);
 
         testInjectionTransactionExecutionForServiceOne(transactionOne);
-//
-        ServiceInstanceURL zeroURL = transactionApi.liftServiceConfiguration(transactionZero).url();
-        ServiceInstanceURL oneURL = transactionApi.liftServiceConfiguration(transactionOne).url();
+
+    }
+
+    @Test(groups = "transactionsExecutionComplex", dependsOnGroups = "transactionsExecution")
+    public void testComplexTransactionExecution() {
+
+        // Get service Instances
+        SamServiceInstance zero = getUniqueServiceInstance(TestServiceZeroModule.class, TestServiceZero.class);
+        SamServiceInstance one = getUniqueServiceInstance(TestServiceOneModule.class, TestServiceOne.class);
+        SamServiceInstance two = getUniqueServiceInstance(TestServiceTwoModule.class, TestServiceTwo.class);
+
+        // Create configuration
+        // Service0 alone
+        InjectionConfigurationElement elementZero = InjectionConfigurationBuilder.singleInstanceBind(architectureManager, zero);
+        assertNotNull(elementZero);
+        assertEquals(zero.implementation().implKey().contract(), elementZero.contractKey());
+
+        // Service1 alone
+        InjectionConfigurationElement elementOne = InjectionConfigurationBuilder.singleInstanceBind(architectureManager, one);
+        assertNotNull(elementOne);
+        assertEquals(one.implementation().implKey().contract(), elementOne.contractKey());
+
+        // Service1 bind to Service0 and Service1
+        InjectionConfigurationElement[] bindings = {elementOne, elementZero};
+        InjectionConfigurationElement elementTwo = InjectionConfigurationBuilder.complexInstanceBind(architectureManager, two, bindings);
+        assertNotNull(elementTwo);
+        assertEquals(two.implementation().implKey().contract(), elementTwo.contractKey());
+
+        // Create configurations
+        ServiceConfigurationID transactionZero = registerConfiguration(elementZero);
+        ServiceConfigurationID transactionOne = registerConfiguration(elementOne);
+        ServiceConfigurationID transactionTwo = registerConfiguration(elementTwo);
+
+        ServiceInstanceURL zeroURL = executionNode.liftServiceConfiguration(transactionZero).url();
+        ServiceInstanceURL oneURL = executionNode.liftServiceConfiguration(transactionOne).url();
 
         SamService serviceOne = architectureManager.getService(one.implementation().implKey().contract());
         InjectionConfigurationElement externalOne = InjectionConfigurationBuilder.externalServiceBind(serviceOne.id(), oneURL);
@@ -148,19 +174,19 @@ public class TestServiceExecutionCreationByStep {
         assertNotNull(elementTwoRemote);
         assertEquals(two.implementation().implKey().contract(), elementTwoRemote.contractKey());
 
-        ServiceConfigurationID siurlRemoteTwo = setupAndCheckTransactionRegistration(elementTwoRemote);
+        ServiceConfigurationID siurlRemoteTwo = registerConfiguration(elementTwoRemote);
 
         testInjectionTransactionExecutionForServiceTwo(siurlRemoteTwo);
     }
 
-    private ServiceConfigurationID setupAndCheckTransactionRegistration(InjectionConfigurationElement element) {
+    private ServiceConfigurationID registerConfiguration(InjectionConfigurationElement element) {
         ServiceConfigurationID serviceConfigurationID = executionNode.registerInjectionConfiguration(element);
         return serviceConfigurationID;
     }
 
     public void testInjectionTransactionExecutionForServiceOne(ServiceConfigurationID transactionOne) {
         Key<TestInterfaceOne> interfaceOneKey = Key.get(TestInterfaceOne.class);
-        LiftedServiceConfiguration liftedServiceConfiguration = transactionApi.liftServiceConfiguration(transactionOne);
+        LiftedServiceConfiguration liftedServiceConfiguration = executionNode.liftServiceConfiguration(transactionOne);
         Future<Boolean> booleanFuture = transactionApi.executeServiceAction(liftedServiceConfiguration, new ServiceAction<Boolean, TestInterfaceOne>(interfaceOneKey) {
             @Override
             public Boolean executeInteraction(TestInterfaceOne service) {
@@ -178,7 +204,7 @@ public class TestServiceExecutionCreationByStep {
 
     public void testInjectionTransactionExecutionForServiceTwo(ServiceConfigurationID configurationID) {
         Key<TestInterfaceTwo0> interfaceTwoKey = Key.get(TestInterfaceTwo0.class);
-        LiftedServiceConfiguration liftedServiceConfiguration = transactionApi.liftServiceConfiguration(configurationID);
+        LiftedServiceConfiguration liftedServiceConfiguration = executionNode.liftServiceConfiguration(configurationID);
         Future<Boolean> booleanFuture = transactionApi.executeServiceAction(liftedServiceConfiguration, new ServiceAction<Boolean, TestInterfaceTwo0>(interfaceTwoKey) {
             @Override
             public Boolean executeInteraction(TestInterfaceTwo0 service) {

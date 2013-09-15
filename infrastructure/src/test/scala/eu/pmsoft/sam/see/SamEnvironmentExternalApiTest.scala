@@ -6,24 +6,24 @@ import ExecutionContext.Implicits.global
 import org.testng.annotations.{BeforeClass, Test}
 import org.testng.Assert._
 import eu.pmsoft.see.api.data.architecture.SeeTestArchitecture
-import eu.pmsoft.see.api.data.impl.{ TestServiceOneModule, TestServiceZeroModule}
+import eu.pmsoft.see.api.data.impl.{TestServiceOneModule, TestServiceZeroModule}
 import com.google.inject.Guice
-import java.net.InetSocketAddress
+import java.net.{URL, InetSocketAddress}
 import scala.concurrent._
 import scala.concurrent.duration._
 import eu.pmsoft.sam.model._
-import eu.pmsoft.see.api.data.architecture.service.{ TestServiceOne, TestServiceZero}
+import eu.pmsoft.see.api.data.architecture.service.{TestServiceOne, TestServiceZero}
 import eu.pmsoft.sam.model.ExposedServiceTransaction
 import eu.pmsoft.sam.model.SamServiceKey
 import eu.pmsoft.sam.idgenerator.LongLongIdGenerator
 
 class SamEnvironmentExternalApiTest extends SamTestUtil {
 
-  val idGenerator : LongLongIdGenerator = LongLongIdGenerator.createGenerator()
+  val idGenerator: LongLongIdGenerator = LongLongIdGenerator.createGenerator()
 
   var externalApi: SamEnvironmentExternalApi = _
 
-  var expectedServices : Seq[ExposedServiceTransaction] = _
+  var expectedServices: Seq[ExposedServiceTransaction] = _
 
   @BeforeClass
   def setup() {
@@ -33,11 +33,11 @@ class SamEnvironmentExternalApiTest extends SamTestUtil {
     val testZero = SamModelBuilder.implementationKey(classOf[TestServiceZeroModule], SamServiceKey(classOf[TestServiceZero]))
     val testOne = SamModelBuilder.implementationKey(classOf[TestServiceOneModule], SamServiceKey(classOf[TestServiceOne]))
 
-    val urlZero = createSimpleInstanceAndGetUrl(target,testZero)
-    val urlOne = createSimpleInstanceAndGetUrl(target,testOne)
+    val urlZero = createSimpleInstanceAndGetUrl(target, testZero)
+    val urlOne = createSimpleInstanceAndGetUrl(target, testOne)
     expectedServices = Seq(
-      ExposedServiceTransaction(urlZero,SamServiceKey(classOf[TestServiceZero])),
-      ExposedServiceTransaction(urlOne ,SamServiceKey(classOf[TestServiceOne]))
+      ExposedServiceTransaction(urlZero, SamServiceKey(classOf[TestServiceZero])),
+      ExposedServiceTransaction(urlOne, SamServiceKey(classOf[TestServiceOne]))
     )
 
     val targetPort = target.configuration.port
@@ -65,46 +65,27 @@ class SamEnvironmentExternalApiTest extends SamTestUtil {
     val services: Future[Seq[ExposedServiceTransaction]] = externalApi.getExposedServices()
     val result: Seq[ExposedServiceTransaction] = Await.result(services, 2 seconds)
     assertTrue(result.size == 2, "expected 2 exposed services")
-    assertTrue(result.filterNot( exposed => expectedServices.contains( exposed ) ).size == 0 , "expected services don't match results" )
+    assertTrue(result.filterNot(exposed => expectedServices.contains(exposed)).size == 0, "expected services don't match results")
   }
 
   @Test
-  def testRegisterAndUnregisterTransaction() {
+  def testRegisterAndUnregisteredTransaction() {
     val transactionId = idGenerator.getNextID
+    val headId = idGenerator.getNextID
+    val surl = ServiceInstanceURL(new URL("http://test.com:3000/"))
+    val pipeRef = PipeReference(ThreadExecutionIdentifier(headId), PipeIdentifier(idGenerator.getNextID), surl)
     val services: Future[Seq[ExposedServiceTransaction]] = externalApi.getExposedServices()
-    val toRegister = services map { _.head }
-    val regOK = toRegister flatMap { exposed =>
-      externalApi.registerTransaction(transactionId, exposed)
-    } flatMap { ok =>
-      if( !ok ) throw new IllegalStateException("failed to register transaction")
-      externalApi.unRegisterTransaction(transactionId)
+    val toRegister = services map {
+      _.head
+    }
+    val regOK = toRegister flatMap {
+      exposed =>
+        externalApi.registerTransaction(transactionId, pipeRef, exposed)
+    } flatMap {
+      ok =>
+        externalApi.unRegisterTransaction(transactionId)
     }
     assertTrue(Await.result(regOK, 2 second), " Failed to register and unregister transaction")
   }
-
-//  @Test
-//  def testAccessiblyServiceSignatureAndType() {
-//    assertTrue(false)
-//  }
-//
-//  @Test
-//  def testCheckTransactionConfigurationPositive() {
-//    assertTrue(false)
-//  }
-//
-//  @Test
-//  def testCheckTransactionConfigurationNegative() {
-//    assertTrue(false)
-//  }
-//
-//  @Test
-//  def testTransactionGlobalIdSetup() {
-//    assertTrue(false)
-//  }
-//
-//  @Test
-//  def testTransactionCommunicationByGlobalId() {
-//    assertTrue(false)
-//  }
 
 }

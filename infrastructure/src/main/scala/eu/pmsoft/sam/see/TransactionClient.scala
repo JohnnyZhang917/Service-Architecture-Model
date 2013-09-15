@@ -8,7 +8,7 @@ object TransactionClient {
 
 }
 
-private class InjectionTransactionRecordManager(val injectionConfiguration: InjectionConfigurationElement, transportContext : TransactionTransportContext) extends TransactionStatusFlow with InstanceRegistry {
+private class InjectionTransactionRecordManager(val injectionConfiguration: InjectionConfigurationElement, transportContext: TransactionTransportContext) extends TransactionStatusFlow with InstanceRegistry {
   private val logger = LoggerFactory.getLogger(this.getClass)
   private val externalBind = InjectionTransaction.getExternalBind(injectionConfiguration)
   val nrOfSlots = externalBind.size
@@ -26,7 +26,7 @@ private class InjectionTransactionRecordManager(val injectionConfiguration: Inje
 
   def nextInstanceNr(slotNr: Int): Int = transactionRecordStatus.slots(slotNr).instances.size
 
-  val recordingExecutionManager = new ExecutionStackManager(transportContext.externalBind.map( _._2).toVector, this)
+  val recordingExecutionManager = new ExecutionStackManager(transportContext.externalBind.map(_._2).toVector, this)
 
   def recordCall(slotNr: Int, call: CanonicalProtocolMethodCall) {
     recordingExecutionManager.pushMethodCall(ProtocolMethodCall(slotNr, call))
