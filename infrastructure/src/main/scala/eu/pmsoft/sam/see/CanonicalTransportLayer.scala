@@ -124,9 +124,9 @@ private class EnvironmentConnection(val logic: EnvironmentExternalApiLogic, val 
       }
   }
 
-  def registerTransaction(globalTransactionID: LongLongID, headConnectionPipe: PipeReference, service: ExposedServiceTransaction): Future[TransactionBindRegistration] = dispatcher flatMap {
+  def registerTransactionRemote(globalTransactionID: GlobalTransactionIdentifier, headConnectionPipe: PipeReference, service: ExposedServiceTransaction): Future[TransactionBindRegistration] = dispatcher flatMap {
     disp =>
-      val registerData = SamTransactionRegistration.getDefaultInstance.copy(globalTransactionID: LongLongIDProto, mapPipeRef(headConnectionPipe), ProtocolTransformations.serviceReference(service))
+      val registerData = SamTransactionRegistration.getDefaultInstance.copy(globalTransactionID.globalID: LongLongIDProto, mapPipeRef(headConnectionPipe), ProtocolTransformations.serviceReference(service))
       val action = SamEnvironmentAction.getDefaultInstance.copy(SamEnvironmentCommandType.REGISTER_TRANSACTION, Some(registerData))
       disp.dispatch(action)
   } map {
@@ -139,9 +139,9 @@ private class EnvironmentConnection(val logic: EnvironmentExternalApiLogic, val 
   }
 
 
-  def unRegisterTransaction(tid: LongLongID): Future[Boolean] = dispatcher flatMap {
+  def unRegisterTransactionRemote(tid: GlobalTransactionIdentifier): Future[Boolean] = dispatcher flatMap {
     disp =>
-      val action = SamEnvironmentAction.getDefaultInstance.copy(SamEnvironmentCommandType.UNREGISTER_TRANSACTION, None, Some(tid))
+      val action = SamEnvironmentAction.getDefaultInstance.copy(SamEnvironmentCommandType.UNREGISTER_TRANSACTION, None, Some(tid.globalID))
       disp.dispatch(action)
   } map {
     res => true

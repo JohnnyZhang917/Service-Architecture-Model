@@ -24,11 +24,13 @@ object InjectionBusBuild extends Build {
   ) ++ TestNGExecution ++ scalabuffSettings
 
   lazy val CommonSettings = Defaults.defaultSettings ++ Seq(
-    organization := "eu.pmsoft.sam",
+    organization := "eu.paweld2",
     crossPaths := false,
     version := "0.4.2-SNAPSHOT",
+    publishTo := Some(Resolver.file("file",  new File( "../localrepo" )) ),
     scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xcheckinit", "-encoding", "utf8"),
     javacOptions ++= Seq("-target", "1.6", "-source", "1.6", "-Xlint:deprecation"),
+    javacOptions in doc := Seq("-source", "1.6"),
     libraryDependencies ++= CommonDependencies
   )
 
@@ -49,7 +51,7 @@ object InjectionBusBuild extends Build {
   lazy val root = Project(
     id = "root",
     base = file("."),
-    settings = CommonSettings
+    settings = CommonSettings ++ Seq( publishArtifact := false )
   ) aggregate(
     core,
     model,

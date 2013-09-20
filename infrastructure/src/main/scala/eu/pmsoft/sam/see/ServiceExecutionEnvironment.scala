@@ -3,7 +3,7 @@ package eu.pmsoft.sam.see
 
 import scala.concurrent._
 import ExecutionContext.Implicits.global
-import scala.collection.mutable
+import scala.collection.concurrent
 import com.google.inject._
 import org.slf4j.LoggerFactory
 import java.net.URL
@@ -12,7 +12,7 @@ import eu.pmsoft.sam.injection.{FreeBindingInjectionUtil, ExternalBindingControl
 import eu.pmsoft.sam.architecture.definition.SamArchitectureDefinition
 import eu.pmsoft.sam.definition.implementation.SamServiceImplementationPackageContract
 import eu.pmsoft.sam.execution.ServiceAction
-import eu.pmsoft.sam.idgenerator.{LongLongIdGenerator, LongLongID}
+import eu.pmsoft.sam.idgenerator.LongLongIdGenerator
 
 import eu.pmsoft.sam.definition.service.SamServiceDefinition
 import scala.Predef._
@@ -30,6 +30,8 @@ import eu.pmsoft.sam.model.SEEConfigurationBuilder
 import eu.pmsoft.sam.model.SEEConfiguration
 import eu.pmsoft.sam.model.SamServiceImplementationKey
 import scala.util.{Failure, Success}
+import scala.collection.concurrent.TrieMap
+import scala.annotation.tailrec
 
 object ServiceExecutionEnvironment {
 
@@ -76,31 +78,30 @@ class ServiceExecutionEnvironment(val configuration: SEEConfiguration) extends E
 
   private val bindIdGenerator: LongLongIdGenerator = LongLongIdGenerator.createGenerator()
 
-  def registerTransaction(globalID: LongLongID, clientPipeReference: PipeReference, serviceURL: ServiceInstanceURL, setupPendingMode: Boolean): Future[TransactionRegistrationResult] = {
+  def registerTransaction(globalID: GlobalTransactionIdentifier, clientPipeReference: PipeReference, serviceURL: ServiceInstanceURL, setupPendingMode: Boolean): Future[TransactionRegistrationResult] = {
     val serviceConfiguration = status.getExposedServiceConfigurations(serviceURL)
     val transactionContextBindID = ThreadExecutionIdentifier(bindIdGenerator.getNextID)
     bindNestedTransaction(globalID, transactionContextBindID, clientPipeReference, serviceConfiguration) map {
       tb =>
         val serviceTransaction = transaction.createTransactionContext(serviceConfiguration, tb)
         val executor = ThreadExecutionModel.openTransactionThread(transactionContextBindID, serviceTransaction)
-        val executorID = status.linkGlobalTransaction(globalID, transactionContextBindID, serviceURL, executor)
+        val executorID = status.linkGlobalTransaction(globalID, transactionContextBindID, executor)
         if (setupPendingMode) {
           executor.startPendingThreadForExecution()
         }
-        TransactionRegistrationResult(executorID, PipeReference(executorID, tb.localHeadPipeId, serviceURL))
+        TransactionRegistrationResult(globalID,executorID, PipeReference(executorID, tb.localHeadPipeId, serviceURL))
     }
 
   }
 
-
-  def unregisterTransaction(tid: LongLongID): Future[Boolean] = Future {
+  def unregisterTransaction(tid: GlobalTransactionIdentifier): Future[Boolean] = Future {
     status.unlinkGlobalTransaction(tid)
   }
 
   val transactionIdGenerator = LongLongIdGenerator.createGenerator()
   val pipeIdGenerator = LongLongIdGenerator.createGenerator()
 
-  private def bindNestedTransaction(globalID: LongLongID, tid: ThreadExecutionIdentifier, clientPipeReference: PipeReference, configuration: LiftedServiceConfiguration): Future[TransactionBinding] = {
+  private def bindNestedTransaction(globalID: GlobalTransactionIdentifier, tid: ThreadExecutionIdentifier, clientPipeReference: PipeReference, configuration: LiftedServiceConfiguration): Future[TransactionBinding] = {
     val serviceConf: InjectionConfiguration = status.getConfigurations(configuration.configId)
     val externalBind = InjectionTransaction.getExternalBind(serviceConf.configurationRoot)
     val localHeadPipeID = PipeIdentifier(pipeIdGenerator.getNextID)
@@ -112,7 +113,9 @@ class ServiceExecutionEnvironment(val configuration: SEEConfiguration) extends E
     }
 
     val externalBinds = externalServiceRef map {
-      case (exposed, connectionPipeRef) => server.getConnectionFromServiceURL(exposed.url).registerTransaction(globalID, connectionPipeRef, exposed)
+      case (exposed, connectionPipeRef) => {
+        server.getConnectionFromServiceURL(exposed.url).registerTransactionRemote(globalID, connectionPipeRef, exposed)
+      }
     }
     val internalBind = externalServiceRef map {
       case (exposed, connectionPipeRef) => exposed.url -> connectionPipeRef.pipeID
@@ -127,18 +130,20 @@ class ServiceExecutionEnvironment(val configuration: SEEConfiguration) extends E
 
 
   def executeServiceAction[R, T](configuration: LiftedServiceConfiguration, action: ServiceAction[R, T]): Future[R] = {
-    val globalTransactionID = transactionIdGenerator.getNextID
-    val tid = ThreadExecutionIdentifier(globalTransactionID)
+    val globalTransactionID = GlobalTransactionIdentifier(transactionIdGenerator.getNextID)
+    val tid = ThreadExecutionIdentifier(transactionIdGenerator.getNextID)
     val fakePipeRef = PipeReference(tid, PipeIdentifier(pipeIdGenerator.getNextID), configuration.url)
     registerTransaction(globalTransactionID, fakePipeRef, configuration.url, false) flatMap {
       registration =>
         val executor = status.getTransactionContextById(registration.transactionID).get
-        executor.executeServiceAction(action)
+        val actionResultF = executor.executeServiceAction(action)
+        actionResultF.onComplete { case _ =>  status.unlinkGlobalTransaction(registration.globalTransactionID) }
+        actionResultF
     }
   }
 
   def dispatchMessage(routingInfo: MessageRoutingInformation): Future[Unit] = {
-    logger.debug("dispatch message for routingInfo {}", routingInfo)
+    logger.trace("dispatch message for routingInfo {}", routingInfo)
     val executor = status.getTransactionContextById(routingInfo.remoteTargetPipeRef.transactionBindID).get
     executor.dispatchMessage(routingInfo)
   }
@@ -151,9 +156,9 @@ trait EnvironmentExternalApiLogic {
 
   def getExposedServiceTransaction(): Future[Seq[ExposedServiceTransaction]]
 
-  def registerTransaction(globalID: LongLongID, headPipeReference: PipeReference, serviceURL: ServiceInstanceURL, setupPendingMode: Boolean): Future[TransactionRegistrationResult]
+  def registerTransaction(globalID: GlobalTransactionIdentifier, headPipeReference: PipeReference, serviceURL: ServiceInstanceURL, setupPendingMode: Boolean): Future[TransactionRegistrationResult]
 
-  def unregisterTransaction(tid: LongLongID): Future[Boolean]
+  def unregisterTransaction(tid: GlobalTransactionIdentifier): Future[Boolean]
 
   def dispatchMessage(routingInfo: MessageRoutingInformation): Future[Unit]
 
@@ -162,7 +167,7 @@ trait EnvironmentExternalApiLogic {
   def handle(action: SamEnvironmentAction): Future[SamEnvironmentResult] = {
     import SamEnvironmentCommandType._
     import ProtocolTransformations._
-    logger.debug("handle action {}", action.`command`)
+    logger.trace("handle action {}", action.`command`)
 
     val result = SamEnvironmentResult.getDefaultInstance.copy(`command` = action.`command`)
     val fres = action.`command` match {
@@ -184,9 +189,10 @@ trait EnvironmentExternalApiLogic {
           val regData = action.`registration`.get
           val hp = regData.`headPipeReference`
           val pipeRef: PipeReference = PipeReference(ThreadExecutionIdentifier(hp.`transactionBindId`), PipeIdentifier(hp.`pipeRefId`), createUrl(hp.`address`))
-          val bindIdFut = registerTransaction(regData.`transactionGlobalId`, pipeRef, createUrl(regData.`serviceReference`.`url`), true)
+          val bindIdFut = registerTransaction(GlobalTransactionIdentifier(regData.`transactionGlobalId`), pipeRef, createUrl(regData.`serviceReference`.`url`), true)
           val res = bindIdFut map {
             registration =>
+              logger.debug("transaction registered as {}", registration)
               val headPipeRef = PipeReferenceProto.getDefaultInstance.copy(registration.transactionID.tid, registration.transactionHeadPipeReference.pipeID.pid, registration.transactionHeadPipeReference.address.url.toExternalForm)
               val confirmation = SamTransactionRegistrationConfirmation.getDefaultInstance.copy(registration.transactionID.tid, headPipeRef)
               result.setRegistrationConfirmation(confirmation)
@@ -202,7 +208,7 @@ trait EnvironmentExternalApiLogic {
         }
       }
       case UNREGISTER_TRANSACTION => {
-        unregisterTransaction(action.`transactionGlobalId`.get) map {
+        unregisterTransaction(GlobalTransactionIdentifier(action.`transactionGlobalId`.get)) map {
           ok => result.setUnregisterOk(ok)
         }
       }
@@ -214,15 +220,11 @@ trait EnvironmentExternalApiLogic {
               result
           }
         } catch {
-          case e: Throwable => logger.error("error {}", e); ???
+          case e: Throwable => logger.error("error {}", e); e.printStackTrace(); ???
         }
 
       }
       case _ => ???
-    }
-    fres onComplete {
-      case Failure(t) => logger.error("error on action handler ", t)
-      case Success(v) => logger.debug("action handler done")
     }
     fres
   }
@@ -289,7 +291,9 @@ private class SamExecutionNode(val serviceRegistry: SamServiceRegistryApi,
 
   def liftServiceConfiguration(configurationId: ServiceConfigurationID): LiftedServiceConfiguration = {
     // FIXME validate external configuration
-    status.exposeServiceConfiguration(configurationId, urlCreator)
+    val lifted = status.exposeServiceConfiguration(configurationId, urlCreator)
+    logger.trace("lift of service on URL: {} ", lifted.url)
+    lifted
   }
 }
 
@@ -315,10 +319,10 @@ private object FreeBindingBuilder {
 
 private class ServiceExecutionEnvironmentStatus(val implementationContracts: Set[SamServiceImplementationPackageContract],
                                                 val architectureDefinitions: Set[SamArchitectureDefinition]) {
-  private val instanceRunning: mutable.Map[ServiceInstanceID, SamServiceInstance] = mutable.Map.empty
-  private val configurations: mutable.Map[ServiceConfigurationID, InjectionConfiguration] = mutable.Map.empty
-  private val exposedServicesUrl: mutable.Map[ServiceConfigurationID, LiftedServiceConfiguration] = mutable.Map.empty
-  private val exposedServiceConfigurations: mutable.Map[ServiceInstanceURL, LiftedServiceConfiguration] = mutable.Map.empty
+  private val instanceRunning: concurrent.Map[ServiceInstanceID, SamServiceInstance] = new TrieMap()
+  private val configurations: concurrent.Map[ServiceConfigurationID, InjectionConfiguration] = new TrieMap()
+  private val exposedServicesUrl: concurrent.Map[ServiceConfigurationID, LiftedServiceConfiguration] = new TrieMap()
+  private val exposedServiceConfigurations: concurrent.Map[ServiceInstanceURL, LiftedServiceConfiguration] = new TrieMap()
   val logger = LoggerFactory.getLogger(this.getClass)
 
   // Registration of implementations
@@ -366,18 +370,35 @@ private class ServiceExecutionEnvironmentStatus(val implementationContracts: Set
 
   def getExposedServiceConfigurations = exposedServiceConfigurations
 
-  private val linkedTransaction: mutable.Map[LongLongID, mutable.Map[ServiceInstanceURL, ThreadExecutionIdentifier]] = mutable.Map.empty
-  private val bindTransactionMap: mutable.Map[ThreadExecutionIdentifier, TransactionThreadStatus] = mutable.Map.empty
+  private val linkedTransaction: concurrent.Map[GlobalTransactionIdentifier, Set[ThreadExecutionIdentifier]] = new TrieMap()
+  private val bindTransactionMap: concurrent.Map[ThreadExecutionIdentifier, TransactionThreadStatus] = new TrieMap()
 
-  def linkGlobalTransaction(globalTransactionID: LongLongID, bindId: ThreadExecutionIdentifier, surl: ServiceInstanceURL, context: TransactionThreadStatus): ThreadExecutionIdentifier = {
-    bindTransactionMap.put(bindId, context)
-    linkedTransaction.put(globalTransactionID, linkedTransaction.getOrElse(globalTransactionID, mutable.Map.empty).updated(surl, bindId))
+  @tailrec
+  private def updateGlobalTransactionSet(globalTransactionID: GlobalTransactionIdentifier, bindId: ThreadExecutionIdentifier) : Unit = {
+    val old = linkedTransaction.getOrElseUpdate(globalTransactionID,Set())
+    if(! linkedTransaction.replace(globalTransactionID,old,old + bindId) ) {
+      updateGlobalTransactionSet(globalTransactionID,bindId)
+    }
+
+  }
+
+  def linkGlobalTransaction(globalTransactionID: GlobalTransactionIdentifier, bindId: ThreadExecutionIdentifier, context: TransactionThreadStatus): ThreadExecutionIdentifier = {
+    logger.trace("bind global transaction {}",globalTransactionID.globalID)
+    logger.trace("bind context {}",bindId.tid)
+    bindTransactionMap.putIfAbsent(bindId, context)
+    updateGlobalTransactionSet(globalTransactionID,bindId)
     bindId
   }
 
-  def unlinkGlobalTransaction(globalTransactionID: LongLongID): Boolean = {
-    linkedTransaction.getOrElse(globalTransactionID, mutable.Map.empty).values foreach {
-      bid => bindTransactionMap.remove(bid)
+  def unlinkGlobalTransaction(globalTransactionID: GlobalTransactionIdentifier): Boolean = {
+    logger.trace("unbind transaction {}",globalTransactionID.globalID)
+    linkedTransaction.getOrElse(globalTransactionID, Set()) foreach {
+      bid => {
+        logger.trace("unbind context {}",bid.tid)
+        bindTransactionMap.remove(bid).map {
+          threadStatus => threadStatus.exitPendingMode()
+        }
+      }
     }
     true
   }

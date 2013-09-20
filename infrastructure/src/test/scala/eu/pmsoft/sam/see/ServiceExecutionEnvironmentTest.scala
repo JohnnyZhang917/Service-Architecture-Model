@@ -21,7 +21,7 @@ import eu.pmsoft.sam.model.SEEConfiguration
 
 class ServiceExecutionEnvironmentTest extends SamTestUtil {
 
-  val logger = LoggerFactory.getLogger(this.getClass)
+  override val logger = LoggerFactory.getLogger(this.getClass)
 
   @Test def builderApi() {
     val anyPort = getAnyPortValue
@@ -83,14 +83,16 @@ class ServiceExecutionEnvironmentTest extends SamTestUtil {
 
 
   @Test def testSimpleServiceByUrl() {
-    val env = createEnvironment
+    val envZero = createEnvironment
+    val envOne  = createEnvironment
+    val envTwo  = createEnvironment
 
     val testZero = SamModelBuilder.implementationKey(classOf[TestServiceZeroModule], SamServiceKey(classOf[TestServiceZero]))
     val testOne = SamModelBuilder.implementationKey(classOf[TestServiceOneModule], SamServiceKey(classOf[TestServiceOne]))
     val testTwo = SamModelBuilder.implementationKey(classOf[TestServiceTwoModule], SamServiceKey(classOf[TestServiceTwo]))
 
-    val urlOne = createSimpleInstanceAndGetUrl(env, testOne)
-    val urlZero = createSimpleInstanceAndGetUrl(env, testZero)
+    val urlOne = createSimpleInstanceAndGetUrl(envOne, testOne)
+    val urlZero = createSimpleInstanceAndGetUrl(envZero, testZero)
 
     import SamTransactionModel._
 
@@ -105,7 +107,7 @@ class ServiceExecutionEnvironmentTest extends SamTestUtil {
     val action: ServiceAction[Boolean, TestInterfaceTwo1] = new ServiceAction[Boolean, TestInterfaceTwo1](Key.get(classOf[TestInterfaceTwo1])) {
       def executeInteraction(serviceTwoApi: TestInterfaceTwo1): Boolean = serviceTwoApi.runTest()
     }
-    val res = executeTestAction(env, definition, action)
+    val res = executeTestAction(envTwo, definition, action)
     assertTrue(Await.result(res, 3 seconds))
   }
 
@@ -155,7 +157,7 @@ class ServiceExecutionEnvironmentTest extends SamTestUtil {
       def executeInteraction(service: ShoppingStoreWithCourierInteraction): Boolean = service.makeShoping() == 8800
     }
     val res = executeTestAction(envShop, definition, action)
-    assertTrue(Await.result(res, 1 seconds))
+    assertTrue(Await.result(res, 10 seconds))
   }
 
 }

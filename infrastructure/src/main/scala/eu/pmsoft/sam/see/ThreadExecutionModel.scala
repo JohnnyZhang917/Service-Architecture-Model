@@ -49,6 +49,10 @@ class TransactionThreadStatus(id: ThreadExecutionIdentifier, transactionInjector
     }
   }
 
+  def exitPendingMode() : Unit = {
+    transactionInjector.exitPendingMode()
+  }
+
   def dispatchMessage(routingInfo: MessageRoutingInformation): Future[Unit] = {
     Future {
       try {

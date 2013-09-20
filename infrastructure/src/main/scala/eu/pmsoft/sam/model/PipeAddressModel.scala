@@ -8,6 +8,8 @@ object PipeAddressModel {
 }
 
 
+case class GlobalTransactionIdentifier(globalID: LongLongID)
+
 case class ThreadExecutionIdentifier(tid: LongLongID)
 
 case class PipeIdentifier(pid: LongLongID)
@@ -16,7 +18,7 @@ case class PipeReference(transactionBindID: ThreadExecutionIdentifier, pipeID: P
 
 case class MessageRoutingInformation(sourcePipeID: PipeIdentifier, remoteTargetPipeRef: PipeReference, message: ThreadMessage)
 
-case class TransactionBinding(globalId: LongLongID,
+case class TransactionBinding(globalId: GlobalTransactionIdentifier,
                               tid: ThreadExecutionIdentifier,
                               localHeadPipeId: PipeIdentifier,
                               clientPipeReference: PipeReference,
@@ -24,7 +26,7 @@ case class TransactionBinding(globalId: LongLongID,
                               externalBinds: Map[ServiceInstanceURL, PipeReference])
 
 
-case class TransactionRegistrationResult(transactionID: ThreadExecutionIdentifier, transactionHeadPipeReference: PipeReference)
+case class TransactionRegistrationResult(globalTransactionID: GlobalTransactionIdentifier, transactionID: ThreadExecutionIdentifier, transactionHeadPipeReference: PipeReference)
 
 trait TransportPipe[T] {
 

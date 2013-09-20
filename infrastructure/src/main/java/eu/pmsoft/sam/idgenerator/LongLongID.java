@@ -39,4 +39,9 @@ public class LongLongID implements Serializable {
     public long getLinear() {
         return linear;
     }
+
+    @Override
+    public String toString() {
+        return "LLID" + mark + "=" + linear;
+    }
 }

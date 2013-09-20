@@ -52,6 +52,8 @@ trait InjectionTransactionAccessApi {
   def getTransactionTransportContext: TransactionTransportContext
 
   def enterPendingMode(): Unit
+
+  def exitPendingMode(): Unit
 }
 
 
@@ -74,9 +76,9 @@ trait SamEnvironmentExternalApi {
 
   def getExposedServices(): Future[Seq[ExposedServiceTransaction]]
 
-  def registerTransaction(globalTransactionID: LongLongID, headConnectionPipe: PipeReference, service: ExposedServiceTransaction): Future[TransactionBindRegistration]
+  def registerTransactionRemote(globalTransactionID: GlobalTransactionIdentifier, headConnectionPipe: PipeReference, service: ExposedServiceTransaction): Future[TransactionBindRegistration]
 
-  def unRegisterTransaction(globalTransactionID: LongLongID): Future[Boolean]
+  def unRegisterTransactionRemote(globalTransactionID: GlobalTransactionIdentifier): Future[Boolean]
 }
 
-case class TransactionBindRegistration(globalID: LongLongID, surl: ServiceInstanceURL, bindId: ThreadExecutionIdentifier, transactionHeadPipeRef: PipeReference)
+case class TransactionBindRegistration(globalID: GlobalTransactionIdentifier, surl: ServiceInstanceURL, bindId: ThreadExecutionIdentifier, transactionHeadPipeRef: PipeReference)

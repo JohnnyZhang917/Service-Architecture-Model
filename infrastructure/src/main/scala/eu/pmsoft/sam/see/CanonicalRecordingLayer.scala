@@ -86,7 +86,12 @@ private class CanonicalRecordingLayer(registry: SamArchitectureManagementApi, in
       protocolExecution()
     }
     logger.debug("exit pending mode")
+  }
 
+
+  def exitPendingMode() {
+    closed.set(true)
+    transportContext.loopPipe.getInputPipe.receiveMessage( ThreadMessage(None,None))
   }
 
   def protocolExecution(): Unit = {

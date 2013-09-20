@@ -70,20 +70,20 @@ class SamEnvironmentExternalApiTest extends SamTestUtil {
 
   @Test
   def testRegisterAndUnregisteredTransaction() {
-    val transactionId = idGenerator.getNextID
-    val headId = idGenerator.getNextID
-    val surl = ServiceInstanceURL(new URL("http://test.com:3000/"))
-    val pipeRef = PipeReference(ThreadExecutionIdentifier(headId), PipeIdentifier(idGenerator.getNextID), surl)
+    val transactionId = GlobalTransactionIdentifier(idGenerator.getNextID)
+    val headId = ThreadExecutionIdentifier(idGenerator.getNextID)
+    val surl = ServiceInstanceURL(new URL("http://test.com:2999/"))
+    val pipeRef = PipeReference(headId, PipeIdentifier(idGenerator.getNextID), surl)
     val services: Future[Seq[ExposedServiceTransaction]] = externalApi.getExposedServices()
     val toRegister = services map {
       _.head
     }
     val regOK = toRegister flatMap {
       exposed =>
-        externalApi.registerTransaction(transactionId, pipeRef, exposed)
+        externalApi.registerTransactionRemote(transactionId, pipeRef, exposed)
     } flatMap {
       ok =>
-        externalApi.unRegisterTransaction(transactionId)
+        externalApi.unRegisterTransactionRemote(transactionId)
     }
     assertTrue(Await.result(regOK, 2 second), " Failed to register and unregister transaction")
   }

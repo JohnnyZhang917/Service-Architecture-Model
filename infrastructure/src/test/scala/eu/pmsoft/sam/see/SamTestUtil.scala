@@ -10,8 +10,15 @@ import eu.pmsoft.sam.model.ServiceInstanceURL
 import eu.pmsoft.sam.model.SamServiceImplementationKey
 import eu.pmsoft.sam.execution.ServiceAction
 import scala.concurrent.Future
+import org.slf4j.LoggerFactory
+
+object SamTestUtil {
+  private val portCounter  = new AtomicInteger(3000)
+}
 
 trait SamTestUtil {
+
+  val logger = LoggerFactory.getLogger(classOf[SamTestUtil])
 
   def liftDefinition(env: ServiceExecutionEnvironment, definition: InjectionConfigurationDefinition) = {
     val configuration = buildConfiguration(env.architectureManagerApi, env.executionNode, definition)
@@ -40,8 +47,6 @@ trait SamTestUtil {
     ServiceExecutionEnvironment(config)
   }
 
-  private val portCounter = new AtomicInteger(3000)
-
-  def getAnyPortValue: Int = portCounter.getAndIncrement()
+  def getAnyPortValue: Int = SamTestUtil.portCounter.getAndIncrement()
 
 }
