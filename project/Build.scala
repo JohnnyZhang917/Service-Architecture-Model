@@ -1,8 +1,10 @@
+
 import sbt._
 import Keys._
 
 import de.johoop.testngplugin.Keys._
 import scalabuff.ScalaBuffPlugin._
+import com.typesafe.sbt.SbtPgp._
 
 object InjectionBusBuild extends Build {
 
@@ -27,11 +29,56 @@ object InjectionBusBuild extends Build {
     organization := "eu.paweld2",
     crossPaths := false,
     version := "0.4.2-SNAPSHOT",
-    publishTo := Some(Resolver.file("file",  new File( "../localrepo" )) ),
     scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xcheckinit", "-encoding", "utf8"),
     javacOptions ++= Seq("-target", "1.6", "-source", "1.6", "-Xlint:deprecation"),
     javacOptions in doc := Seq("-source", "1.6"),
     libraryDependencies ++= CommonDependencies
+  ) ++ sonatypeSettings
+
+  val sonatypeSettings = Seq(
+    publishMavenStyle := true,
+    publishArtifact in Test := false,
+    pomIncludeRepository := {
+      _ => false
+    },
+    credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
+    publishTo <<= version {
+      (v: String) =>
+        val nexus = "https://oss.sonatype.org/"
+        if (v.trim.endsWith("SNAPSHOT"))
+          Some("snapshots" at nexus + "content/repositories/snapshots")
+        else
+          Some("releases" at nexus + "service/local/staging/deploy/maven2")
+    },
+    useGpg := true,
+    useGpgAgent := true,
+    pomExtra := (
+      <url>https://github.com/paweld2/Service-Architecture-Model</url>
+        <licenses>
+          <license>
+            <name>Apache 2</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+          </license>
+        </licenses>
+        <scm>
+          <url>git@github.com:paweld2/Service-Architecture-Model.git</url>
+          <developerConnection>scm:git:git@github.com:paweld2/Service-Architecture-Model.git</developerConnection>
+          <connection>scm:git:git@github.com:paweld2/Service-Architecture-Model.git</connection>
+        </scm>
+        <developers>
+          <developer>
+            <id>paweld2</id>
+            <name>Pawel Cesar Sanjuan Szklarz</name>
+            <url>http://paweld2.eu</url>
+          </developer>
+        </developers>
+        <parent>
+          <groupId>org.sonatype.oss</groupId>
+          <artifactId>oss-parent</artifactId>
+          <version>7</version>
+        </parent>
+      )
   )
 
   lazy val TestNGExecution = de.johoop.testngplugin.TestNGPlugin.testNGSettings ++ Seq(
@@ -51,7 +98,7 @@ object InjectionBusBuild extends Build {
   lazy val root = Project(
     id = "root",
     base = file("."),
-    settings = CommonSettings ++ Seq( publishArtifact := false )
+    settings = CommonSettings ++ Seq(publishArtifact := false)
   ) aggregate(
     core,
     model,
