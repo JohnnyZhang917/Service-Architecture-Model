@@ -278,3 +278,7 @@ product:a-1
 3388 [main] DEBUG pmsoft.execution.ThreadExecutionServer - shutdown local server on address 0.0.0.0/0.0.0.0:4988
 3394 [main] DEBUG pmsoft.execution.ThreadExecutionServer - shutdown local server on address 0.0.0.0/0.0.0.0:4987
 ```
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/paweld2/service-architecture-model/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
