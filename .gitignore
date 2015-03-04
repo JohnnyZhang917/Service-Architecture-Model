@@ -1,10 +1,5 @@
-.classpath
-.project
 bin
 build
-.gradle
-.settings
-gradle.properties
 test-output
 *.iml
 .idea/
