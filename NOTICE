@@ -1,0 +1,10 @@
+
+Software Architecture Model.
+
+Remote dependency injection protocol.
+
+Current implementation is based in Google Guice 3.0 dependency injection library.
+For serialization and transport the protobuf library is used.
+TCP/IP comunication is realized using the NETTY 4.0 library.
+
+Model and protocol algorithms are a original idea of Paweł Cesar Sanjuan Szklarz.
