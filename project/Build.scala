@@ -45,7 +45,7 @@ object InjectionBusBuild extends Build {
   lazy val CommonSettings = Defaults.defaultSettings ++ Seq(
     organization := "eu.paweld2",
     crossPaths := false,
-    version := "0.4.2-SNAPSHOT",
+    version := "0.4.3-SNAPSHOT",
     scalacOptions ++= Seq("-unchecked", "-deprecation", "-Xcheckinit", "-encoding", "utf8"),
     javacOptions ++= Seq("-target", "1.6", "-source", "1.6", "-Xlint:deprecation"),
     javacOptions in doc := Seq("-source", "1.6"),
