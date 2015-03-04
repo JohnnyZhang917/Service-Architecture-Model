@@ -1,7 +1,9 @@
-resolvers += Classpaths.typesafeResolver
+resolvers += Classpaths.typesafeReleases
 
-addSbtPlugin("de.johoop" % "sbt-testng-plugin" % "2.0.3")
+addSbtPlugin("de.johoop" % "sbt-testng-plugin" % "3.0.2")
 
-addSbtPlugin("com.github.sbt" %% "sbt-scalabuff" % "0.2")
+resolvers += "iDecide 3rd party Releases" at "https://nexus.flexis.ru/content/repositories/thirdparty"
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-pgp" % "0.8.1")
+addSbtPlugin("com.github.sbt" %% "sbt-scalabuff" % "0.4.0_1.4.0")
+
+addSbtPlugin("com.jsuereth" % "sbt-pgp" % "1.0.0")

@@ -24,20 +24,21 @@ import com.typesafe.sbt.SbtPgp._
 
 object InjectionBusBuild extends Build {
 
-  lazy val slf4jVersion = "1.7.3"
+  lazy val slf4jVersion = "1.7.10"
+  lazy val scalaVersionStr = "2.11.5"
 
   override lazy val settings = super.settings ++ Seq(
-    scalaVersion := "2.10.2"
+    scalaVersion := scalaVersionStr
   )
 
   lazy val InjectionBusSettings = CommonSettings ++ Seq(
-    scalaVersion := "2.10.2",
+    scalaVersion := scalaVersionStr,
     crossPaths := true,
     libraryDependencies ++= Seq(
-      "io.netty" % "netty-all" % "4.0.9.Final",
+      "io.netty" % "netty-all" % "4.0.26.Final",
       "org.slf4j" % "slf4j-api" % slf4jVersion,
       "org.slf4j" % "slf4j-simple" % slf4jVersion % "test",
-      "com.google.guava" % "guava" % "14.0.1" % "test"
+      "com.google.guava" % "guava" % "18.0" % "test"
     )
   ) ++ TestNGExecution ++ scalabuffSettings
 
@@ -66,8 +67,8 @@ object InjectionBusBuild extends Build {
         else
           Some("releases" at nexus + "service/local/staging/deploy/maven2")
     },
-    useGpg := true,
-    useGpgAgent := true,
+//    useGpg := true,
+//    useGpgAgent := true,
     pomExtra := (
       <url>https://github.com/paweld2/Service-Architecture-Model</url>
         <licenses>
@@ -106,8 +107,8 @@ object InjectionBusBuild extends Build {
   lazy val CommonDependencies = Seq(
     "com.google.inject" % "guice" % "3.0",
     "com.google.inject.extensions" % "guice-assistedinject" % "3.0",
-    "org.mockito" % "mockito-all" % "1.9.5" % "test",
-    "org.testng" % "testng" % "6.8.5" % "test"
+    "org.mockito" % "mockito-all" % "2.0.2-beta" % "test",
+    "org.testng" % "testng" % "6.8.21" % "test"
   )
 
 
