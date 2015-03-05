@@ -20,7 +20,6 @@ import Keys._
 
 import de.johoop.testngplugin.Keys._
 import scalabuff.ScalaBuffPlugin._
-import com.typesafe.sbt.SbtPgp._
 
 object InjectionBusBuild extends Build {
 
