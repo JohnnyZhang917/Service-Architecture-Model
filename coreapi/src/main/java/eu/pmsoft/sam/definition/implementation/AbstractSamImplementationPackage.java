@@ -16,6 +16,7 @@
 
 package eu.pmsoft.sam.definition.implementation;
 
+import com.google.inject.Module;
 import eu.pmsoft.sam.definition.service.SamServiceDefinition;
 
 public abstract class AbstractSamImplementationPackage implements
@@ -38,6 +39,10 @@ public abstract class AbstractSamImplementationPackage implements
     protected final void registerImplementation(
             AbstractSamServiceImplementationDefinition<? extends SamServiceDefinition> serviceImplementationContract) {
         reader.registerImplementation(serviceImplementationContract);
+    }
+
+    protected final <T extends SamServiceDefinition> void registerImplementation(Class<T> serviceContract, Class<? extends Module> implementationModule){
+        registerImplementation(new AbstractSamServiceImplementationDefinition<T>(serviceContract,implementationModule){});
     }
 
 }
