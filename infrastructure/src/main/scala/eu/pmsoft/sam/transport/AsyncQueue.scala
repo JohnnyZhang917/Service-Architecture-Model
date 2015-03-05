@@ -139,13 +139,14 @@ class AsyncSemaphore protected(initialPermits: Int, maxWaiters: Option[Int]) {
 
   import AsyncSemaphore._
 
-  def this(initialPermits: Int = 0) = this(initialPermits, None)
+  def this(initialPermits: Int) = this(initialPermits, None)
 
   def this(initialPermits: Int, maxWaiters: Int) = this(initialPermits, Some(maxWaiters))
 
   require(maxWaiters.getOrElse(0) >= 0)
   private[this] val waitq = new ArrayDeque[Promise[Permit]]
   private[this] var availablePermits = initialPermits
+  require(availablePermits > 0)
 
   private[this] class SemaphorePermit extends Permit {
     /**

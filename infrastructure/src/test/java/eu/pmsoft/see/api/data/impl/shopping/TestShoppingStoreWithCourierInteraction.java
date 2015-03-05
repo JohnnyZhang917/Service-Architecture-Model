@@ -21,6 +21,7 @@ import eu.pmsoft.see.api.data.architecture.contract.courier.CourierAddressSetupI
 import eu.pmsoft.see.api.data.architecture.contract.courier.CourierServiceContract;
 import eu.pmsoft.see.api.data.architecture.contract.courier.CourierServiceOrder;
 import eu.pmsoft.see.api.data.architecture.contract.shopping.ShoppingStoreWithCourierInteraction;
+import eu.pmsoft.see.api.data.architecture.contract.store.ProductOnOrder;
 import eu.pmsoft.see.api.data.architecture.contract.store.StoreOrder;
 import eu.pmsoft.see.api.data.architecture.contract.store.StoreServiceContract;
 import org.slf4j.Logger;
@@ -45,8 +46,8 @@ public class TestShoppingStoreWithCourierInteraction implements ShoppingStoreWit
     public Integer makeShoping() {
         logger.debug("init shopping interaction");
         StoreOrder order = store.createNewOrder();
-        order.addProduct("a", 1);
-        order.addProduct("b", 1);
+        order.addProduct(new ProductOnOrder("a", 1));
+        order.addProduct(new ProductOnOrder("b", 1));
 
         CourierServiceOrder contract = courier.openOrder("myContractId");
         CourierAddressSetupInfo address = contract.setupAddress();

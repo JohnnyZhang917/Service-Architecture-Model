@@ -16,6 +16,8 @@
 
 package eu.pmsoft.sam.see
 
+import io.netty.util.internal.logging.{Slf4JLoggerFactory, InternalLoggerFactory}
+
 import scala.concurrent._
 import ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -53,6 +55,8 @@ import eu.pmsoft.sam.model.ClientReturnBindingKeyInstance
 import java.util.concurrent.atomic.AtomicBoolean
 
 object CanonicalTransportLayer {
+
+  InternalLoggerFactory.setDefaultFactory(new Slf4JLoggerFactory());
 
   private val EnvProtoCodec = TransportCodecBuilder.clientProtobuff[SamEnvironmentAction, SamEnvironmentResult](SamEnvironmentResult.getDefaultInstance)
 

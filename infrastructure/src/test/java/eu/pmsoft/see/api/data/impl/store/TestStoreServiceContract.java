@@ -17,6 +17,7 @@
 package eu.pmsoft.see.api.data.impl.store;
 
 import eu.pmsoft.see.api.data.architecture.contract.courier.CourierAddressSetupInfo;
+import eu.pmsoft.see.api.data.architecture.contract.store.ProductOnOrder;
 import eu.pmsoft.see.api.data.architecture.contract.store.StoreOrder;
 import eu.pmsoft.see.api.data.architecture.contract.store.StoreServiceContract;
 
@@ -36,12 +37,13 @@ public class TestStoreServiceContract implements StoreServiceContract {
         Map<String, Integer> order = new HashMap<String, Integer>();
 
         @Override
-        public void addProduct(String productId, Integer nrOfProducts) {
+        public void addProduct(ProductOnOrder productInfo) {
+            String productId = productInfo.getProductId();
             if (order.containsKey(productId)) {
                 Integer current = order.get(productId);
-                order.put(productId, current + nrOfProducts);
+                order.put(productId, current + productInfo.getNrOfProducts());
             } else {
-                order.put(productId, nrOfProducts);
+                order.put(productId, productInfo.getNrOfProducts());
             }
         }
 

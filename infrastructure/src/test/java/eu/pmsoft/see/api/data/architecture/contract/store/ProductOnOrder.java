@@ -16,15 +16,22 @@
 
 package eu.pmsoft.see.api.data.architecture.contract.store;
 
-import eu.pmsoft.see.api.data.architecture.contract.courier.CourierAddressSetupInfo;
+import java.io.Serializable;
 
-public interface StoreOrder {
+public class ProductOnOrder implements Serializable {
+    private final String productId;
+    private final Integer nrOfProducts;
 
-    public void addProduct(ProductOnOrder productInfo);
+    public ProductOnOrder(String productId, Integer nrOfProducts) {
+        this.productId = productId;
+        this.nrOfProducts = nrOfProducts;
+    }
 
-    public boolean receiveExternalCourierService(CourierAddressSetupInfo adressSetup);
+    public String getProductId() {
+        return productId;
+    }
 
-    public boolean cancelOrder();
-
-    public String realizeOrder();
+    public Integer getNrOfProducts() {
+        return nrOfProducts;
+    }
 }
